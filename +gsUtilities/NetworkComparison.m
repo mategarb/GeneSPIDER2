@@ -232,11 +232,11 @@ classdef NetworkComparison < hgsetget
                 STopoT(T > M.tol) = 1;
                 STopoT(T < -M.tol) = -1;
                 temp = M.STA == STopoT;
-                
+
                 M.ncs(length(M.ncs)+1) = sum(sum(temp));
                 M.sst(length(M.sst)+1) = sum(sum(temp))/M.nnodes^2;
                 M.sst0(length(M.sst0)+1) = sum(sum(temp(M.DGA)))/M.ntl;
-                
+
                 tempnd = M.STA(M.IndexNondiag) == STopoT(M.IndexNondiag);
                 M.sstnd(length(M.sstnd)+1) = sum(sum(tempnd))/(M.nnodes^2-M.nnodes);
                 M.sst0nd(length(M.sst0nd)+1) = sum(sum(tempnd(M.DGA(M.IndexNondiag))))/sum(sum(M.DGA(M.IndexNondiag)));
@@ -349,37 +349,46 @@ classdef NetworkComparison < hgsetget
             end
         end
 
-        function varargout = show(M)
-        % get a list of measures
+        function varargout = show(M,varargin)
+        % get a list of measures or with input string get the index of that measure
             tmp = set(M);
             allprops = fieldnames(rmfield(tmp,'A'));
-            
+
             if nargout == 0
                 for i=1:length(allprops)
-                    printf('%i %s',i,allprops{i})
+                    fprintf('%i %s\n',i,allprops{i})
                 end
             elseif nargout == 1
-                varargout{1} = allprops;
+                if length(varargin) == 0
+                    varargout{1} = allprops;
+                else
+                    measure = varargin{1};
+                    if isa(measure,'char')
+                        varargout{1} = find(strcmp(allprops,measure));
+                    else isa(measure,'double')
+                        varargout{1} = allprops{measure};
+                    end
+                end
             end
         end
-        
+
         function varargout = max(M,varargin);
         % Find maximum values of specified measures or all values dependant on a single measure.
-        % 
+        %
         %   Input Arguments: max(M [,<measure>])
         %   ================
         %   M         = Measure object
-        %   <measure> = Optional measure to get maximum value of as given by the 
+        %   <measure> = Optional measure to get maximum value of as given by the
         %               measures availible by show(M), may be both string or integer. ('all')
         %
-        %   Output Arguments:
+        %   Output Arguments: [maximums, maxind]
         %   ================
         %   maximums  = If <measure> is not given then returns maximum values for each measure
-        %               else the maximum value of given <measure> along with corresponding 
+        %               else the maximum value of given <measure> along with corresponding
         %               value for all other measures.
         %   maxind    = Gives the index of the maximum value for the given measures.
         %
-            
+
             m = 'all';
             if nargin >= 1
                 props = show(M);
@@ -388,47 +397,49 @@ classdef NetworkComparison < hgsetget
                 m = varargin{1};
             end
             if isa(m,'double')
-                mainprop = props{m};
+                m = props{m};
             end
-            
+
             maximums = [];
             if strcmp(m,'all')
                 for i=1:length(props)
-                    [maximums(i,:), maxind] = max(M.(props{i}));
+                    [maximums(i,:), maxind] = max((M.(props{i}))');
                 end
             else
                 ind = find(strcmp(props,m));
-                [junk,maxind] = max(M.(props{ind}));
-                % maxind = find(M.(props{ind}) == max(M.(props{ind})));
+                [junk,maxind] = max((M.(props{ind}))');
                 for i=1:length(props)
-                    maximums(i,:) = M.(props{i})(maxind);
+                    prop = M.(props{i})';
+                    for j=1:size(prop,2)
+                        maximums(i,j) = prop(maxind(j),j);
+                    end
                 end
             end
-            
+
             varargout{1} = maximums;
-            
+
             if nargout == 2
                varargout{2} = maxind;
             end
         end
-        
-        function minimums = min(M,varargin);
+
+        function varargout = min(M,varargin);
         % Find minimum values of specified measures or all values dependant on a single measure.
-        % 
+        %
         %   Input Arguments: min(M [,<measure>])
         %   ================
         %   M         = Measure object
-        %   <measure> = Optional measure to get minimum value of as given by the 
+        %   <measure> = Optional measure to get minimum value of as given by the
         %               measures availible by show(M), may be both string or integer. ('all')
         %
-        %   Output Arguments:
+        %   Output Arguments: [minimums,minind]
         %   ================
         %   minimums  = If <measure> is not given then returns minimum values for each measure
-        %               else the minimum value of given <measure> along with corresponding 
+        %               else the minimum value of given <measure> along with corresponding
         %               value for all other measures.
         %   maxind    = Gives the index of the minimum value for the given measures.
         %
-            
+
             m = 'all';
             if nargin == 1
                 props = show(M);
@@ -439,7 +450,7 @@ classdef NetworkComparison < hgsetget
             if isa(m,'double')
                 mainprop = props{m};
             end
-            
+
             minimums = [];
             if strcmp(m,'all')
                 for i=1:length(props)
@@ -452,11 +463,28 @@ classdef NetworkComparison < hgsetget
                     minimums(i,:) = M.(props{i})(minind);
                 end
             end
-            
+
             varargout{1} = minimums;
-            
+
             if nargout == 2
                varargout{2} = minind;
+            end
+        end
+
+        function plus(M,N)
+            props = show(M);
+            for i=1:length(props)
+                M.(props{i}) = M.(props{i}) + N.(props{i});
+            end
+        end
+
+        function M = vertcat(M,varargin)
+            props = show(M);
+            for j=1:length(varargin)
+                N = varargin{j};
+                for i=1:length(props)
+                    M.(props{i}) = [M.(props{i}); N.(props{i})];
+                end
             end
         end
     end
