@@ -66,8 +66,8 @@ if ~inputopts.sign
         fprintf('%s\n',ME.message)
     end
 elseif inputopts.sign
-    Neg = A < -tol;
-    Pos = A > tol;
+    Neg = Atilde < -tol;
+    Pos = Atilde > tol;
     try
         cvx_begin sdp
         cvx_precision('low')
@@ -79,8 +79,8 @@ elseif inputopts.sign
         Shi <= e <= Epsilon
         D(S) == 0
         Atmp = Atilde + D
-        Atmp(Pos) > 0 
-        Atmp(Neg) < 0 
+        Atmp(Pos) >= 0 
+        Atmp(Neg) <= 0 
         cvx_end
     catch ME
         fprintf('%s\n',ME.message)
