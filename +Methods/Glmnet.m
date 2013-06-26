@@ -1,13 +1,14 @@
 function varargout = Glmnet(varargin)
-% function estA = Glmnet(data,require,zetavec,rawZeta)
-% evalGLasso will evaluate the method glasso and produce an
-% estimated network matrix.
+% function estA = Glmnet(data,net,zetavec[,alpha,rawZeta])
 %
-%   Input Arguments: Glmnet(data,net,zetavec,rawZeta)
+%   Input Arguments: Glmnet(data,net,zetavec[,alpha,rawZeta])
 %   ================
 %   data:    GeneSpider.Dataset
 %   net:     GeneSpider.Network
-%   zetavec: method parameter for tuning the network fitting. (optinal)
+%   zetavec: method parameter for tuning the network fitting.
+%   alpha:   The elasticnet mixing parameter, with 0 < alpha <= 1. (default = 1, Lasso)
+%            Currently alpha < 0.01 is not reliable, unless you
+%            supply your own zeta sequence. zeta needs to be set first
 %   rawZeta: logical to determine if the zeta values should be
 %            converted.  default = false
 %
@@ -19,7 +20,8 @@ function varargout = Glmnet(varargin)
 %%  Parse input arguments %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 rawZeta = 0;
-
+zetavec = [];
+alpha = 1;
 for i=1:nargin
     if isa(varargin{i},'GeneSpider.Dataset')
         data = varargin{i};
@@ -28,7 +30,11 @@ for i=1:nargin
     elseif isa(varargin{i},'logical')
         rawZeta = varargin{i};
     else
-        zetavec = varargin{i};
+        if isempty(zetavec)
+            zetavec = varargin{i};
+        else
+            alpha = varargin{i};
+        end
     end
 end
 
@@ -75,10 +81,9 @@ end
 %% Run
 for i = 1:size(data.P,1)
     % fit = glmnet(nY',-P(i,:)','gaussian',glmnetSet(struct('lambda',zetavec,'standardize',false)));
-    fit = glmnet(responce(data,net)',-data.P(i,:)','gaussian',glmnetSet(struct('lambda',zetavec)));
+    fit = glmnet(responce(data,net)',-data.P(i,:)','gaussian',glmnetSet(struct('lambda',zetavec,'alpha',alpha)));
     Afit(i,:,:) = fit.beta(:,:);
 end
-
 Afit(:, :, :) = Afit(:, :, end:-1:1); % Glmnet reverses the order. Need to undo.
 
 for i=1:size(Afit,3)
@@ -87,4 +92,4 @@ end
 
 varargout{1} = Afit;
 
-varargout{3} = fit;
+varargout{2} = fit;

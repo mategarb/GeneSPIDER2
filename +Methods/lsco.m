@@ -52,8 +52,8 @@ end
 if ~rawZeta
     zetaRange = [];
     estA = -data.P*pinv(responce(data,net));
-    zetaRange(1) = min(abs(estA(estA~=0)));
-    zetaRange(2) = max(abs(estA(estA~=0)));
+    zetaRange(1) = min(abs(estA(estA~=0)))-eps;
+    zetaRange(2) = max(abs(estA(estA~=0)))+10*eps;
     
     % Convert to interval.
     delta = zetaRange(2)-zetaRange(1);
