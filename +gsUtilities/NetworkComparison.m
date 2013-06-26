@@ -153,7 +153,7 @@ classdef NetworkComparison < hgsetget
             end
         end
 
-        function setA(M,net)
+        function set.A(M,net)
             A = M.A;
             if isempty(A)
                 if isa(net,'GeneSpider.Network')
@@ -161,32 +161,36 @@ classdef NetworkComparison < hgsetget
                 else
                     M.A = net;
                 end
-                [UA SA VA] = svd(M.A);
-                [QA LA] = eig(M.A);
-                LA = diag(LA);
-                [crap index] = sort(abs(LA),1,'descend');
-                LA = LA(index);
-                QA = QA(:,index);
-                Z = zeros(size(M.A));
-                DiGraphA = logical(Z);
-                DiGraphA(abs(M.A) > M.tol) = true;
-                STopoA = Z;
-                STopoA(M.A > M.tol) = 1;
-                STopoA(M.A < -M.tol) = -1;
-                IndexNondiag = find(ones(size(M.A))-eye(size(M.A)));
-                M.UA = UA;
-                M.SA = SA;
-                M.VA = VA;
-                M.LA = LA;
-                M.QA = QA;
-                M.DGA = DiGraphA;
-                M.STA = STopoA;
-                M.IndexNondiag = IndexNondiag;
-                M.nnodes = size(M.A,1);
-                M.ntl = sum(sum(DiGraphA));
             else
                 error('True A already set, will not change it')
             end
+        end
+
+        function setA(M,net)
+            M.A = net;
+            [UA SA VA] = svd(M.A);
+            [QA LA] = eig(M.A);
+            LA = diag(LA);
+            [crap index] = sort(abs(LA),1,'descend');
+            LA = LA(index);
+            QA = QA(:,index);
+            Z = zeros(size(M.A));
+            DiGraphA = logical(Z);
+            DiGraphA(abs(M.A) > M.tol) = true;
+            STopoA = Z;
+            STopoA(M.A > M.tol) = 1;
+            STopoA(M.A < -M.tol) = -1;
+            IndexNondiag = find(ones(size(M.A))-eye(size(M.A)));
+            M.UA = UA;
+            M.SA = SA;
+            M.VA = VA;
+            M.LA = LA;
+            M.QA = QA;
+            M.DGA = DiGraphA;
+            M.STA = STopoA;
+            M.IndexNondiag = IndexNondiag;
+            M.nnodes = size(M.A,1);
+            M.ntl = sum(sum(DiGraphA));
         end
 
         function systemMeasures(M,Alist)
