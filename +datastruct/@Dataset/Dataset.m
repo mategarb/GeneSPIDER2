@@ -25,7 +25,8 @@ classdef Dataset < hgsetget
         cvY = []; % Covariance of noisy Y
         sdY = []; % measurement point variation of Y
         lambda    % Noise variance
-        SNR       % Signal to noise ratio
+        SNR       % Signal to noise ratio, \sigma_N(Y)/\sigma_1(E)
+        SNRnu     % Signal to noise ratio, \argmin_i min(norm(\Fi_i)/norm(\nu_i))
         etay      % Sample linear independance from data
         etau      % Perturbation linear independance from data
         info      % Level of informativeness [0,1]
@@ -44,7 +45,7 @@ classdef Dataset < hgsetget
             if nargin > 0
                 for i=1:nargin
                     if isa(varargin{i},'GeneSpider.Network')
-                        data.M = size(varargin{i}.A,1);
+                        % data.M = size(varargin{i}.A,1);
                         populate(data,varargin{i});
                     elseif isa(varargin{i},'GeneSpider.Experiment')
                         experiment = struct(varargin{i});
@@ -73,11 +74,40 @@ classdef Dataset < hgsetget
         function SNR = get.SNR(data)
             SNR = min(svd(data.Y))/max(svd(data.E));
         end
+        
+        function set.lambda(data,lambda)
+            if ~isrow(lambda)
+                lambda = lambda';
+            end
+            if prod(size(lambda)) == 1
+                lambda = [lambda, 0];
+            end
+            if prod(size(lambda)) == data.M
+                lambda = [lambda, zeros(size(lambda))];
+            end
+            
+            if ~mod(length(lambda),2) == 0
+                error('Something is wrong with the size of lambda. Help!')
+            end
+            data.lambda = lambda;
+        end
+        
+        function SNR = get.SNRnu(data)
+            snr = [];
+            for i=1:data.M
+                snr(i) = norm(data.Y(i,:))/norm(data.E(i,:));
+            end
+            SNR = min(snr);
+        end
 
         function N = get.N(data)
             N = size(data.P,2);
         end
-        
+
+        function M = get.M(data)
+            M = size(data.P,1);
+        end
+
         function setname(data,varargin)
             if nargin == 1
                 namestruct = data.created;
@@ -109,11 +139,15 @@ classdef Dataset < hgsetget
                 sdP = data.lambda(data.M+1:end)'*ones(1,size(data.P,2));
             end
             if nargout == 1
-               varargout{1} = sdY
+               varargout{1} = sdY;
             elseif nargout == 2
-               varargout{1} = sdY
-               varargout{2} = sdP
+               varargout{1} = sdY;
+               varargout{2} = sdP;
             end
+        end
+        
+        function scaleLambda(data,lambda)
+            data.lambda = lambda;
         end
         
         function newdata = scaleSNR(data,net,SNR)
@@ -131,11 +165,36 @@ classdef Dataset < hgsetget
             newdata.E = scale*newdata.E;
         end
 
-        function setstdY(data,sdY)
+        function gaussian(data)
+        % Generate new gaussian noise matrices E and F with variance lambda for
+        % response and/or perturbations.
+        % 
+        % == Usage ==
+        % gaussian(data)
+        %             
+
+            if numel(data.lambda) == 1,
+                E = sqrt(data.lambda).*randn(data.M,data.N);
+                F = zeros(data.M,data.N);
+            elseif numel(data.lambda) == 2,
+                E = sqrt(data.lambda(1)).*randn(data.M,data.N);
+                F = sqrt(data.lambda(2)).*randn(data.M,data.N);
+            elseif numel(data.lambda) == data.M,
+                E = sqrt(data.lambda)'*randn(1,data.M);
+                F = zeros(data.M,data.N);
+            elseif numel(data.lambda) == 2*data.M,
+                E = sqrt(data.lambda(1:data.M))'*randn(1,data.M);
+                F = sqrt(data.lambda(data.M+1:end))'*randn(1,data.M);
+            end
+            data.E = E;
+            data.F = F;
+        end
+
+        function setsdY(data,sdY)
             data.sdY = sdY;
         end
 
-        function setstdP(data,sdP)
+        function setsdP(data,sdP)
             data.sdP = sdP;
         end
 
@@ -174,7 +233,7 @@ classdef Dataset < hgsetget
         % Gives the level of informativeness of the data set given the network
         % it was produced from.
         %
-        % info = informativeness(data,net)
+        % [info{, uninfo}] = informativeness(data,net)
         %
             lambda = data.lambda;
             if numel(lambda) == 2
@@ -187,8 +246,12 @@ classdef Dataset < hgsetget
 
             if nargout == 0
                 data.info = sum(sum(logical(net) & infotopo))/sum(sum(logical(net)));
-            elseif nargout == 1
+                return
+            elseif nargout >= 1
                 varargout{1} = sum(sum(logical(net) & infotopo))/sum(sum(logical(net)));
+            end
+            if nargout == 2
+                varargout{2} = sum(conf(~logical(net)))/sum(sum(~logical(net)));
             end
         end
 
@@ -241,27 +304,27 @@ classdef Dataset < hgsetget
             for i=1:data.N
                 tmpdata = without(data,net,i);
                 % [Yi,Pi] = without(data,net,i);
-
-                [yiU, yiS, yiV] = svd(tmpdata.Yi);
-                [uiU, uiS, uiV] = svd(tmpdata.Pi);
+                
+                [yiU, yiS, yiV] = svd(responce(tmpdata,net));
+                [uiU, uiS, uiV] = svd(tmpdata.P-tmpdata.F);
                 dyiS = diag(yiS);
                 duiS = diag(uiS);
-
-                if length(dyiS) < size(Yi,1)
-                    dyiS = [ dyiS; zeros( (size(tmpdata.Yi,1)-length(dyiS)),1 ) ];
-                    duiS = [ duiS; zeros( (size(tmpdata.Yi,1)-length(duiS)),1 ) ];
+                
+                if length(dyiS) < tmpdata.N
+                    dyiS = [ dyiS; zeros( (size(tmpdata.N,1)-length(dyiS)),1 ) ];
+                    duiS = [ duiS; zeros( (size(tmpdata.N,1)-length(duiS)),1 ) ];
                 end
-
+                
                 yv = Y(:, i) / norm( Y(:, i) );
                 uv = P(:, i) / norm( P(:, i) );
-
+                
                 yg = dyiS' * abs(yiU' * yv) / sum(dyiS); %yiS(1);
                 etay(i) = yg;
                 ug = duiS' * abs(uiU' * uv) / sum(duiS); %uiS(1);
                 etau(i) = ug;
             end
-            data.etay;
-            data.etau;
+            data.etay = etay;
+            data.etau = etau;
         end
                 
         function varargout = populate(data,input)
