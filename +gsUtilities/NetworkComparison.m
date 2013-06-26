@@ -1,6 +1,8 @@
 classdef NetworkComparison < hgsetget
 % CompareNetworks calculates difference measures between weighted network
-% adjacency matrices
+% adjacency matrices. 
+% For a nice overview do:
+% doc tools.NetworkCopmarison
 %
 %   Input Arguments: NetworkComparison(A, Alist, selected)
 %   ================
@@ -9,9 +11,6 @@ classdef NetworkComparison < hgsetget
 %              other network matrices are compared.
 %   Alist    = A network matrix or 3d array of network matrices that are
 %              compared to the 'true' one.
-%   selected = integer vector determing which measures to
-%              calculate and in which order they should be returned if a return
-%              argument is given to compare.
 %
 %   Output Arguments:
 %   ================
@@ -20,11 +19,11 @@ classdef NetworkComparison < hgsetget
 %   Use Examples:
 %   ================
 %
-%   M = NetworkComparison();       % initiate comparision
-%   % set(M,'tol',value)           % set tolerance {eps}
-%   M.A = A;                       % set true A
-%   <results> = compare(M,Alist);  % Update M with comparisons between A and Alist
-%                                  % and if wished return them in struct <results>
+%   M = NetworkComparison();                  % initiate comparision
+%   % set(M,'tol',value)                      % set tolerance {eps}
+%   M.A = A;                                  % set true A
+%   <results> = compare(M,Alist[,selected]);  % Update M with comparisons between A and Alist
+%                                             % and if wished return them in struct <results>
 %
 %   ================ % initiate comparison with or without Alist
 %
@@ -270,9 +269,10 @@ classdef NetworkComparison < hgsetget
 
                 n = (M.TP(end) + M.FP(end)) * (M.TP(end) + M.FN(end)) * (M.TN(end)+M.FP(end)) * (M.TN(end)+M.FN(end));
                 if n == 0
-                    n = 1;
+                    M.MCC(length(M.MCC)+1) = 0;
+                else
+                    M.MCC(length(M.MCC)+1) = (M.TP(end)*M.TN(end)-M.FP(end)*M.FN(end))/sqrt(n);
                 end
-                M.MCC(length(M.MCC)+1) = (M.TP(end)*M.TN(end)-M.FP(end)*M.FN(end))/sqrt(n);
             end
         end
 
