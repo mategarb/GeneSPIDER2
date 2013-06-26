@@ -9,3 +9,6 @@ or
 ```
 
 Add path to parent directory in MATLAB. This makes +GeneSpider a toolbox and is ready for use.
+
+## Dependencies
+bitbucket.org/xparx/tools.git
