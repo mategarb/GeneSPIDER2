@@ -24,9 +24,14 @@ classdef Network < hgsetget
         tauG              % Time
     end
 
+    properties
+        names = {};
+    end
+
     properties (Hidden = true)
         created = struct('creator','', 'time',now,'id','','nodes','','type','','sparsity','')
         tol = eps;
+        M                 % # Nodes in network
     end
 
     methods
@@ -51,8 +56,8 @@ classdef Network < hgsetget
             net.created.id = strrep(num2str(cond(A)),'.','');
             net.created.nodes = num2str(size(A,1));
             net.created.sparsity = nnz(net);
-            if ispc; net.created.creator = getenv('USERNAME'); 
-            else; net.created.creator = getenv('USER'); 
+            if ispc; net.created.creator = getenv('USERNAME');
+            else; net.created.creator = getenv('USER');
             end
         end
 
@@ -77,6 +82,21 @@ classdef Network < hgsetget
             end
 
             net.network = [namer.creator,'-D',datestr(namer.time,'yyyymmdd'),'-',namer.type,'-N',namer.nodes,'-L',num2str(nnz(net)),'-ID',namer.id];
+        end
+
+        function M = get.M(net)
+            M = size(net,1);
+        end
+
+        function names = get.names(net)
+            names = net.names;
+            if isempty(names)
+                for i=1:net.N
+                    names{i} = ['G',num2str(i)];
+                end
+            else
+                names = net.names;
+            end
         end
 
         function disp(net)
@@ -120,14 +140,14 @@ classdef Network < hgsetget
         % returns the singular values (only) of A. To get the singular vectors use svd(net.A)
             s = svd(net.A);
         end
-        
+
         function info = informativeness(net,data)
             o = ones(size(net));
             [conf,infotopo] = tools.RInorm(responce(net,data)',data.P',diag(lambda(1:length(lambda)/2))*o,diag(lambda(length(lambda)/2+1:end))*o+eps);
-            
+
             info = sum(sum(logical(net) & infotopo));
         end
-        
+
         function Y = responce(net,data)
         % Gives the network responce to input from data.
             if ~isa(net,'GeneSpider.Dataset')
