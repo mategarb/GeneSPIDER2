@@ -32,11 +32,6 @@ classdef NetworkComparison < hgsetget
 %   % or
 %   M = NetworkComparison(A,Alist); % Initiate and do comparison returning an object
 %
-%   ================ % compare specific measure in two different ways:
-%
-%   M.<measure> = Alist;
-%   set(M,'<measure>',Alist);
-%
 %   ================ % querie object
 %
 %   results = get(M)          % Returns struct with measure-named fields and values
@@ -52,8 +47,7 @@ classdef NetworkComparison < hgsetget
 %
 %   ================ % find out what comparisons can be made
 %
-%   set(NetworkComparison)        % returns a struct
-%   properties(NetworkComparison) % returns a cell array of strings
+%   help tools.NetworkComparison.show
 %
 
     properties (Hidden = true)
@@ -338,23 +332,27 @@ classdef NetworkComparison < hgsetget
             graphMeasures(M,Alist);
             dirGraphMeasures(M,Alist);
 
-            tmp = set(M);
-            allprops = fieldnames(rmfield(tmp,'A'));
-            results = struct([]);
-            if nargin == 3
-                selected = varargin{2};
-                for i=selected
-                    results(1).(allprops{i}) = M.(allprops{i});
-                end
-            end
-
             if nargout == 1
+                allprops = show(M);
+                results = struct([]);
+                if nargin == 3
+                    selected = varargin{2};
+                    for i=selected
+                        results(1).(allprops{i}) = M.(allprops{i});
+                    end
+                end
+
                 varargout{1} = results;
             end
         end
 
         function varargout = show(M,varargin)
-        % get a list of measures or with input string get the index of that measure
+        % get a list of measures or with input string get the index of that
+        % measure if output argument is given, otherwise it will print
+        % to terminal.
+        %
+        % {measures} = show(M [,name/number])
+        %
             tmp = set(M);
             allprops = fieldnames(rmfield(tmp,'A'));
 
@@ -377,7 +375,8 @@ classdef NetworkComparison < hgsetget
         end
 
         function varargout = max(M,varargin);
-        % Find maximum values of specified measures or all values dependant on a single measure.
+        % Find maximum values of specified measures or all values dependant on
+        % a single measure.
         %
         %   Input Arguments: max(M [,<measure>])
         %   ================
