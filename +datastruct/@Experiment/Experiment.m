@@ -38,7 +38,6 @@ classdef Experiment  < hgsetget
     end
 
     properties (Hidden = true, SetAccess = protected)
-        % initState     % Initial state of the randomizer
         M             % # variables in A
     end
 
@@ -77,7 +76,6 @@ classdef Experiment  < hgsetget
                     error('initial response needs to be of type double')
                 end
             end
-
         end
 
         function set.A(data,net)
@@ -90,7 +88,6 @@ classdef Experiment  < hgsetget
                     error('Network input argument must be a of double array or Network type')
                 end
                 data.G = -pinv(data.A);
-                data.M = min(size(data.A));
                 data.P = [1; zeros(size(data.A,1)-1,1)];
                 if isempty(data.nnzP)
                     data.nnzP = data.M;
@@ -98,6 +95,10 @@ classdef Experiment  < hgsetget
             else
                 warning('True A already set, will not change it!')
             end
+        end
+
+        function get.M(data)
+            data.M = min(size(data.A));
         end
 
         function set.alpha(data,SignificanceLevel)
@@ -126,7 +127,7 @@ classdef Experiment  < hgsetget
             if prod(size(lambda)) == size(data.P,1)
                 lambda = [lambda, zeros(size(lambda))];
             end
-            
+
             if ~mod(length(lambda),2) == 0
                 error('Something is wrong with the size of lambda. Help!')
             end
@@ -181,7 +182,7 @@ classdef Experiment  < hgsetget
         % generates expression without noise for complete data set
         % Y = trueY(data)
             pre = size(data.Yinit,2) + 1;
-            Y = data.G*data.P(:,pre:end);
+            Y = [data.Yinit, data.G*data.P(:,pre:end)];
         end
 
         function Y = noiseY(data)
@@ -189,7 +190,7 @@ classdef Experiment  < hgsetget
         %
         % Y = noiseY(data)
         % also calculate noise if not enough of if has been generated
-        % 
+        %
             pre = size(data.Yinit,2) + 1;
             while size(data.E,2) < size(data.P,2)
                 gaussian(data);
@@ -228,7 +229,8 @@ classdef Experiment  < hgsetget
         end
 
         function gaussian(data)
-        % generate gaussian noise with variance lambda for response and/or perturbations.
+        % generate gaussian noise with variance lambda for response and/or
+        % perturbations.
         %
             if numel(data.lambda) == 1,
                 data.E = [data.E sqrt(data.lambda).*randn(data.M,1)];
@@ -238,7 +240,7 @@ classdef Experiment  < hgsetget
                 data.F = [data.F sqrt(data.lambda(2)).*randn(data.M,1)];
             elseif numel(data.lambda) == data.M,
                 data.E = [data.E sqrt(data.lambda)'.*randn(data.M,1)];
-                data.F = [data.F zeros(data.M,data.M)];
+                data.F = [data.F zeros(data.M,1)];
             elseif numel(data.lambda) == 2*data.M,
                 data.E = [data.E sqrt(data.lambda(1:data.M))'.*randn(data.M,1)];
                 data.F = [data.F sqrt(data.lambda(data.M+1:end))'.*randn(data.M,1)];
@@ -254,11 +256,12 @@ classdef Experiment  < hgsetget
         end
 
         function scaleSNR(data,SNR)
-        % scales the noise variance to achieve desired SNR, this function sets lambda and change E.
-        % 
+        % scales the noise variance to achieve desired SNR, this function sets
+        % lambda and change E.
+        %
         % == Usage ==
         % scaleSNR(data,SNR)
-        % 
+        %
             noiseY(data);
             sY = svd(trueY(data));
             sE = svd(data.E);
@@ -266,7 +269,7 @@ classdef Experiment  < hgsetget
             data.lambda = scale^2*data.lambda;
             data.E = scale*data.E;
         end
-        
+
         function SVDE(data)
         % SVD     - Linear combination of all directions scaled by their SVs plus a
         %           new orthogonal dimension while needed. Currently assumes F = 0
@@ -300,7 +303,7 @@ classdef Experiment  < hgsetget
         %           used to generate noise of new experiment, while Lambda_ij is
         %           used for old ones. Ysvd and Psvd returns the singular values of
         %           the scaled variables Ytilde and Ptilde.
-            
+
             k = size(data.P,2);
             if k+1 <= data.M
                 newdir = GramSchmidtOrth(data.P(:,1:k),k+1);
@@ -308,11 +311,16 @@ classdef Experiment  < hgsetget
             else
                 [uu,su,vu] = svd(noiseY(data));
                 [u,s,v] = svd(noiseY(data)./sqrt(chi2inv(1-data.alpha,data.M*k).*var(data)));
+                data.P(:,k+1) = zeros(data.M,1);
                 for j = 1:data.M,
                     if s(j,j) < data.SignalThreshold,
-                        data.P(:,k+1) = data.SignalThreshold/s(j,j)*data.P(:,1:k)*vu(:,j);
+                        data.P(:,k+1) = data.P(:,k+1) + data.SignalThreshold/s(j,j)*data.P(:,1:k)*vu(:,j);
                     end
                 end
+                if ~any(diag(s) < data.SignalThreshold)
+                    data.P(:,k+1) = data.SignalThreshold/s(j,j)*data.P(:,1:k)*vu(:,j);
+                end
+
             end
         end
 
@@ -349,7 +357,7 @@ classdef Experiment  < hgsetget
                 end
             end
         end
-        
+
         function RANDPE(data)
         % RandomP - Random perturbations until stop condition is reached, used in PNAS2011
         %           The perturbation is scaled such that the energy is equal to
@@ -359,13 +367,13 @@ classdef Experiment  < hgsetget
             if k+1 <= data.M,
                 temp = temp + GramSchmidtOrth(data.P(:,1:k),k+1);
             end
-            
+
             if any(abs(data.P(:,k+1)) > tol ),
                 data.P(:,k+1) = temp.*(norm(Pall(:,k+1,i-1))/norm(temp));
             else
                 data.P(:,k+1) = data.mag*temp./norm(temp);
             end
         end
-        
+
     end
 end
