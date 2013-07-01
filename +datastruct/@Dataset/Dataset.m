@@ -27,8 +27,10 @@ classdef Dataset < hgsetget
         lambda    % Noise variance
         SNR       % Signal to noise ratio, \sigma_N(Y)/\sigma_1(E)
         SNRnu     % Signal to noise ratio, \argmin_i min(norm(\Fi_i)/norm(\nu_i))
-        etay      % Sample linear independance from data
-        etau      % Perturbation linear independance from data
+        SNRm      % Signal to noise ratio,
+        SNRv      % Signal to noise ratio,
+        etay      % Linear independance from data per sample.
+        etau      % Linear independance from data per perturbation.
         info      % Level of informativeness [0,1]
     end
 
@@ -61,7 +63,7 @@ classdef Dataset < hgsetget
                         if ispc; data.created.creator = getenv('USERNAME');
                         else; data.created.creator = getenv('USER');
                         end
-                        setname(data)                        
+                        setname(data)
                     elseif isa(varargin{i},'struct')
                         input = varargin{i};
                         populate(data,input);
@@ -74,7 +76,7 @@ classdef Dataset < hgsetget
         function SNR = get.SNR(data)
             SNR = min(svd(data.Y))/max(svd(data.E));
         end
-        
+
         function set.lambda(data,lambda)
             if ~isrow(lambda)
                 lambda = lambda';
@@ -85,17 +87,31 @@ classdef Dataset < hgsetget
             if prod(size(lambda)) == data.M
                 lambda = [lambda, zeros(size(lambda))];
             end
-            
+
             if ~mod(length(lambda),2) == 0
                 error('Something is wrong with the size of lambda. Help!')
             end
             data.lambda = lambda;
         end
-        
+
         function SNR = get.SNRnu(data)
             snr = [];
             for i=1:data.M
                 snr(i) = norm(data.Y(i,:))/norm(data.E(i,:));
+            end
+            SNR = min(snr);
+        end
+
+        function SNR = get.SNRm(data)
+            alpha = 0.05;
+            sigma = min(svd((data.Y+data.E)'));
+            SNR = sigma/sqrt(chi2inv(alpha,prod(size(data.P)))*lambda(1));
+        end
+
+        function SNR = get.SNRv(data)
+            alpha = 0.05;
+            for i=1:data.M
+                snr(i) = norm(data.Y(i,:))/sqrt(chi2inv(alpha,prod(size(data.P)))*lambda(1));
             end
             SNR = min(snr);
         end
@@ -145,18 +161,18 @@ classdef Dataset < hgsetget
                varargout{2} = sdP;
             end
         end
-        
+
         function scaleLambda(data,lambda)
             data.lambda = lambda;
         end
-        
+
         function newdata = scaleSNR(data,net,SNR)
         % scales the noise variance to achieve desired SNR. A new dataset is
         % created based on the old data and the new SNR.
-        % 
+        %
         % == Usage ==
         % newdata = scaleSNR(data,net,SNR)
-        % 
+        %
             newdata = GeneSpider.Dataset(data,net);
             sY = svd(newdata.Y);
             sE = svd(newdata.E);
@@ -168,10 +184,10 @@ classdef Dataset < hgsetget
         function gaussian(data)
         % Generate new gaussian noise matrices E and F with variance lambda for
         % response and/or perturbations.
-        % 
+        %
         % == Usage ==
         % gaussian(data)
-        %             
+        %
 
             if numel(data.lambda) == 1,
                 E = sqrt(data.lambda).*randn(data.M,data.N);
@@ -265,31 +281,57 @@ classdef Dataset < hgsetget
 
         function newdata = without(data,net,i)
         % creates a Dataset without sample i
-        % 
+        %
         % == Usage ==
         % newdata = without(data,net,i)
         %           where net is a GeneSpider.Network, and 'i' is the sample
         %           that should be removed.
             N = data.N;
-            
+
             newdata = GeneSpider.Dataset(data,net);
 
             tmp(1).Y = newdata.Y(:,[1:(i-1) (i+1):N]);
             tmp(1).P = newdata.P(:,[1:(i-1) (i+1):N]);
             tmp(1).E = newdata.E(:,[1:(i-1) (i+1):N]);
             tmp(1).F = newdata.F(:,[1:(i-1) (i+1):N]);
-            
+
             sdY = newdata.sdY;
             if ~isempty(sdY)
-                tmp(1).sdY = newdata.sdY;    
+                tmp(1).sdY = newdata.sdY;
             end
 
             sdP = newdata.sdP;
             if ~isempty(sdP)
                 tmp(1).sdP = newdata.sdP;
             end
-            
+
             newdata = populate(newdata,tmp);
+        end
+
+        function varargout = irrepresentability(data,net)
+        % Calculates the irrepresentability of the data set for inference with
+        % LASSO
+            Y = data.Y;
+            Phi = Y';
+            for i = 1:net.M
+                Phiz = Phi(:,net.A(i,:) == 0);
+                Phipc = Phi(:,net.A(i,:) ~= 0);
+
+                sic = abs(Phiz'*Phipc*pinv(Phipc'*Phipc)*sign(net.A(i,net.A(i,:)~=0))');
+                k = 1;
+                for j=1:net.M
+                    if net.A(i,j) == 0
+                        SIC(i,j) = sic(i);
+                        k = k + 1;
+                    end
+                end
+            end
+
+            if nargout >= 1
+                irr = sum(sum(SIC < 1))/data.M^2;
+            elseif nargout >= 2
+                varargout{2} = SIC;
+            end
         end
 
         function eta(data,net)
@@ -304,20 +346,20 @@ classdef Dataset < hgsetget
             for i=1:data.N
                 tmpdata = without(data,net,i);
                 % [Yi,Pi] = without(data,net,i);
-                
+
                 [yiU, yiS, yiV] = svd(responce(tmpdata,net));
                 [uiU, uiS, uiV] = svd(tmpdata.P-tmpdata.F);
                 dyiS = diag(yiS);
                 duiS = diag(uiS);
-                
+
                 if length(dyiS) < tmpdata.N
                     dyiS = [ dyiS; zeros( (size(tmpdata.N,1)-length(dyiS)),1 ) ];
                     duiS = [ duiS; zeros( (size(tmpdata.N,1)-length(duiS)),1 ) ];
                 end
-                
+
                 yv = Y(:, i) / norm( Y(:, i) );
                 uv = P(:, i) / norm( P(:, i) );
-                
+
                 yg = dyiS' * abs(yiU' * yv) / sum(dyiS); %yiS(1);
                 etay(i) = yg;
                 ug = duiS' * abs(uiU' * uv) / sum(duiS); %uiS(1);
@@ -326,10 +368,10 @@ classdef Dataset < hgsetget
             data.etay = etay;
             data.etau = etau;
         end
-                
+
         function varargout = populate(data,input)
         % populate the Dataset object with matching fields of the input.
-        % 
+        %
         % == Usage ==
         % {data =} populate(data,input)
         %          where input can be a struct, GeneSpider.Dataset,
@@ -346,7 +388,7 @@ classdef Dataset < hgsetget
                     data.(name{1}) = input.(name{1});
                 end
             end
-            
+
             if nargout > 0
                 varargout{1} = data;
             end
