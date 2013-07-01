@@ -91,7 +91,7 @@ classdef Network < hgsetget
         function names = get.names(net)
             names = net.names;
             if isempty(names)
-                for i=1:net.N
+                for i=1:net.M
                     names{i} = ['G',num2str(i)];
                 end
             else
@@ -165,7 +165,7 @@ classdef Network < hgsetget
             inputnames = fieldnames(input);
             names = fieldnames(net);
             for name = inputnames'
-                if any(strmatch(name,names))
+                if any(strmatch(name,names,'exact'))
                     net.(name{1}) = input.(name{1});
                 end
             end
