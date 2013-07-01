@@ -37,8 +37,9 @@ classdef Dataset < hgsetget
     properties (Hidden = true)
         M           % # variables in A
         N           % # experiments
-        created = struct('creator','','time',now,'id','','nexp','')
+        created = struct('creator','','time',now,'id','','nexp','');
         tol = eps;
+        alpha = 0.01; % Confidence 
     end
 
     methods
@@ -103,15 +104,15 @@ classdef Dataset < hgsetget
         end
 
         function SNR = get.SNRm(data)
-            alpha = 0.05;
+            alpha = data.alpha;
             sigma = min(svd((data.Y+data.E)'));
-            SNR = sigma/sqrt(chi2inv(alpha,prod(size(data.P)))*lambda(1));
+            SNR = sigma/sqrt(chi2inv(alpha,prod(size(data.P)))*data.lambda(1));
         end
 
         function SNR = get.SNRv(data)
-            alpha = 0.05;
+            alpha = data.alpha;
             for i=1:data.M
-                snr(i) = norm(data.Y(i,:))/sqrt(chi2inv(alpha,prod(size(data.P)))*lambda(1));
+                snr(i) = norm(data.Y(i,:))/sqrt(chi2inv(alpha,prod(size(data.P)))*data.lambda(1));
             end
             SNR = min(snr);
         end
@@ -266,8 +267,11 @@ classdef Dataset < hgsetget
             elseif nargout >= 1
                 varargout{1} = sum(sum(logical(net) & infotopo))/sum(sum(logical(net)));
             end
-            if nargout == 2
+            if nargout >= 2
                 varargout{2} = sum(conf(~logical(net)))/sum(sum(~logical(net)));
+            end
+            if nargout >= 3
+                varargout{3} = conf;
             end
         end
 
