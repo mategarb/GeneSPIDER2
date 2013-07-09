@@ -39,7 +39,7 @@ classdef Dataset < hgsetget
         N           % # experiments
         created = struct('creator','','time',now,'id','','nexp','');
         tol = eps;
-        alpha = 0.01; % Confidence 
+        alpha = 0.01; % Confidence
     end
 
     methods
@@ -48,7 +48,6 @@ classdef Dataset < hgsetget
             if nargin > 0
                 for i=1:nargin
                     if isa(varargin{i},'GeneSpider.Network')
-                        % data.M = size(varargin{i}.A,1);
                         populate(data,varargin{i});
                     elseif isa(varargin{i},'GeneSpider.Experiment')
                         experiment = struct(varargin{i});
@@ -57,14 +56,14 @@ classdef Dataset < hgsetget
                         if ispc; data.created.creator = getenv('USERNAME');
                         else; data.created.creator = getenv('USER');
                         end
-                        setname(data)
+                        data.created.id = num2str(round(cond(data.Y)*10000));
                     elseif isa(varargin{i},'GeneSpider.Dataset')
                         newdata = struct(varargin{i});
                         populate(data,newdata);
                         if ispc; data.created.creator = getenv('USERNAME');
                         else; data.created.creator = getenv('USER');
                         end
-                        setname(data)
+                        data.created.id = num2str(round(cond(data.Y)*10000));
                     elseif isa(varargin{i},'struct')
                         input = varargin{i};
                         populate(data,input);
@@ -105,14 +104,14 @@ classdef Dataset < hgsetget
 
         function SNR = get.SNRm(data)
             alpha = data.alpha;
-            sigma = min(svd((data.Y+data.E)'));
-            SNR = sigma/sqrt(chi2inv(alpha,prod(size(data.P)))*data.lambda(1));
+            sigma = min(svd(data.Y'));
+            SNR = sigma/sqrt(chi2inv(1-alpha,prod(size(data.P)))*data.lambda(1));
         end
 
         function SNR = get.SNRv(data)
             alpha = data.alpha;
             for i=1:data.M
-                snr(i) = norm(data.Y(i,:))/sqrt(chi2inv(alpha,prod(size(data.P)))*data.lambda(1));
+                snr(i) = norm(data.Y(i,:))/sqrt(chi2inv(1-alpha,prod(size(data.P)))*data.lambda(1));
             end
             SNR = min(snr);
         end
@@ -144,7 +143,7 @@ classdef Dataset < hgsetget
                     namer.(inpNames{i}) = namestruct.(inpNames{i});
                 end
             end
-            data.dataset = [namer.creator,'-ID',data.network(regexpi(data.network,'-ID')+3:end),'-D',datestr(namer.time,'yyyymmdd'),'-E',num2str(size(data.P,2)),'-SNR',strrep(num2str(data.SNR),'.','-')];
+            data.dataset = [namer.creator,'-ID',data.network(regexpi(data.network,'-ID')+3:end),'-D',datestr(namer.time,'yyyymmdd'),'-E',num2str(size(data.P,2)),'-SNR',num2str(round(data.SNRm*1000)),'-IDY',namer.id];
         end
 
         function varargout = std(data)
@@ -164,6 +163,13 @@ classdef Dataset < hgsetget
         end
 
         function scaleLambda(data,lambda)
+            data.lambda = lambda;
+        end
+
+        function scaleSNRm(data,SNRm)
+        % scale the noise variance by setting the theoretic lambda
+            s = svd(data.Y);
+            lambda = min(s)^2/(chi2inv(1-data.alpha,prod(size(data.P)))*SNRm^2);
             data.lambda = lambda;
         end
 
@@ -255,10 +261,10 @@ classdef Dataset < hgsetget
             lambda = data.lambda;
             if numel(lambda) == 2
                 o = ones(size(data.P));
-                [conf,infotopo] = tools.RInorm(responce(data,net)',data.P',diag(lambda(1:length(lambda)/2))*o',diag(lambda(length(lambda)/2+1:end))*o'+eps);
+                [conf,infotopo] = tools.RInorm(responce(data,net)',data.P',diag(lambda(1:length(lambda)/2))*o',diag(lambda(length(lambda)/2+1:end))*o'+eps,data.alpha);
             else
                 o = ones(size(data.P),2);
-                [conf,infotopo] = tools.RInorm(responce(data,net)',data.P',(diag(lambda(1:length(lambda)/2))'*o)',(diag(lambda(length(lambda)/2+1:end))'*o)'+eps);
+                [conf,infotopo] = tools.RInorm(responce(data,net)',data.P',(diag(lambda(1:length(lambda)/2))'*o)',(diag(lambda(length(lambda)/2+1:end))'*o)'+eps,data.alpha);
             end
 
             if nargout == 0
@@ -325,15 +331,22 @@ classdef Dataset < hgsetget
                 k = 1;
                 for j=1:net.M
                     if net.A(i,j) == 0
-                        SIC(i,j) = sic(i);
+                        SIC(i,j) = sic(k);
                         k = k + 1;
                     end
                 end
             end
-
+            % SIC = SIC;
+            irr = min(1-SIC(~logical(net)));
+            if nargout == 0
+                % irr = sum(sum(SIC < 1))/data.M^2;
+                varargout{1} = irr;
+            end
             if nargout >= 1
-                irr = sum(sum(SIC < 1))/data.M^2;
-            elseif nargout >= 2
+                % irr = sum(sum(SIC < 1))/data.M^2;
+                varargout{1} = irr;
+            end
+            if nargout >= 2
                 varargout{2} = SIC;
             end
         end
