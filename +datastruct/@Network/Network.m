@@ -53,7 +53,7 @@ classdef Network < hgsetget
             net.NetworkComponents = graphconncomp(sparse(sign(A)), 'Directed', true);
             net.tauG = min(sort(1./abs(real(eig(-pinv(A))))));
 
-            net.created.id = strrep(num2str(cond(A)),'.','');
+            net.created.id = num2str(round(cond(A)*10000));
             net.created.nodes = num2str(size(A,1));
             net.created.sparsity = nnz(net);
             if ispc; net.created.creator = getenv('USERNAME');
