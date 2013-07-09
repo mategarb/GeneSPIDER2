@@ -97,8 +97,8 @@ classdef Experiment  < hgsetget
             end
         end
 
-        function get.M(data)
-            data.M = min(size(data.A));
+        function M = get.M(data)
+            M = min(size(data.A));
         end
 
         function set.alpha(data,SignificanceLevel)
@@ -268,6 +268,19 @@ classdef Experiment  < hgsetget
             scale = 1/SNR*min(sY)/max(sE);
             data.lambda = scale^2*data.lambda;
             data.E = scale*data.E;
+        end
+
+        function scaleSNRm(data,SNR)
+        % scales the noise variance to achieve desired SNR, this function sets
+        % lambda and changes E.
+        %
+        % == Usage ==
+        % scaleSNR(data,SNR)
+        %
+            sY = svd(trueY(data));
+            data.lambda = min(sY)^2/(chi2inv(data.alpha,prod(size(data.P)))*SNR^2);
+            data.E = [];
+            noiseY(data);
         end
 
         function SVDE(data)
