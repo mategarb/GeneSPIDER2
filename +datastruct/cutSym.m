@@ -1,5 +1,6 @@
 function A = cutSym(A,inchance)
-% removes links in a symmetric matrix with a probability to be in or out degree
+% removes links in a symmetric matrix with a probability to be in or out degree.
+% A small chanse of keeping feedback loops.
 %
 % A = GeneSpider.cutSym(A,inchance)
 %
@@ -8,12 +9,21 @@ function A = cutSym(A,inchance)
 
 N = size(A,1);
 
+if inchance < 0.5
+    feedback = inchance/20;
+else
+    feedback = (1-inchance)/20;
+end
+
+inchance = inchance - feedback;
+
 for i=1:N-1
     for j=i+1:N
         if A(i,j) == 1
-            if rand < inchance
+            r = rand;
+            if r < inchance
                 A(i,j) = 0;
-            else
+            elseif r > inchance+feedback
                 A(j,i) = 0;
             end
         end

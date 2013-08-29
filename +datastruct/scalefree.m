@@ -1,5 +1,5 @@
 function A = scalefree(N,sparsity)
-% Create a scalefree network with N nodes and specific sparseness degree
+% Create a scalefree network with N nodes and specific sparseness.
 %
 % A = GeneSpider.scalefree(N,sparsity)
 %
