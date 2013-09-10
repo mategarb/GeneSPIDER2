@@ -10,7 +10,7 @@ function export2Cytoscape(A,genes,outf)
 %       existing files
 %
 
-if strcmp(class(A),'GeneSpider.Network')
+if isa(A,'GeneSpider.Network')
     A = A.A;
 end
 

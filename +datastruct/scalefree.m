@@ -7,7 +7,7 @@ function A = scalefree(N,sparsity)
 % N: number of nodes
 % sparsity: sparsity degree [0,1]
 
-m0 = sparsity*N;
+m0 = round(sparsity*N);
 seed = logical(full(sprand(m0*2,m0*2-1,m0/m0^2)));
 while rank(double(seed)) < min(size(seed))
     seed(floor(rand*numel(seed)+1)) = 1;
