@@ -31,7 +31,7 @@ classdef Network < hgsetget
     properties (Hidden = true)
         created = struct('creator','', 'time',now,'id','','nodes','','type','','sparsity','')
         tol = eps;
-        M                 % # Nodes in network
+        N                 % # Nodes in network
     end
 
     methods
@@ -84,15 +84,15 @@ classdef Network < hgsetget
             net.network = [namer.creator,'-D',datestr(namer.time,'yyyymmdd'),'-',namer.type,'-N',namer.nodes,'-L',num2str(nnz(net)),'-ID',namer.id];
         end
 
-        function M = get.M(net)
-            M = size(net,1);
+        function N = get.N(net)
+            N = size(net,1);
         end
 
         function names = get.names(net)
             names = net.names;
             if isempty(names)
-                for i=1:net.M
-                    names{i} = ['G',num2str(i)];
+                for i=1:net.N
+                    names{i} = sprintf(['G%0',num2str(log10(net.N)+1),'d'],i);
                 end
             else
                 names = net.names;
@@ -143,15 +143,15 @@ classdef Network < hgsetget
 
         function info = informativeness(net,data)
             o = ones(size(net));
-            [conf,infotopo] = tools.RInorm(responce(net,data)',data.P',diag(lambda(1:length(lambda)/2))*o,diag(lambda(length(lambda)/2+1:end))*o+eps);
+            [conf,infotopo] = tools.RInorm(response(net,data)',data.P',diag(lambda(1:length(lambda)/2))*o,diag(lambda(length(lambda)/2+1:end))*o+eps);
 
             info = sum(sum(logical(net) & infotopo));
         end
 
-        function Y = responce(net,data)
-        % Gives the network responce to input from data.
-            if ~isa(net,'GeneSpider.Dataset')
-                error('Must give a GeneSpider.Dataset to calculate responce')
+        function Y = response(net,data)
+        % Gives the network response to input from data.
+            if ~isa(data,'GeneSpider.Dataset')
+                error('Must give a GeneSpider.Dataset to calculate response')
             end
             Y = net.G*(data.P-data.F) + data.E;
         end
@@ -181,6 +181,7 @@ classdef Network < hgsetget
         %   path:          Path to directory.
         %   fileext:       File extension: .xml or (.mat)
         %
+
             warning('off','MATLAB:structOnObject')
             fending = '.mat';
             savepath = './';

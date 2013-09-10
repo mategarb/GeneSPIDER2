@@ -38,7 +38,7 @@ classdef Experiment  < hgsetget
     end
 
     properties (Hidden = true, SetAccess = protected)
-        M             % # variables in A
+        N             % # variables in A
     end
 
     methods
@@ -90,20 +90,20 @@ classdef Experiment  < hgsetget
                 data.G = -pinv(data.A);
                 data.P = [1; zeros(size(data.A,1)-1,1)];
                 if isempty(data.nnzP)
-                    data.nnzP = data.M;
+                    data.nnzP = data.N;
                 end
             else
                 warning('True A already set, will not change it!')
             end
         end
 
-        function M = get.M(data)
-            M = min(size(data.A));
+        function N = get.N(data)
+            N = min(size(data.A));
         end
 
         function set.alpha(data,SignificanceLevel)
             if SignificanceLevel > 1 || SignificanceLevel < 0
-                error('SignificanceLevel must be in the span (0,1)')
+                error('SignificanceLevel must be in the range [0,1]')
             end
             data.alpha = SignificanceLevel;
         end
@@ -141,11 +141,11 @@ classdef Experiment  < hgsetget
             data.SignalThreshold = SignalThreshold;
         end
 
-        function set.nExp(data,N)
-            if rem(N,1) ~= 0 || N < 1
+        function set.nExp(data,M)
+            if rem(M,1) ~= 0 || M < 1
                 error('# experiments must be a positive integer')
             end
-            data.nExp = N;
+            data.nExp = M;
         end
 
         function TF = terminate(data,varargin)
@@ -165,13 +165,13 @@ classdef Experiment  < hgsetget
                 condition = varargin{1};
                 if strcmp(condition,'ST') % Signal Threshold
                     s = svd(noiseY(data));
-                    if (min(s) > data.SignalThreshold) && (size(data.P,2) >= data.M)
+                    if (min(s) > data.SignalThreshold) && (size(data.P,2) >= data.N)
                         TF = true;
                     end
                 elseif strcmp(condition,'SCT') % Scaled Threshold
                     k = size(data.P,2);
-                    s = svd(noiseY(data)./sqrt(chi2inv(1-data.alpha,data.M*k).*var(data)));
-                    if (min(s) > data.SignalThreshold) && (size(data.P,2) >= data.M)
+                    s = svd(noiseY(data)./sqrt(chi2inv(1-data.alpha,data.N*k).*var(data)));
+                    if (min(s) > data.SignalThreshold) && (size(data.P,2) >= data.N)
                         TF = true;
                     end
                 end
@@ -214,14 +214,21 @@ classdef Experiment  < hgsetget
             if numel(data.lambda) == 2,
                 vY = data.lambda(1)*ones(size(data.P));
             else
-                vY = data.lambda(1:data.M)'*ones(1,size(data.P,2));
+                vY = data.lambda(1:data.N)'*ones(1,size(data.P,2));
             end
         end
 
-        function sparse(data)
+        function sparse(data,varargin)
         % make each purturbation sufficiently sparse naively
+
+            if nargin == 2
+                nnzP = varargin{1}
+            else
+                nnzP = data.nnzP;
+            end
+
             p = data.P(:,end);
-            nZero = data.M-data.nnzP;
+            nZero = data.N-nnzP;
             [sortedValues,sortIndex] = sort(abs(p(:)));
             minIndex = sortIndex(1:nZero);
             p(minIndex) = 0;
@@ -233,17 +240,17 @@ classdef Experiment  < hgsetget
         % perturbations.
         %
             if numel(data.lambda) == 1,
-                data.E = [data.E sqrt(data.lambda).*randn(data.M,1)];
-                data.F = [data.F zeros(data.M,1)];
+                data.E = [data.E sqrt(data.lambda).*randn(data.N,1)];
+                data.F = [data.F zeros(data.N,1)];
             elseif numel(data.lambda) == 2,
-                data.E = [data.E sqrt(data.lambda(1)).*randn(data.M,1)];
-                data.F = [data.F sqrt(data.lambda(2)).*randn(data.M,1)];
-            elseif numel(data.lambda) == data.M,
-                data.E = [data.E sqrt(data.lambda)'.*randn(data.M,1)];
-                data.F = [data.F zeros(data.M,1)];
-            elseif numel(data.lambda) == 2*data.M,
-                data.E = [data.E sqrt(data.lambda(1:data.M))'.*randn(data.M,1)];
-                data.F = [data.F sqrt(data.lambda(data.M+1:end))'.*randn(data.M,1)];
+                data.E = [data.E sqrt(data.lambda(1)).*randn(data.N,1)];
+                data.F = [data.F sqrt(data.lambda(2)).*randn(data.N,1)];
+            elseif numel(data.lambda) == data.N,
+                data.E = [data.E sqrt(data.lambda)'.*randn(data.N,1)];
+                data.F = [data.F zeros(data.N,1)];
+            elseif numel(data.lambda) == 2*data.N,
+                data.E = [data.E sqrt(data.lambda(1:data.N))'.*randn(data.N,1)];
+                data.F = [data.F sqrt(data.lambda(data.N+1:end))'.*randn(data.N,1)];
             end
         end
 
@@ -270,7 +277,7 @@ classdef Experiment  < hgsetget
             data.E = scale*data.E;
         end
 
-        function scaleSNRm(data,SNR)
+        function scaleSNRm(data,SNRm)
         % scales the noise variance to achieve desired SNR, this function sets
         % lambda and changes E.
         %
@@ -278,8 +285,10 @@ classdef Experiment  < hgsetget
         % scaleSNR(data,SNR)
         %
             sY = svd(trueY(data));
-            data.lambda = min(sY)^2/(chi2inv(data.alpha,prod(size(data.P)))*SNR^2);
+            lambda = min(sY)^2/(chi2inv(1-data.alpha,prod(size(data.P)))*SNRm^2);
+            data.lambda = lambda;
             data.E = [];
+            data.F = [];
             noiseY(data);
         end
 
@@ -288,7 +297,7 @@ classdef Experiment  < hgsetget
         %           new orthogonal dimension while needed. Currently assumes F = 0
         %           <=> Ptrue = P.
             k = size(data.P,2);
-            if k+1 <= data.M
+            if k+1 <= data.N
                 newdir = GramSchmidtOrth(data.P(:,1:k),k+1);
                 data.P(:,k+1) = data.mag*newdir(:,k+1);
             end
@@ -296,7 +305,7 @@ classdef Experiment  < hgsetget
                 [u,s,v] = svd(noiseY(data));
                 if min(diag(s)) < data.SignalThreshold,
                     for j=1:min(size(s)),
-                        if s(j,j) > tol,
+                        if s(j,j) > data.tol,
                             data.P(:,k+1) = data.P(:,k+1) + data.SignalThreshold/s(j,j)*data.P(:,1:k)*v(:,j);
                         end
                     end
@@ -318,22 +327,21 @@ classdef Experiment  < hgsetget
         %           the scaled variables Ytilde and Ptilde.
 
             k = size(data.P,2);
-            if k+1 <= data.M
+            if k+1 <= data.N
                 newdir = GramSchmidtOrth(data.P(:,1:k),k+1);
                 data.P(:,k+1) = data.mag*newdir(:,k+1);
             else
                 [uu,su,vu] = svd(noiseY(data));
-                [u,s,v] = svd(noiseY(data)./sqrt(chi2inv(1-data.alpha,data.M*k).*var(data)));
-                data.P(:,k+1) = zeros(data.M,1);
-                for j = 1:data.M,
+                [u,s,v] = svd(noiseY(data)./sqrt(chi2inv(1-data.alpha,data.N*k).*var(data)));
+                data.P(:,k+1) = zeros(data.N,1);
+                for j = 1:data.N,
                     if s(j,j) < data.SignalThreshold,
-                        data.P(:,k+1) = data.P(:,k+1) + data.SignalThreshold/s(j,j)*data.P(:,1:k)*vu(:,j);
+                        data.P(:,k+1) = data.P(:,k+1) + data.mag*data.SignalThreshold/s(j,j)*data.P(:,1:k)*vu(:,j);
                     end
                 end
                 if ~any(diag(s) < data.SignalThreshold)
-                    data.P(:,k+1) = data.SignalThreshold/s(j,j)*data.P(:,1:k)*vu(:,j);
+                    data.P(:,k+1) = data.mag*data.SignalThreshold/s(j,j)*data.P(:,1:k)*vu(:,j);
                 end
-
             end
         end
 
@@ -342,12 +350,12 @@ classdef Experiment  < hgsetget
         %           are below the threshold, unless P is singular and a new orthogonal
         %           dimesion is perturbed. Currently assumes F = 0 <=> Ptrue = P.
             k = size(data.P,2);
-            if k+1 <= data.M
+            if k+1 <= data.N
                 newdir = GramSchmidtOrth(data.P(:,1:k),k+1);
                 data.P(:,k+1) = data.mag*newdir(:,k+1);
             else
                 [u,s,v] = svd(noiseY(data));
-                for j = 1:data.M,
+                for j = 1:data.N,
                     if s(j,j) < data.SignalThreshold,
                         data.P(:,k+1) = data.SignalThreshold/s(j,j)*data.P(:,1:k)*v(:,j);
                     end
@@ -360,13 +368,13 @@ classdef Experiment  < hgsetget
         %           unless P is singular and a new orthogonal dimesion is
         %           perturbed. Currently assumes F = 0 <=> Ptrue = P.
             k = size(data.P,2);
-            if k+1 <= data.M
+            if k+1 <= data.N
                 newdir = GramSchmidtOrth(data.P(:,1:k),k+1);
                 data.P(:,k+1) = data.mag*newdir(:,k+1);
             else
                 [u,s,v] = svd(noiseY(data));
                 if min(diag(s)) < data.SignalThreshold,
-                    data.P(:,k+1) = data.SignalThreshold/s(data.M,data.M)*data.P(:,1:k)*v(:,data.M);
+                    data.P(:,k+1) = data.SignalThreshold/s(data.N,data.N)*data.P(:,1:k)*v(:,data.N);
                 end
             end
         end
@@ -377,7 +385,7 @@ classdef Experiment  < hgsetget
         %           the same perturbation of another set of experiments that have been
         %           design previously and is nonzero.
             temp = randn(size(data.G,2),1);
-            if k+1 <= data.M,
+            if k+1 <= data.N,
                 temp = temp + GramSchmidtOrth(data.P(:,1:k),k+1);
             end
 

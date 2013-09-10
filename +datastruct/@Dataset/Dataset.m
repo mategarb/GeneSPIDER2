@@ -35,8 +35,8 @@ classdef Dataset < hgsetget
     end
 
     properties (Hidden = true)
-        M           % # variables in A
-        N           % # experiments
+        N           % # variables in A
+        M           % # experiments
         created = struct('creator','','time',now,'id','','nexp','');
         tol = eps;
         alpha = 0.01; % Confidence
@@ -73,6 +73,14 @@ classdef Dataset < hgsetget
             end
         end
 
+        function M = get.M(data)
+            M = size(data.P,2);
+        end
+
+        function N = get.N(data)
+            N = size(data.P,1);
+        end
+
         function SNR = get.SNR(data)
             SNR = min(svd(data.Y))/max(svd(data.E));
         end
@@ -84,7 +92,7 @@ classdef Dataset < hgsetget
             if prod(size(lambda)) == 1
                 lambda = [lambda, 0];
             end
-            if prod(size(lambda)) == data.M
+            if prod(size(lambda)) == data.N
                 lambda = [lambda, zeros(size(lambda))];
             end
 
@@ -96,32 +104,24 @@ classdef Dataset < hgsetget
 
         function SNR = get.SNRnu(data)
             snr = [];
-            for i=1:data.M
+            for i=1:data.N
                 snr(i) = norm(data.Y(i,:))/norm(data.E(i,:));
             end
             SNR = min(snr);
         end
 
-        function SNR = get.SNRm(data)
+        function SNRm = get.SNRm(data)
             alpha = data.alpha;
             sigma = min(svd(data.Y'));
-            SNR = sigma/sqrt(chi2inv(1-alpha,prod(size(data.P)))*data.lambda(1));
+            SNRm = sigma/sqrt(chi2inv(1-alpha,prod(size(data.P)))*data.lambda(1));
         end
 
-        function SNR = get.SNRv(data)
+        function SNRv = get.SNRv(data)
             alpha = data.alpha;
-            for i=1:data.M
+            for i=1:data.N
                 snr(i) = norm(data.Y(i,:))/sqrt(chi2inv(1-alpha,prod(size(data.P)))*data.lambda(1));
             end
-            SNR = min(snr);
-        end
-
-        function N = get.N(data)
-            N = size(data.P,2);
-        end
-
-        function M = get.M(data)
-            M = size(data.P,1);
+            SNRv = min(snr);
         end
 
         function setname(data,varargin)
@@ -151,8 +151,8 @@ classdef Dataset < hgsetget
                 sdY = data.lambda(1)*ones(size(data.P));
                 sdP = data.lambda(2)*ones(size(data.P));
             else
-                sdY = data.lambda(1:data.M)'*ones(1,size(data.P,2));
-                sdP = data.lambda(data.M+1:end)'*ones(1,size(data.P,2));
+                sdY = data.lambda(1:data.N)'*ones(1,size(data.P,2));
+                sdP = data.lambda(data.N+1:end)'*ones(1,size(data.P,2));
             end
             if nargout == 1
                varargout{1} = sdY;
@@ -197,17 +197,17 @@ classdef Dataset < hgsetget
         %
 
             if numel(data.lambda) == 1,
-                E = sqrt(data.lambda).*randn(data.M,data.N);
+                E = sqrt(data.lambda).*randn(data.N,data.M);
                 F = zeros(data.M,data.N);
             elseif numel(data.lambda) == 2,
-                E = sqrt(data.lambda(1)).*randn(data.M,data.N);
-                F = sqrt(data.lambda(2)).*randn(data.M,data.N);
-            elseif numel(data.lambda) == data.M,
-                E = sqrt(data.lambda)'*randn(1,data.M);
-                F = zeros(data.M,data.N);
-            elseif numel(data.lambda) == 2*data.M,
-                E = sqrt(data.lambda(1:data.M))'*randn(1,data.M);
-                F = sqrt(data.lambda(data.M+1:end))'*randn(1,data.M);
+                E = sqrt(data.lambda(1)).*randn(data.N,data.M);
+                F = sqrt(data.lambda(2)).*randn(data.N,data.M);
+            elseif numel(data.lambda) == data.N,
+                E = sqrt(data.lambda)'*randn(1,data.N);
+                F = zeros(data.N,data.M);
+            elseif numel(data.lambda) == 2*data.N,
+                E = sqrt(data.lambda(1:data.N))'*randn(1,data.N);
+                F = sqrt(data.lambda(data.N+1:end))'*randn(1,data.N);
             end
             data.E = E;
             data.F = F;
@@ -224,17 +224,17 @@ classdef Dataset < hgsetget
         function varargout = cov(data)
         % returns default covariance for the data.
             if numel(data.lambda) == 1
-                cvY = data.lambda*eye(data.M);
-                cvP = 0*eye(data.M);
+                cvY = data.lambda*eye(data.N);
+                cvP = 0*eye(data.N);
             elseif numel(data.lambda) == 2
-                cvY = data.lambda(1)*eye(data.M);
-                cvP = data.lambda(2)*eye(data.M);
-            elseif numel(data.lambda) == data.M
+                cvY = data.lambda(1)*eye(data.N);
+                cvP = data.lambda(2)*eye(data.N);
+            elseif numel(data.lambda) == data.N
                 cvY = diag(data.lambda);
-                cvP = 0*eye(size(data.M,1));
-            elseif numel(data.lambda) == 2*data.M
-                cvY = diag(data.lambda(1:data.M));
-                cvP = diag(data.lambda(data.M+1:end));
+                cvP = 0*eye(size(data.N,1));
+            elseif numel(data.lambda) == 2*data.N
+                cvY = diag(data.lambda(1:data.N));
+                cvP = diag(data.lambda(data.N+1:end));
             end
             if nargout == 1
                varargout{1} = cvY
@@ -261,10 +261,10 @@ classdef Dataset < hgsetget
             lambda = data.lambda;
             if numel(lambda) == 2
                 o = ones(size(data.P));
-                [conf,infotopo] = tools.RInorm(responce(data,net)',data.P',diag(lambda(1:length(lambda)/2))*o',diag(lambda(length(lambda)/2+1:end))*o'+eps,data.alpha);
+                [conf,infotopo] = tools.RInorm(response(data,net)',data.P',diag(lambda(1:length(lambda)/2))*o',diag(lambda(length(lambda)/2+1:end))*o'+eps,data.alpha);
             else
                 o = ones(size(data.P),2);
-                [conf,infotopo] = tools.RInorm(responce(data,net)',data.P',(diag(lambda(1:length(lambda)/2))'*o)',(diag(lambda(length(lambda)/2+1:end))'*o)'+eps,data.alpha);
+                [conf,infotopo] = tools.RInorm(response(data,net)',data.P',(diag(lambda(1:length(lambda)/2))'*o)',(diag(lambda(length(lambda)/2+1:end))'*o)'+eps,data.alpha);
             end
 
             if nargout == 0
@@ -281,10 +281,10 @@ classdef Dataset < hgsetget
             end
         end
 
-        function Y = responce(data,net)
-        % Gives the networks responce to input from data.
+        function Y = response(data,net)
+        % Gives the networks response to input from data.
             if ~isa(net,'GeneSpider.Network')
-                error('Must give a GeneSpider.Network to calculate responce')
+                error('Must give a GeneSpider.Network to calculate response')
             end
             Y = net.G*(data.P-data.F) + data.E;
         end
@@ -296,14 +296,14 @@ classdef Dataset < hgsetget
         % newdata = without(data,net,i)
         %           where net is a GeneSpider.Network, and 'i' is the sample
         %           that should be removed.
-            N = data.N;
+            M = data.M;
 
             newdata = GeneSpider.Dataset(data,net);
 
-            tmp(1).Y = newdata.Y(:,[1:(i-1) (i+1):N]);
-            tmp(1).P = newdata.P(:,[1:(i-1) (i+1):N]);
-            tmp(1).E = newdata.E(:,[1:(i-1) (i+1):N]);
-            tmp(1).F = newdata.F(:,[1:(i-1) (i+1):N]);
+            tmp(1).Y = newdata.Y(:,[1:(i-1) (i+1):M]);
+            tmp(1).P = newdata.P(:,[1:(i-1) (i+1):M]);
+            tmp(1).E = newdata.E(:,[1:(i-1) (i+1):M]);
+            tmp(1).F = newdata.F(:,[1:(i-1) (i+1):M]);
 
             sdY = newdata.sdY;
             if ~isempty(sdY)
@@ -323,13 +323,13 @@ classdef Dataset < hgsetget
         % LASSO
             Y = data.Y;
             Phi = Y';
-            for i = 1:net.M
+            for i = 1:net.N
                 Phiz = Phi(:,net.A(i,:) == 0);
                 Phipc = Phi(:,net.A(i,:) ~= 0);
 
                 sic = abs(Phiz'*Phipc*pinv(Phipc'*Phipc)*sign(net.A(i,net.A(i,:)~=0))');
                 k = 1;
-                for j=1:net.M
+                for j=1:net.N
                     if net.A(i,j) == 0
                         SIC(i,j) = sic(k);
                         k = k + 1;
@@ -339,11 +339,11 @@ classdef Dataset < hgsetget
             % SIC = SIC;
             irr = min(1-SIC(~logical(net)));
             if nargout == 0
-                % irr = sum(sum(SIC < 1))/data.M^2;
+                % irr = sum(sum(SIC < 1))/data.N^2;
                 varargout{1} = irr;
             end
             if nargout >= 1
-                % irr = sum(sum(SIC < 1))/data.M^2;
+                % irr = sum(sum(SIC < 1))/data.N^2;
                 varargout{1} = irr;
             end
             if nargout >= 2
@@ -356,15 +356,15 @@ classdef Dataset < hgsetget
         %
         % eta(data,net)
         %
-            Y = responce(data,net);
+            Y = response(data,net);
             P = data.P-data.F;
             etay = [];
             etau = [];
-            for i=1:data.N
+            for i=1:data.M
                 tmpdata = without(data,net,i);
                 % [Yi,Pi] = without(data,net,i);
 
-                [yiU, yiS, yiV] = svd(responce(tmpdata,net));
+                [yiU, yiS, yiV] = svd(response(tmpdata,net));
                 [uiU, uiS, uiV] = svd(tmpdata.P-tmpdata.F);
                 dyiS = diag(yiS);
                 duiS = diag(uiS);
