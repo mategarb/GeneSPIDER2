@@ -18,8 +18,7 @@ function varargout = cls(varargin)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%  Parse input arguments %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-rawZeta = 0;
-
+net = [];
 for i=1:nargin
     if isa(varargin{i},'GeneSpider.Dataset')
         data = varargin{i};
@@ -33,9 +32,6 @@ end
 if ~exist('data')
     error('needs a data set')
 end
-if ~exist('net')
-    error('needs a network')
-end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -43,7 +39,7 @@ end
 %% Parse data to use
 %% Parse data to use
 P = data.P;
-Y = responce(data,net);
+Y = response(data,net);
 
 [cvY,cvP] = cov(data);
 
