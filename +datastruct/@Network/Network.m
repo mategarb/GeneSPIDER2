@@ -288,10 +288,14 @@ classdef Network < hgsetget
                     varargout{1} = output;
                     return
                 elseif isempty(lfile)
-                    for j=1:length(output)
-                        fprintf('%d %s\n',j,output{j});
+                    if exist('output','var')
+                        for j=1:length(output)
+                            fprintf('%d %s\n',j,output{j});
+                        end
+                        return
+                    else
+                        error('No mat- or xml-files to list in dir %s',lpath)
                     end
-                    return
                 else
                     lfile = output{lfile};
                 end
