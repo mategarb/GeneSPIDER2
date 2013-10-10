@@ -1,6 +1,6 @@
 classdef NetworkComparison < hgsetget
 % CompareNetworks calculates difference measures between weighted network
-% adjacency matrices. 
+% adjacency matrices.
 % For a nice overview do:
 % doc tools.NetworkCopmarison
 %
@@ -65,13 +65,14 @@ classdef NetworkComparison < hgsetget
         QA           % Eigenvectors of true A
         DGA          % Adjacency matrix of A
         STA          % Signed topology of A
-        IndexNondiag % Index of non diagonal elements
-        nnodes       % # Nodes
+        %% IndexNondiag % Index of non diagonal elements
+
+        N            % # Nodes
         ntl          % # True Links
+        npl          % # possible links
     end
 
     properties (SetAccess = private)
-
         %% System measures
 
         abs2norm    % Absolute induced 2-norm
@@ -98,13 +99,10 @@ classdef NetworkComparison < hgsetget
         ncs         % # Correct signs
         sst         % Similarity of signed topology
         sst0        % Similarity of signed topology of nonzero elements of A
-        sstnd       % Similarity of signed topology of nondiagonal elements of A
-        sst0nd      % Similarity of signed topology of nonzero-nondiagonal elements of A
 
         %% Correlation measures
 
-        plc         % Pearson's linear correlation coefficient based on all elements
-        plcnd       % Pearson's linear correlation coefficient based on non-diagonal elements
+        plc         % Pearson's linear correlation coefficient
 
         %% Graph measures
 
@@ -173,7 +171,6 @@ classdef NetworkComparison < hgsetget
             STopoA = Z;
             STopoA(M.A > M.tol) = 1;
             STopoA(M.A < -M.tol) = -1;
-            IndexNondiag = find(ones(size(M.A))-eye(size(M.A)));
             M.UA = UA;
             M.SA = SA;
             M.VA = VA;
@@ -181,9 +178,14 @@ classdef NetworkComparison < hgsetget
             M.QA = QA;
             M.DGA = DiGraphA;
             M.STA = STopoA;
-            M.IndexNondiag = IndexNondiag;
-            M.nnodes = size(M.A,1);
+            M.N = size(M.A,1);
+            M.npl = prod(size(M.A));
             M.ntl = sum(sum(DiGraphA));
+        end
+
+        function zsst = sst2z(M)
+        % Calculates similarity of signed topology for an empty network
+            zsst = sum(sum(M.A == 0))/M.npl;
         end
 
         function systemMeasures(M,Alist)
@@ -231,12 +233,8 @@ classdef NetworkComparison < hgsetget
                 temp = M.STA == STopoT;
 
                 M.ncs(length(M.ncs)+1) = sum(sum(temp));
-                M.sst(length(M.sst)+1) = sum(sum(temp))/M.nnodes^2;
+                M.sst(length(M.sst)+1) = sum(sum(temp))/M.npl;
                 M.sst0(length(M.sst0)+1) = sum(sum(temp(M.DGA)))/M.ntl;
-
-                tempnd = M.STA(M.IndexNondiag) == STopoT(M.IndexNondiag);
-                M.sstnd(length(M.sstnd)+1) = sum(sum(tempnd))/(M.nnodes^2-M.nnodes);
-                M.sst0nd(length(M.sst0nd)+1) = sum(sum(tempnd(M.DGA(M.IndexNondiag))))/sum(sum(M.DGA(M.IndexNondiag)));
             end
         end
 
@@ -244,7 +242,6 @@ classdef NetworkComparison < hgsetget
             for i=1:length(Alist(1,1,:))
                 T = Alist(:,:,i);
                 M.plc(length(M.plc)+1) = corr(M.A(:),T(:));
-                M.plcnd(length(M.plcnd)+1) = corr(M.A(M.IndexNondiag),T(M.IndexNondiag));
             end
         end
 
@@ -265,7 +262,7 @@ classdef NetworkComparison < hgsetget
                 M.comspe(length(M.comspe)+1) = M.FP(end)/(M.TN(end)+M.FP(end));
                 M.pre(length(M.pre)+1) = M.TP(end)/(M.TP(end)+M.FP(end));
                 M.TPTN(length(M.TPTN)+1) = M.TP(end) + M.TN(end);
-                M.structsim(length(M.structsim)+1) = M.TPTN(end)/M.nnodes;
+                M.structsim(length(M.structsim)+1) = M.TPTN(end)/M.npl;
 
                 n = (M.TP(end) + M.FP(end)) * (M.TP(end) + M.FN(end)) * (M.TN(end)+M.FP(end)) * (M.TN(end)+M.FN(end));
                 if n == 0
@@ -309,7 +306,7 @@ classdef NetworkComparison < hgsetget
             end
         end
 
-        function varargout = compare(M,varargin)
+        function varargout = compare(M,Alist,varargin)
         % Compares a 3D array of networks to the true network and returns the selected measures
         %
         % <results => compare(obj, Alist [, selected])
@@ -320,11 +317,21 @@ classdef NetworkComparison < hgsetget
                 error('True network, A, needs to be set')
             end
 
-            if nargin == 1
-                error('compare needs a 3d array of networks to compare')
+            if nargin >= 3
+                for i=1:length(varargin)
+                if isa(varargin{i},'logical')
+                    diagonal = varargin{i};
+                else
+                    selected = varargin{i};
+                end
             end
 
-            Alist = varargin{1};
+            if exist('diagonal','var')
+                if size(M.A,1) == size(M.A,2)
+                    setA(M,tools.rmdiag(M.A));
+                end
+                Alist = tools.rmdiag(Alist);
+            end
 
             systemMeasures(M,Alist);
             topologyMeasures(M,Alist);
@@ -335,13 +342,11 @@ classdef NetworkComparison < hgsetget
             if nargout == 1
                 allprops = show(M);
                 results = struct([]);
-                if nargin == 3
-                    selected = varargin{2};
+                if exist('selected','var')
                     for i=selected
                         results(1).(allprops{i}) = M.(allprops{i});
                     end
                 end
-
                 varargout{1} = results;
             end
         end
@@ -367,7 +372,7 @@ classdef NetworkComparison < hgsetget
                     measure = varargin{1};
                     if isa(measure,'char')
                         varargout{1} = find(strcmp(allprops,measure));
-                    else isa(measure,'double')
+                    elseif isa(measure,'double')
                         varargout{1} = allprops{measure};
                     end
                 end
