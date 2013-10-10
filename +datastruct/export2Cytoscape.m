@@ -1,6 +1,6 @@
 function export2Cytoscape(A,genes,outf)
 %
-% Make a Cytoscape input file for Taipale's Drosophila data.
+% Make a Cytoscape input file from Network class.
 % This will output the interaction node fields <source> <target> <strength>
 % to an output file in this directory.
 %

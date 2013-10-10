@@ -13,7 +13,7 @@ P = data.P;
 Y = data.Y+data.E;
 
 for j = 1:size(Alist,3)
-    A = Alist(:,:,j)
+    A = Alist(:,:,j);
     
     y = -pinv(A)*P(:,i);
     p = -A*Y(:,i);
