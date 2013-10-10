@@ -39,7 +39,7 @@ classdef Dataset < hgsetget
         M           % # experiments
         created = struct('creator','','time',now,'id','','nexp','');
         tol = eps;
-        alpha = 0.01; % Confidence
+        alpha = 0.05; % Confidence
     end
 
     methods
@@ -168,9 +168,11 @@ classdef Dataset < hgsetget
 
         function scaleSNRm(data,SNRm)
         % scale the noise variance by setting the theoretic lambda
+            preLambda = data.lambda(1);
             s = svd(data.Y);
             lambda = min(s)^2/(chi2inv(1-data.alpha,prod(size(data.P)))*SNRm^2);
             data.lambda = lambda;
+            data.E = sqrt(lambda/preLambda).*data.E;
         end
 
         function newdata = scaleSNR(data,net,SNR)
@@ -237,10 +239,10 @@ classdef Dataset < hgsetget
                 cvP = diag(data.lambda(data.N+1:end));
             end
             if nargout == 1
-               varargout{1} = cvY
+               varargout{1} = cvY;
             elseif nargout == 2
-               varargout{1} = cvY
-               varargout{2} = cvP
+               varargout{1} = cvY;
+               varargout{2} = cvP;
             end
         end
 
@@ -252,12 +254,18 @@ classdef Dataset < hgsetget
             data.cvP = cvP;
         end
 
-        function varargout = informativeness(data,net)
+        function varargout = informativeness(data,varargin)
         % Gives the level of informativeness of the data set given the network
         % it was produced from.
         %
         % [info{, uninfo}] = informativeness(data,net)
         %
+            net = [];
+            if length(varargin) == 1
+                if isa(varargin{1},'GeneSpider.Network')
+                    net = varargin{1};
+                end
+            end
             lambda = data.lambda;
             if numel(lambda) == 2
                 o = ones(size(data.P));
@@ -281,38 +289,58 @@ classdef Dataset < hgsetget
             end
         end
 
-        function Y = response(data,net)
+        function Y = response(data,varargin)
         % Gives the networks response to input from data.
-            if ~isa(net,'GeneSpider.Network')
-                error('Must give a GeneSpider.Network to calculate response')
+
+            [n,m] = size(data.P);
+            if length(varargin) == 1
+                if isa(varargin{1},'GeneSpider.Network')
+                    net = varargin{1};
+                    Y = net.G*(data.P-data.F(:,1:m)) + data.E(:,1:m);
+                else
+                    Y = data.Y+data.E(:,1:m);
+                end
+            else
+                Y = data.Y+data.E(:,1:m);
             end
-            Y = net.G*(data.P-data.F) + data.E;
         end
 
-        function newdata = without(data,net,i)
+        function newdata = without(data,i,varargin)
         % creates a Dataset without sample i
         %
         % == Usage ==
-        % newdata = without(data,net,i)
-        %           where net is a GeneSpider.Network, and 'i' is the sample
-        %           that should be removed.
+        % newdata = without(data,i [,net])
+        %           where 'i' is the sample that should be removed
+        %           and net is a GeneSpider.Network.
+        %
             M = data.M;
 
-            newdata = GeneSpider.Dataset(data,net);
+            tmp(1).Y = data.Y;
+            tmp(1).P = data.P;
+            tmp(1).E = data.E;
+            tmp(1).F = data.F;
 
-            tmp(1).Y = newdata.Y(:,[1:(i-1) (i+1):M]);
-            tmp(1).P = newdata.P(:,[1:(i-1) (i+1):M]);
-            tmp(1).E = newdata.E(:,[1:(i-1) (i+1):M]);
-            tmp(1).F = newdata.F(:,[1:(i-1) (i+1):M]);
+            tmp(1).Y(:,i) = [];
+            tmp(1).P(:,i) = [];
+            tmp(1).E(:,i) = [];
+            tmp(1).F(:,i) = [];
 
-            sdY = newdata.sdY;
+            sdY = data.sdY;
             if ~isempty(sdY)
-                tmp(1).sdY = newdata.sdY;
+                sdY(:,i) = [];
+                tmp(1).sdY = sdY;
             end
 
-            sdP = newdata.sdP;
+            sdP = data.sdP;
             if ~isempty(sdP)
-                tmp(1).sdP = newdata.sdP;
+                sdP(:,i) = [];
+                tmp(1).sdP = sdP;
+            end
+
+            if length(varargin) == 1
+                newdata = GeneSpider.Dataset(data,net);
+            else
+                newdata = GeneSpider.Dataset(data);
             end
 
             newdata = populate(newdata,tmp);
@@ -351,25 +379,59 @@ classdef Dataset < hgsetget
             end
         end
 
-        function eta(data,net)
+        function eta(data,varargin)
         % calculates eta values for Y and P.
         %
-        % eta(data,net)
+        % eta(data[,net])
         %
+            net = [];
+            if length(varargin) == 1
+                if isa(varargin{1},'GeneSpider.Network')
+                    net = varargin{1};
+                end
+            end
+            Y = response(data,net);
+            P = data.P-data.F;
+
+            for i=1:data.M
+                Ytemp = Y;
+                Ptemp = P;
+                Ytemp(:,i) = [];
+                Ptemp(:,i) = [];
+                ytemp = Y(:,i);
+                ptemp = P(:,i);
+                etay(i) = sum( abs(Ytemp'*ytemp) );
+                etau(i) = sum( abs(Ptemp'*ptemp) );
+            end
+            data.etay = etay;
+            data.etau = etau;
+        end
+
+        function w_eta(data,varargin)
+        % calculates eta values for Y and P.
+        %
+        % eta(data[,net])
+        %
+
+            net = [];
+            if length(varargin) == 1
+                if isa(varargin{1},'GeneSpider.Network')
+                    net = varargin{1};
+                end
+            end
             Y = response(data,net);
             P = data.P-data.F;
             etay = [];
             etau = [];
             for i=1:data.M
-                tmpdata = without(data,net,i);
-                % [Yi,Pi] = without(data,net,i);
+                tmpdata = without(data,i);
 
                 [yiU, yiS, yiV] = svd(response(tmpdata,net));
                 [uiU, uiS, uiV] = svd(tmpdata.P-tmpdata.F);
                 dyiS = diag(yiS);
                 duiS = diag(uiS);
 
-                if length(dyiS) < tmpdata.N
+                if length(dyiS) < tmpdata.M
                     dyiS = [ dyiS; zeros( (size(tmpdata.N,1)-length(dyiS)),1 ) ];
                     duiS = [ duiS; zeros( (size(tmpdata.N,1)-length(duiS)),1 ) ];
                 end
@@ -384,6 +446,32 @@ classdef Dataset < hgsetget
             end
             data.etay = etay;
             data.etau = etau;
+        end
+
+        function included = include(data,varargin)
+        % based on eta limit, returns samples ok to inkclude in LOCO
+        %
+        % Currently assumes F = 0
+        %
+            if length(varargin) == 1
+                etaLim = varargin{1};
+            end
+
+            if isempty(data.etay)
+                eta(data);
+            end
+
+            if ~exist('etaLim','var')
+                SY = svd(response(data));
+                SP = svd(data.P+data.F);
+                included = [and(data.etay >= SY(end), data.etau >= SP(end))];
+            elseif exist('etaLim','var')
+                if numel(etaLim) == 1
+                    included = [and(data.etay >= etaLim, data.etau >= etaLim)];
+                else
+                    included = [and(data.etay >= etaLim(1), data.etau >= etaLim(2))];
+                end
+            end
         end
 
         function varargout = populate(data,input)
