@@ -1,6 +1,7 @@
 function [RSSy RSSp] = RSS(Alist,data,i,type)
 % Function for calculating prediction Error PE for y and p,
 %
+% [RSSy RSSp] = RSS(Alist,data,i,type)
 % If type='WRSS' is given then the weighted residual sum of squares is
 % caluculated.
 % Otherwise the residual sum of squares is calculated.
