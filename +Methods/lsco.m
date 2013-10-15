@@ -40,7 +40,7 @@ end
 
 %% Run
 if ~exist('zetavec','var')
-    estA = -data.P*pinv(responce(data,net));
+    estA = -data.P*pinv(response(data,net));
     varargout{1} = estA;
     return
 end
@@ -51,7 +51,7 @@ end
 
 if ~rawZeta
     zetaRange = [];
-    estA = -data.P*pinv(responce(data,net));
+    estA = -data.P*pinv(response(data,net));
     zetaRange(1) = min(abs(estA(estA~=0)))-eps;
     zetaRange(2) = max(abs(estA(estA~=0)))+10*eps;
     
@@ -63,7 +63,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Als = -data.P*pinv(responce(data,net));
+Als = -data.P*pinv(response(data,net));
 for i=1:length(zetavec)
     temp = find(abs(Als) <= zetavec(i));
     Atmp = Als;
