@@ -65,7 +65,6 @@ classdef NetworkComparison < hgsetget
         QA           % Eigenvectors of true A
         DGA          % Adjacency matrix of A
         STA          % Signed topology of A
-        %% IndexNondiag % Index of non diagonal elements
 
         N            % # Nodes
         ntl          % # True Links
@@ -129,7 +128,6 @@ classdef NetworkComparison < hgsetget
         dirsen      % Directed sensitivity
         dirspe      % Directed specificity
         dirprec     % Directed precision
-
     end
 
     methods
@@ -319,10 +317,11 @@ classdef NetworkComparison < hgsetget
 
             if nargin >= 3
                 for i=1:length(varargin)
-                if isa(varargin{i},'logical')
-                    diagonal = varargin{i};
-                else
-                    selected = varargin{i};
+                    if isa(varargin{i},'logical')
+                        diagonal = varargin{i};
+                    else
+                        selected = varargin{i};
+                    end
                 end
             end
 
@@ -427,7 +426,7 @@ classdef NetworkComparison < hgsetget
             varargout{1} = maximums;
 
             if nargout == 2
-               varargout{2} = maxind;
+                varargout{2} = maxind;
             end
         end
 
@@ -475,7 +474,7 @@ classdef NetworkComparison < hgsetget
             varargout{1} = minimums;
 
             if nargout == 2
-               varargout{2} = minind;
+                varargout{2} = minind;
             end
         end
 
