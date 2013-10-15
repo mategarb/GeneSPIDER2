@@ -54,7 +54,7 @@ function varargout = fcls(varargin)
         [H, D, H] = svd(A * data.cvY * A' + data.cvP + e*eye(size(A)));
         dD = diag(D);
         R = H * sqrt(diag( 1 ./dD ));
-        results = tools.fcls(A,response(data,net),data.P,R,verbose);
+        results = tools.matcls(A,response(data,net),data.P,R,verbose);
 
         Aest(:,:,j) = results.A;
     end
