@@ -4,9 +4,9 @@ function varargout = rmdiag(net)
 % A = rmdiag(A)
 %
 
-if isa(varargin{i},'GeneSpider.Network') || isa(varargin{i},'tools.NetworkComparison')
+if isa(net,'GeneSpider.Network') || isa(net,'tools.NetworkComparison')
     A = net.A;
-elseif isa(varargin{i},'double')
+elseif isa(net,'double')
     A = net;
 end
 
