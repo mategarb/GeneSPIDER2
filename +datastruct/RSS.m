@@ -15,7 +15,11 @@ Y = data.Y+data.E;
 
 for j = 1:size(Alist,3)
     A = Alist(:,:,j);
-    
+    if any(isnan(A))
+        RSSy(j) = NaN;
+        RSSp(j) = NaN;
+        continue
+    end
     y = -pinv(A)*P(:,i);
     p = -A*Y(:,i);
     
