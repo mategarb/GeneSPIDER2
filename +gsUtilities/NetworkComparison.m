@@ -144,25 +144,28 @@ classdef NetworkComparison < hgsetget
 
         function set.A(M,net)
             A = M.A;
-            if isempty(A)
-                if isa(net,'GeneSpider.Network')
-                    M.A = net.A;
-                else
-                    M.A = net;
-                end
+            if ~isempty(A)
+                warning('True A already set, overwriting')
+            end
+            if isa(net,'GeneSpider.Network')
+                M.A = net.A;
             else
-                error('True A already set, will not change it')
+                M.A = net;
             end
         end
 
         function setA(M,net)
             M.A = net;
             [UA SA VA] = svd(M.A);
-            [QA LA] = eig(M.A);
-            LA = diag(LA);
-            [crap index] = sort(abs(LA),1,'descend');
-            LA = LA(index);
-            QA = QA(:,index);
+            if issquare(M.A)
+                [QA LA] = eig(M.A);
+                LA = diag(LA);
+                [crap index] = sort(abs(LA),1,'descend');
+                LA = LA(index);
+                QA = QA(:,index);
+                M.LA = LA;
+                M.QA = QA;
+            end
             Z = zeros(size(M.A));
             DiGraphA = logical(Z);
             DiGraphA(abs(M.A) > M.tol) = true;
@@ -172,8 +175,6 @@ classdef NetworkComparison < hgsetget
             M.UA = UA;
             M.SA = SA;
             M.VA = VA;
-            M.LA = LA;
-            M.QA = QA;
             M.DGA = DiGraphA;
             M.STA = STopoA;
             M.N = size(M.A,1);
@@ -305,38 +306,47 @@ classdef NetworkComparison < hgsetget
         end
 
         function varargout = compare(M,Alist,varargin)
-        % Compares a 3D array of networks to the true network and returns the selected measures
+        % Compares a 3D array of networks to the true network and returns the
+        % selected measures
         %
-        % <results => compare(obj, Alist [, selected])
+        % <results => compare(obj, Alist [, selected,diagonal])
         %
+        % Input variables:
+        % ===============
+        %
+        % obj:      NetworkComparison object
+        % Alist:    A list of networks to compare
+        % selected: Only used if output is defined then it will return
+        %           only the selected measures. Should be a vector of
+        %           indices corresponding to indices given in show(obj).
+        %
+        % Output variables:
+        % ================
+        %
+        % results:  A struct with selected measures if any.
 
             A = M.A;
             if isempty(A)
                 error('True network, A, needs to be set')
             end
 
-            if nargin >= 3
-                for i=1:length(varargin)
-                    if isa(varargin{i},'logical')
-                        diagonal = varargin{i};
-                    else
-                        selected = varargin{i};
-                    end
-                end
+            if nargin == 3
+                selected = varargin{1};
             end
 
-            if exist('diagonal','var')
-                if size(M.A,1) == size(M.A,2)
-                    setA(M,tools.rmdiag(M.A));
-                end
-                Alist = tools.rmdiag(Alist);
+            % Eigenvalues can not be calculated for a non square matrix
+            if issquare(M.A)
+                systemMeasures(M,Alist);
+                topologyMeasures(M,Alist);
+                correlationMeasures(M,Alist);
+                graphMeasures(M,Alist);
+                dirGraphMeasures(M,Alist);
+            else
+                topologyMeasures(M,tools.rmdiag(Alist));
+                correlationMeasures(M,tools.rmdiag(Alist));
+                graphMeasures(M,tools.rmdiag(Alist));
+                dirGraphMeasures(M,tools.rmdiag(Alist));
             end
-
-            systemMeasures(M,Alist);
-            topologyMeasures(M,Alist);
-            correlationMeasures(M,Alist);
-            graphMeasures(M,Alist);
-            dirGraphMeasures(M,Alist);
 
             if nargout == 1
                 allprops = show(M);
@@ -351,7 +361,7 @@ classdef NetworkComparison < hgsetget
         end
 
         function varargout = show(M,varargin)
-        % get a list of measures or with input string get the index of that
+        % Get a list of measures or with input string get the index of that
         % measure if output argument is given, otherwise it will print
         % to terminal.
         %
