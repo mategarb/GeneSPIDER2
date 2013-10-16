@@ -51,7 +51,7 @@ function varargout = fcls(varargin)
 
     for j=1:size(Ainit,3)
         A = Ainit(:,:,j);
-        [H, D, H] = svd(A * data.cvY * A' + data.cvP + e*eye(size(A)));
+        [H, D, H] = svd(A * cvY * A' + cvP + e*eye(size(A)));
         dD = diag(D);
         R = H * sqrt(diag( 1 ./dD ));
         results = tools.matcls(A,response(data,net),data.P,R,verbose);

@@ -19,6 +19,7 @@ function varargout = lsco(varargin)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 rawZeta = 0;
 
+net = [];
 for i=1:nargin
     if isa(varargin{i},'GeneSpider.Dataset')
         data = varargin{i};
@@ -33,9 +34,6 @@ end
 
 if ~exist('data')
     error('needs a data set')
-end
-if ~exist('net')
-    error('needs a network')
 end
 
 %% Run
