@@ -13,7 +13,7 @@ function results = matcls(Ainit, Y, P, R, verbo)
 % results: structure with fields:
 %   A: optimal network (n x n)
 %   status: {'Solved', 'Failed'}
-%  
+%
 
 % Settings
 alpha = 0.01;
@@ -60,12 +60,23 @@ RRt = R*R';
 YYt = Y*Y';
 gterm2 = 2 .* RRt*P*Y';
 
+% Check for rank-deficient Y
+rankdefY = false;
+m = size(Y, 2);
+if (m < n)
+    rankdefY = true;
+end
+
 % Hessian is constant
 H = F' * kron(YYt, 2*RRt) * F;
-[H_L, notposdef] = chol(H); 
-H_L = H_L'; % A = H_L * H_L'
-if (notposdef)
-    error('Hessian is not positive definite');
+if (rankdefY)
+    Hinv = pinv(H); % pseudoinverse
+else % Should be positive definite
+    [H_L, notposdef] = chol(H);
+    H_L = H_L'; % A = H_L * H_L'
+    if (notposdef)
+        error('Hessian is not positive definite');
+    end
 end
 
 % Functions
@@ -101,15 +112,19 @@ rstatus = 'Failed';
 
 % Newton's method for equality-constrained minimization
 for i = 0:max_steps
-    
+
     % Evaluate and get gradient
     fx = f(A, Y, R, P);
     g = F'*grad(A, RRt, YYt, gterm2, d);
-    znt = -H_L' \ (H_L \ g);
-    
+
     % Newton step and decrement
+    if (rankdefY)
+        znt = -Hinv*g;
+    else
+        znt = -H_L' \ (H_L \ g);
+    end
     gap = -0.5*g'*znt;
-    
+
     % Display progress
     if (verbose)
         frob = norm((A*Y+P)'*R, 'fro');
@@ -121,13 +136,13 @@ for i = 0:max_steps
             display([str ' ']);
         end
     end
-    
+
     % Check stopping criteria
     if (gap < prec)
         rstatus = 'Solved';
         break;
     end
-    
+
     % Line search
     t = 1/beta;
     lhs = Inf;
@@ -138,30 +153,30 @@ for i = 0:max_steps
         zcurr = z + t*znt;
         xcurr = F*zcurr + xhat;
         Acurr = reshape(xcurr, n, n);
-        
+
         % Evaluate at new point to get lhs
         lhs = f(Acurr, Y, R, P);
-        
+
         % Right-hand side
         rhs = fx + alpha*t*g'*znt;
-        
+
         % Stop
         if (lhs < rhs)
             break;
         end
-        
+
         % Short-circuit
         if (btx > max_bt_steps)
             error('Short-circuited line search');
         end
         btx = btx + 1;
     end
-    
-    % Update 
+
+    % Update
     z = z + t*znt;
     x = F*z + xhat;
     A = reshape(x, n, n);
-    
+
 end % Newton steps
 
 % Display result
