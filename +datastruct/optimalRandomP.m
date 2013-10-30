@@ -1,9 +1,9 @@
 function candidateP = optimalRandomP(A,nCandidates,nm)
 % candidateP = optimalRandomP(A)
-% 
+%
 % optimalRandomP calculates an optimal perturbation design of desired
 % size for a network response to be informative when influenced by noise.
-% 
+%
 % A: Network matrix
 % nCandidates: How many candidates should be generated
 % nm: Vector [n,m]. Where m is # nodes and m is # experiments.
@@ -12,7 +12,7 @@ n = nm(1);
 m = nm(2);
 [UA SA VA] = svd(A);
 G = -pinv(A); % Static gain of system
-limitSVY = 0.4; % Limit for how much the SVs of Y may differ from 1 (wished value)
+limitSVY = 0.33; % Limit for how much the SVs of Y may differ from 1 (wished value)
 
 % level = logspace(-4,-1,4);
 level = [0.1 0.01 0.001];
@@ -27,11 +27,11 @@ for r = 1:nCandidates
     R = GramSchmidtOrth(-1+2*rand(max([n m]))); % Random R as a start
     R = R(:,1:n)';
     P = UA*SA*R; % P based on economy size svd
-    P = round(1000.*P)./1000; 
+    P = round(1000.*P)./1000;
     nrpert(r) = sum(sum(P ~= 0)); % Number of non-zero elements in P
 
     %% Optimises the P to be as sparse as possible
-    k = 1; 
+    k = 1;
     removedelement = false;
     while k <= length(level)
         P(abs(P) < 0.001) = 0;
@@ -39,15 +39,16 @@ for r = 1:nCandidates
         SVYsumP = norm(SVY-ones(size(SVY)),2); % Sum of SVs difference from one
         fprintf([datestr(clock) '\t' num2str(r) '\t' num2str(k) '\tnrpert:' num2str(nrpert(r)) '\tSVYsumP:' num2str(SVYsumP,10),'\n'])
 
-        
+
         %% Tries to set as many elements to zero as possible
         while true,
             %% Find the effect on SVs of Y of setting each element one-by-one of P to zero
+            fprintf(' loop %d halway done out of %d total\n',k,length(level))
             for i = 1:size(P,1),
                 for j = 1:size(P,2),
                     Ptemp = P;
                     Ptemp(i,j) = 0;
-                    SVY = svd(G*Ptemp); % SVs of Y
+                    SVY = svd(G*Ptemp);
                     SVYeff(i,j) = max(abs(SVY-ones(size(SVY)))); % Find SV of Y that differs most from 1 (wished value)
                 end
             end
@@ -64,27 +65,28 @@ for r = 1:nCandidates
                 break
             end
         end
-       
-        %% Tries to optimise non-zero elements of P        
-        P(abs(P) < 0.001) = 0; 
+
+        %% Tries to optimise non-zero elements of P
+        P(abs(P) < level(end)) = 0;
         SVY = svd(G*P);
         SVYsumPold = norm(SVY-ones(size(SVY)),2); % Sum of SVs difference from one
         SVYsumP = SVYsumPold;
-        while true
-            % Go through all elements one by one
+        while true % Go through all elements one by one
             for i = 1:size(P,1)
                 for j = 1:size(P,2)
                     if P(i,j) ~= 0
                         % Make the element unchanged, plus or minus one level,
                         % depending on which gives smallest criteria
                         Ptemp = P;
+
                         Ptemp(i,j) = Ptemp(i,j) + level(k);
                         SVY = svd(G*Ptemp);
                         SVYsumplus = norm(SVY-ones(size(SVY)),2); % Sum of SVs difference from one
+
                         Ptemp(i,j) = Ptemp(i,j) - 2*level(k);
-                        SVY = svd(G*Ptemp); % SVs of Y
-                        
+                        SVY = svd(G*Ptemp);
                         SVYsumminus = norm(SVY-ones(size(SVY)),2); % Sum of SVs difference from one
+
                         [val ind] = min([SVYsumP SVYsumminus SVYsumplus]);
                         SVYsumP = val;
                         switch ind,
