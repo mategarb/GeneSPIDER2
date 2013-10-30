@@ -453,6 +453,11 @@ classdef Dataset < hgsetget
         %
         % Currently assumes F = 0
         %
+        % included = include(data {, etaLim})
+        %
+        % etaLim is a vector with one element for each limit for Y and P.
+        % If one element is given it's used for both Y and P
+        %
             if length(varargin) == 1
                 etaLim = varargin{1};
             end
