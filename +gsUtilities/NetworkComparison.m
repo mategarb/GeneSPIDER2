@@ -50,7 +50,7 @@ classdef NetworkComparison < hgsetget
 %
 
     properties (Hidden = true)
-        tol = eps;  % Link strength tolerance
+        tol = eps;    % Link strength tolerance
     end
 
     properties (SetAccess = public, AbortSet = true)
@@ -65,7 +65,6 @@ classdef NetworkComparison < hgsetget
         QA           % Eigenvectors of true A
         DGA          % Adjacency matrix of A
         STA          % Signed topology of A
-
         N            % # Nodes
         ntl          % # True Links
         npl          % # possible links
@@ -117,6 +116,7 @@ classdef NetworkComparison < hgsetget
         TPTN        % Number of links that is present and absent in both networks (TP+TN)
         structsim   % Structural similarity (TP+TN)/#Nodes^2
         MCC         % Matthews correlation coefficient
+        SMCC        % Signed Matthews correlation coefficient
 
         %% Directed graph measures
 
@@ -265,7 +265,7 @@ classdef NetworkComparison < hgsetget
 
                 n = (M.TP(end) + M.FP(end)) * (M.TP(end) + M.FN(end)) * (M.TN(end)+M.FP(end)) * (M.TN(end)+M.FN(end));
                 if n == 0
-                    M.MCC(length(M.MCC)+1) = 0;
+                    M.MCC(length(M.MCC)+1) = NaN;
                 else
                     M.MCC(length(M.MCC)+1) = (M.TP(end)*M.TN(end)-M.FP(end)*M.FN(end))/sqrt(n);
                 end
