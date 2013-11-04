@@ -279,11 +279,11 @@ classdef NetworkComparison < hgsetget
                 STT(T > M.tol) = 1;
                 STT(T < -M.tol) = -1;
 
-                M.TR(length(M.TR)+1) = nnz( M.STA == 1 & STT == 1 | M.STA == -1 & STT == -1);
-                M.TZ(length(M.TZ)+1) = nnz( M.STA == 0 & STT == 0);
-                M.FI(length(M.FI)+1) = nnz( M.STA == 1 & STT == -1 | M.STA < -1 & STT > 1 );
-                M.FR(length(M.FR)+1) = nnz( M.STA == 0 & STT == 1 );
-                M.FZ(length(M.FZ)+1) = nnz( M.STA == 1 & STT == 0 );
+                M.TR(length(M.TR)+1) = nnz( M.STA == 1 & STT == 1) + nnz(M.STA == -1 & STT == -1);
+                M.TZ(length(M.TZ)+1) = nnz( and(~M.STA,~STT) );
+                M.FI(length(M.FI)+1) = nnz( M.STA == 1 & STT == -1) + nnz(M.STA == -1 & STT == 1 );
+                M.FR(length(M.FR)+1) = nnz( and(~M.STA,abs(STT)) );
+                M.FZ(length(M.FZ)+1) = nnz( and(abs(M.STA),~STT) );
 
                 if (M.TR(end) + M.FI(end) + M.FZ(end)) == 0
                     M.dirsen(length(M.dirsen)+1) = 0;
@@ -303,11 +303,11 @@ classdef NetworkComparison < hgsetget
                     M.dirprec(length(M.dirprec)+1) = M.TR(end)/(M.TR(end) + M.FI(end) + M.FR(end));
                 end
 
-                n = (M.TR(end) + M.FR(end)) * (M.TR(end) + M.FI(end) + M.FZ(end)) * (M.TZ(end)+M.FR(end)) * (M.TZ(end)+M.FI(end) + M.FZ(end));
+                n = (M.TR(end) + M.FR(end)) * (M.TR(end) + M.FI(end) + M.FZ(end)) * (M.TZ(end) + M.FR(end)) * (M.TZ(end) + M.FI(end) + M.FZ(end));
                 if n == 0
                     M.SMCC(length(M.SMCC)+1) = NaN;
                 else
-                    M.SMCC(length(M.SMCC)+1) = (M.TR(end)*M.TZ(end) - M.FR(end)*(M.FI(end) + M.FZ(end)))/sqrt(n);
+                    M.SMCC(length(M.SMCC)+1) = (M.TR(end)*M.TZ(end) - M.FR(end)*(M.FI(end) + M.FZ(end))) / sqrt(n);
                 end
 
             end
