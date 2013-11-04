@@ -275,15 +275,15 @@ classdef NetworkComparison < hgsetget
         function dirGraphMeasures(M,Alist)
             for i=1:length(Alist(1,1,:))
                 T = Alist(:,:,i);
-                STopoT = zeros(size(M.A));
-                STopoT(T > M.tol) = 1;
-                STopoT(T < -M.tol) = -1;
+                STT = zeros(size(M.A));
+                STT(T > M.tol) = 1;
+                STT(T < -M.tol) = -1;
 
-                M.TR(length(M.TR)+1) = nnz(M.A > M.tol & T > M.tol | M.A < -M.tol & T < -M.tol);
-                M.TZ(length(M.TZ)+1) = nnz(abs(M.A) < M.tol & abs(T) < M.tol);
-                M.FI(length(M.FI)+1) = nnz( M.A > M.tol & T < -M.tol |  M.A < -M.tol & T > M.tol );
-                M.FR(length(M.FR)+1) = nnz(abs( M.A ) < M.tol & abs(T > M.tol));
-                M.FZ(length(M.FZ)+1) = nnz(abs( M.A ) > M.tol & abs(T < M.tol));
+                M.TR(length(M.TR)+1) = nnz( M.STA == 1 & STT == 1 | M.STA == -1 & STT == -1);
+                M.TZ(length(M.TZ)+1) = nnz( M.STA == 0 & STT == 0);
+                M.FI(length(M.FI)+1) = nnz( M.STA == 1 & STT == -1 | M.STA < -1 & STT > 1 );
+                M.FR(length(M.FR)+1) = nnz( M.STA == 0 & STT == 1 );
+                M.FZ(length(M.FZ)+1) = nnz( M.STA == 1 & STT == 0 );
 
                 if (M.TR(end) + M.FI(end) + M.FZ(end)) == 0
                     M.dirsen(length(M.dirsen)+1) = 0;
@@ -302,6 +302,14 @@ classdef NetworkComparison < hgsetget
                 else
                     M.dirprec(length(M.dirprec)+1) = M.TR(end)/(M.TR(end) + M.FI(end) + M.FR(end));
                 end
+
+                n = (M.TR(end) + M.FR(end)) * (M.TR(end) + M.FI(end) + M.FZ(end)) * (M.TZ(end)+M.FR(end)) * (M.TZ(end)+M.FI(end) + M.FZ(end));
+                if n == 0
+                    M.SMCC(length(M.SMCC)+1) = NaN;
+                else
+                    M.SMCC(length(M.SMCC)+1) = (M.TR(end)*M.TZ(end) - M.FR(end)*(M.FI(end) + M.FZ(end)))/sqrt(n);
+                end
+
             end
         end
 
