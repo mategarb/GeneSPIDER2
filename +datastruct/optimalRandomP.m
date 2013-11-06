@@ -1,5 +1,5 @@
 function candidateP = optimalRandomP(A,nCandidates,nm)
-% candidateP = optimalRandomP(A)
+% candidateP = optimalRandomP(A,nCandidates,size(P))
 %
 % optimalRandomP calculates an optimal perturbation design of desired
 % size for a network response to be informative when influenced by noise.
