@@ -162,17 +162,17 @@ classdef Dataset < hgsetget
             end
         end
 
-        function scaleLambda(data,lambda)
+        function set_new_lambda(data,lambda)
             data.lambda = lambda;
         end
 
-        function scaleSNRm(data,SNRm)
-        % scale the noise variance by setting the theoretic lambda
-            preLambda = data.lambda(1);
+        function scale_lambda_SNRm(data,SNRm)
+        % scale the noise variance by setting the theoretic lambda with wished SNRm            
             s = svd(data.Y);
+            % preLambda = data.lambda(1);
             lambda = min(s)^2/(chi2inv(1-data.alpha,prod(size(data.P)))*SNRm^2);
             data.lambda = lambda;
-            data.E = sqrt(lambda/preLambda).*data.E;
+            % data.E = sqrt(lambda/preLambda).*data.E;
         end
 
         function newdata = scaleSNR(data,net,SNR)

@@ -15,8 +15,8 @@ G = -pinv(A); % Static gain of system
 limitSVY = 0.33; % Limit for how much the SVs of Y may differ from 1 (wished value)
 
 % level = logspace(-4,-1,4);
-level = [0.1 0.01 0.001];
-% level = [0.1 0.01 0.01 0.001]; % Original. Why two of the same
+% level = [0.1 0.01 0.001];
+level = [0.1 0.01 0.01 0.001]; % Original. Why two of the same
 tol = 10^-4; % Tolerance
 keepOneElementOnEachColumn = true; % Used to avoid experiments where nothing is perturbed
 
@@ -43,13 +43,14 @@ for r = 1:nCandidates
         %% Tries to set as many elements to zero as possible
         while true,
             %% Find the effect on SVs of Y of setting each element one-by-one of P to zero
-            fprintf(' loop %d halway done out of %d total\n',k,length(level))
             for i = 1:size(P,1),
                 for j = 1:size(P,2),
-                    Ptemp = P;
-                    Ptemp(i,j) = 0;
-                    SVY = svd(G*Ptemp);
-                    SVYeff(i,j) = max(abs(SVY-ones(size(SVY)))); % Find SV of Y that differs most from 1 (wished value)
+                    if P(i,j) ~= 0
+                        Ptemp = P;
+                        Ptemp(i,j) = 0;
+                        SVY = svd(G*Ptemp);
+                        SVYeff(i,j) = max(abs(SVY-ones(size(SVY)))); % Find SV of Y that differs most from 1 (wished value)
+                    end
                 end
             end
             SVYeff(P == 0) = Inf; % Excludes all elements that already are zero
