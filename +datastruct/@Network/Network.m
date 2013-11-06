@@ -92,7 +92,7 @@ classdef Network < hgsetget
             names = net.names;
             if isempty(names)
                 for i=1:net.N
-                    names{i} = sprintf(['G%0',num2str(log10(net.N)+1),'d'],i);
+                    names{i} = sprintf(['G%0',num2str(floor(log10(net.N))+1),'d'],i);
                 end
             else
                 names = net.names;
