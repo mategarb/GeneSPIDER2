@@ -496,20 +496,40 @@ classdef NetworkComparison < hgsetget
             end
         end
 
-        function plus(M,N)
+        function pM = plus(M,N)
             props = show(M);
+            pM = tools.NetworkComparison(M.A);
             for i=1:length(props)
-                M.(props{i}) = M.(props{i}) + N.(props{i});
+                pM.(props{i}) = M.(props{i}) + N.(props{i});
             end
         end
 
-        function M = vertcat(M,varargin)
+        function vertM = vertcat(M,varargin)
             props = show(M);
+            vertM = tools.NetworkComparison(M.A);
             for j=1:length(varargin)
                 N = varargin{j};
                 for i=1:length(props)
-                    M.(props{i}) = [M.(props{i}); N.(props{i})];
+                    vertM.(props{i}) = [M.(props{i}); N.(props{i})];
                 end
+            end
+        end
+        
+        function mM = mean(M)
+        % calculate mean of all measures
+            props = show(M);
+            mM = tools.NetworkComparison(M.A);
+            for i=1:length(props)
+                mM.(props{i}) = mean(M.(props{i}));
+            end
+        end
+        
+        function vM = var(M)
+        % calculate variance of all measures
+            props = show(M);
+            mM = tools.NetworkComparison(M.A);
+            for i=1:length(props)
+                mM.(props{i}) = var(M.(props{i}));
             end
         end
     end
