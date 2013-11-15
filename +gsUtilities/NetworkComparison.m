@@ -265,7 +265,7 @@ classdef NetworkComparison < hgsetget
 
                 n = (M.TP(end) + M.FP(end)) * (M.TP(end) + M.FN(end)) * (M.TN(end)+M.FP(end)) * (M.TN(end)+M.FN(end));
                 if n == 0
-                    M.MCC(length(M.MCC)+1) = NaN;
+                    n = 1;
                 else
                     M.MCC(length(M.MCC)+1) = (M.TP(end)*M.TN(end)-M.FP(end)*M.FN(end))/sqrt(n);
                 end
@@ -305,7 +305,7 @@ classdef NetworkComparison < hgsetget
 
                 n = (M.TR(end) + M.FR(end)) * (M.TR(end) + M.FI(end) + M.FZ(end)) * (M.TZ(end) + M.FR(end)) * (M.TZ(end) + M.FI(end) + M.FZ(end));
                 if n == 0
-                    M.SMCC(length(M.SMCC)+1) = NaN;
+                    n = 1;
                 else
                     M.SMCC(length(M.SMCC)+1) = (M.TR(end)*M.TZ(end) - M.FR(end)*(M.FI(end) + M.FZ(end))) / sqrt(n);
                 end
