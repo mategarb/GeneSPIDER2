@@ -1,4 +1,5 @@
 function export2Cytoscape(A,genes,outf)
+% export2Cytoscape(A,genes,outf)
 %
 % Make a Cytoscape input file from Network class.
 % This will output the interaction node fields <source> <target> <strength>
@@ -6,7 +7,7 @@ function export2Cytoscape(A,genes,outf)
 %
 % A: interaction matrix
 % genes: cell array (n x 1) with gene names
-% outf: base name of output text file "<outf>.txt"; it will overwrite any
+% outf: name of output text file "<outf>.tsv"; it will overwrite any
 %       existing files
 %
 
@@ -16,7 +17,7 @@ end
 
 % Initialize
 nGenes = size(A,1);
-outfile = [outf '.txt'];
+outfile = [outf, '.tsv'];
 fid = fopen(outfile,'w');
 
 for src = 1:nGenes  % Loop through the source genes (columns)
@@ -26,9 +27,9 @@ for src = 1:nGenes  % Loop through the source genes (columns)
             if issparse(strength)
                 strength = full(strength);
             end
-            c_src = char(genes(src));
-            c_tgt = char(genes(tgt));
-            fprintf(fid,'%s\t%s\t%i\t%d\n',c_src,c_tgt,sign(strength),strength);
+            c_src = genes{src};
+            c_tgt = genes{tgt};
+            fprintf(fid,'%s\t%s\t%i\t%g\n',c_src,c_tgt,sign(strength),strength);
         end
     end % target genes
 end % source genes
