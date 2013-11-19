@@ -1,4 +1,8 @@
 function candidateP = weightP(A,P)
+% candidateP = weightP(A,P)
+%
+% A: network
+% P: inital Perturbations
 
 [UA SA VA] = svd(A);
 G = -pinv(A);
@@ -27,12 +31,12 @@ while k <= length(level)
                     Ptemp(i,j) = Ptemp(i,j) + level(k);
                     SVY = svd(G*Ptemp);
                     % SVYsumplus = norm(SVY-ones(size(SVY)),1); % Sum of SVs difference from one
-                    SVYsumplus = norm(log(SVY)-ones(size(SVY)),2); % Sum of SVs difference from one, this is not actually the sum
+                    SVYsumplus = norm(SVY - ones(size(SVY)),2); % Sum of SVs difference from one, this is not actually the sum
 
                     Ptemp(i,j) = Ptemp(i,j) - 2*level(k);
                     SVY = svd(G*Ptemp);
                     % SVYsumminus = norm(SVY-ones(size(SVY)),1); % Sum of SVs difference from one
-                    SVYsumminus = norm(log(SVY)-ones(size(SVY)),2); % Sum of SVs difference from one, this is not actually the sum
+                    SVYsumminus = norm(SVY - ones(size(SVY)),2); % Sum of SVs difference from one, this is not actually the sum
 
                     [val ind] = min([SVYsumP SVYsumminus SVYsumplus]);
                     SVYsumP = val;
