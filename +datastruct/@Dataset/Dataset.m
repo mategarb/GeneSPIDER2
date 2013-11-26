@@ -34,12 +34,15 @@ classdef Dataset < hgsetget
         info      % Level of informativeness [0,1]
     end
 
+    properties (SetAccess = public)
+        alpha = 0.05; % Confidence
+    end
+
     properties (Hidden = true)
         N           % # variables in A
         M           % # experiments
         created = struct('creator','','time',now,'id','','nexp','');
         tol = eps;
-        alpha = 0.05; % Confidence
     end
 
     methods
@@ -81,10 +84,6 @@ classdef Dataset < hgsetget
             N = size(data.P,1);
         end
 
-        function SNR = get.SNR(data)
-            SNR = min(svd(data.Y))/max(svd(data.E));
-        end
-
         function set.lambda(data,lambda)
             if ~isrow(lambda)
                 lambda = lambda';
@@ -102,6 +101,10 @@ classdef Dataset < hgsetget
             data.lambda = lambda;
         end
 
+        function SNR = get.SNR(data)
+            SNR = min(svd(data.Y))/max(svd(data.E));
+        end
+
         function SNR = get.SNRnu(data)
             snr = [];
             for i=1:data.N
@@ -112,7 +115,7 @@ classdef Dataset < hgsetget
 
         function SNRm = get.SNRm(data)
             alpha = data.alpha;
-            sigma = min(svd(data.Y'));
+            sigma = min(svd(data.Y));
             SNRm = sigma/sqrt(chi2inv(1-alpha,prod(size(data.P)))*data.lambda(1));
         end
 
@@ -167,10 +170,9 @@ classdef Dataset < hgsetget
         end
 
         function scale_lambda_SNRm(data,SNRm)
-        % scale the noise variance by setting the theoretic lambda with wished SNRm            
-            s = svd(data.Y);
-            % preLambda = data.lambda(1);
-            lambda = min(s)^2/(chi2inv(1-data.alpha,prod(size(data.P)))*SNRm^2);
+        % scale the noise variance by setting the theoretic lambda with wished SNRm
+            s = min(svd(data.Y));
+            lambda = s^2/(chi2inv(1-data.alpha,prod(size(data.P)))*SNRm^2);
             data.lambda = lambda;
             % data.E = sqrt(lambda/preLambda).*data.E;
         end
