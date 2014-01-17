@@ -21,7 +21,7 @@ function varargout = NIR(varargin)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 rawZeta = 0;
 zetavec = [];
-alpha = 1;
+net = [];
 for i=1:nargin
     if isa(varargin{i},'GeneSpider.Dataset')
         data = varargin{i};
@@ -30,26 +30,18 @@ for i=1:nargin
     elseif isa(varargin{i},'logical')
         rawZeta = varargin{i};
     else
-        if isempty(zetavec)
-            zetavec = varargin{i};
-        else
-            alpha = varargin{i};
-        end
+        zetavec = varargin{i};
     end
 end
 
 if ~exist('data')
     error('needs a data set')
 end
-if ~exist('net')
-    error('needs a network')
-end
 
 %% Determine how to handle zeta %%
-
 if ~rawZeta,
 
-    zetaRange = [0 data.M];
+    zetaRange = [0 data.N];
     % Convert to interval.
     zetavec = 1-zetavec;
     delta = zetaRange(2)-zetaRange(1);
@@ -64,7 +56,7 @@ end
 
 
 %% Parse data to use
-nY = responce(data,net);
+nY = response(data,net);
 P = data.P;
 
 [sdY,sdP] = std(data);
@@ -75,8 +67,6 @@ end
 if ~isempty(data.sdP)
     sdP = data.sdP;
 end
-
-
 
 %% Run
 estA = [];
