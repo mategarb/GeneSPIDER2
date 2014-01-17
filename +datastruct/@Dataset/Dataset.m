@@ -29,6 +29,8 @@ classdef Dataset < hgsetget
         SNRnu     % Signal to noise ratio, \argmin_i min(norm(\Fi_i)/norm(\nu_i))
         SNRm      % Signal to noise ratio,
         SNRv      % Signal to noise ratio,
+        SNRvm     % Signal to noise ratio,
+        SNRnum    % Signal to noise ratio,
         etay      % Linear independance from data per sample.
         etau      % Linear independance from data per perturbation.
         info      % Level of informativeness [0,1]
@@ -84,10 +86,6 @@ classdef Dataset < hgsetget
             N = size(data.P,1);
         end
 
-        function SNR = get.SNR(data)
-            SNR = min(svd(data.Y))/max(svd(data.E));
-        end
-
         function set.lambda(data,lambda)
             if ~isrow(lambda)
                 lambda = lambda';
@@ -105,6 +103,10 @@ classdef Dataset < hgsetget
             data.lambda = lambda;
         end
 
+        function SNR = get.SNR(data)
+            SNR = min(svd(data.Y))/max(svd(data.E));
+        end
+
         function SNR = get.SNRnu(data)
             snr = [];
             for i=1:data.N
@@ -113,18 +115,34 @@ classdef Dataset < hgsetget
             SNR = min(snr);
         end
 
-        function SNRm = get.SNRm(data)
-            alpha = data.alpha;
-            sigma = min(svd(data.Y));
-            SNRm = sigma/sqrt(chi2inv(1-alpha,prod(size(data.P)))*data.lambda(1));
+        function SNR = get.SNRnum(data)
+            snr = [];
+            for i=1:data.N
+                snr(i) = norm(data.Y(i,:))/norm(data.E(i,:));
+            end
+            SNR = mean(snr);
         end
 
-        function SNRv = get.SNRv(data)
+        function SNR = get.SNRm(data)
+            alpha = data.alpha;
+            sigma = min(svd(data.Y));
+            SNR = sigma/sqrt(chi2inv(1-alpha,prod(size(data.P)))*data.lambda(1));
+        end
+
+        function SNR = get.SNRv(data)
             alpha = data.alpha;
             for i=1:data.N
-                snr(i) = norm(data.Y(i,:))/sqrt(chi2inv(1-alpha,prod(size(data.P)))*data.lambda(1));
+                snr(i) = norm(data.Y(i,:))/sqrt(chi2inv(1-alpha,data.M)*data.lambda(1));
             end
-            SNRv = min(snr);
+            SNR = min(snr);
+        end
+
+        function SNR = get.SNRvm(data)
+            alpha = data.alpha;
+            for i=1:data.N
+                snr(i) = norm(data.Y(i,:))/sqrt(chi2inv(1-alpha,data.M)*data.lambda(1));
+            end
+            SNR = mean(snr);
         end
 
         function setname(data,varargin)
