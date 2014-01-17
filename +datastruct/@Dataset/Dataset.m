@@ -34,12 +34,15 @@ classdef Dataset < hgsetget
         info      % Level of informativeness [0,1]
     end
 
+    properties (SetAccess = public)
+        alpha = 0.05; % Confidence
+    end
+
     properties (Hidden = true)
         N           % # variables in A
         M           % # experiments
         created = struct('creator','','time',now,'id','','nexp','');
         tol = eps;
-        alpha = 0.05; % Confidence
     end
 
     methods
@@ -112,7 +115,7 @@ classdef Dataset < hgsetget
 
         function SNRm = get.SNRm(data)
             alpha = data.alpha;
-            sigma = min(svd(data.Y'));
+            sigma = min(svd(data.Y));
             SNRm = sigma/sqrt(chi2inv(1-alpha,prod(size(data.P)))*data.lambda(1));
         end
 
@@ -167,10 +170,9 @@ classdef Dataset < hgsetget
         end
 
         function scale_lambda_SNRm(data,SNRm)
-        % scale the noise variance by setting the theoretic lambda with wished SNRm            
-            s = svd(data.Y);
-            % preLambda = data.lambda(1);
-            lambda = min(s)^2/(chi2inv(1-data.alpha,prod(size(data.P)))*SNRm^2);
+        % scale the noise variance by setting the theoretic lambda with wished SNRm
+            s = min(svd(data.Y));
+            lambda = s^2/(chi2inv(1-data.alpha,prod(size(data.P)))*SNRm^2);
             data.lambda = lambda;
             % data.E = sqrt(lambda/preLambda).*data.E;
         end
@@ -275,14 +277,15 @@ classdef Dataset < hgsetget
                 [conf,infotopo] = tools.RInorm(response(data,net)',data.P',(diag(lambda(1:length(lambda)/2))'*o)',(diag(lambda(length(lambda)/2+1:end))'*o)'+eps,data.alpha);
             end
 
+            L = sum(sum(logical(net)));
             if nargout == 0
-                data.info = sum(sum(logical(net) & infotopo))/sum(sum(logical(net)));
+                data.info = sum(sum(logical(net) & infotopo))/L;
                 return
             elseif nargout >= 1
-                varargout{1} = sum(sum(logical(net) & infotopo))/sum(sum(logical(net)));
+                varargout{1} = sum(sum(logical(net) & infotopo))/L;
             end
             if nargout >= 2
-                varargout{2} = sum(conf(~logical(net)))/sum(sum(~logical(net)));
+                varargout{2} = sum(conf(~logical(net)))/(data.N^2-L);
             end
             if nargout >= 3
                 varargout{3} = conf;
