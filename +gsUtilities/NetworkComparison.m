@@ -116,7 +116,7 @@ classdef NetworkComparison < hgsetget
         TPTN        % Number of links that is present and absent in both networks (TP+TN)
         structsim   % Structural similarity (TP+TN)/#Nodes^2
         MCC         % Matthews correlation coefficient
-        FPEL        % Fraction of Provable Existing Links (relevant for RNI)
+        FEL        % Fraction of Existing Links (for RNI = FPEL)
 
         %% Directed graph measures
 
@@ -263,7 +263,7 @@ classdef NetworkComparison < hgsetget
                 M.pre(length(M.pre)+1) = M.TP(end)/(M.TP(end)+M.FP(end));
                 M.TPTN(length(M.TPTN)+1) = M.TP(end) + M.TN(end);
                 M.structsim(length(M.structsim)+1) = M.TPTN(end)/M.npl;
-                M.FPEL(length(M.FPEL)+1) = sum(sum(M.DGA & DiGraphT))/M.nlinks;
+                M.FEL(length(M.FEL)+1) = nnz(M.DGA & DiGraphT)/M.ntl;
                 
                 n = (M.TP(end) + M.FP(end)) * (M.TP(end) + M.FN(end)) * (M.TN(end)+M.FP(end)) * (M.TN(end)+M.FN(end));
                 if n == 0
