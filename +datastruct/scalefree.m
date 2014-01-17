@@ -9,8 +9,15 @@ function A = scalefree(N,sparsity)
 
 m0 = round(sparsity*N);
 seed = logical(full(sprand(m0*2,m0*2-1,m0/m0^2)));
+k = 0;
 while rank(double(seed)) < min(size(seed))
-    seed(floor(rand*numel(seed)+1)) = 1;
+    seed = logical(full(sprand(m0*2,m0*2-1,m0/m0^2)));
+    % seed(floor(rand*numel(seed)+1)) = 1;
+    k = k + 1;
+
+    if ~mod(k,100)
+        fprintf('k = %d\n',k)
+    end
 end
 
 tmp = zeros(m0*2);
