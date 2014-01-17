@@ -23,7 +23,8 @@ tol = eps;
 max_steps = 100;
 max_bt_steps = 100;
 n = size(Ainit,1);
-d = n*n;
+ex = size(Ainit,2);
+d = n*ex;
 verbose = false;
 if (nargin > 4)
     verbose = verbo;
@@ -152,7 +153,7 @@ for i = 0:max_steps
         t = beta*t;
         zcurr = z + t*znt;
         xcurr = F*zcurr + xhat;
-        Acurr = reshape(xcurr, n, n);
+        Acurr = reshape(xcurr, n, ex);
 
         % Evaluate at new point to get lhs
         lhs = f(Acurr, Y, R, P);
@@ -175,7 +176,7 @@ for i = 0:max_steps
     % Update
     z = z + t*znt;
     x = F*z + xhat;
-    A = reshape(x, n, n);
+    A = reshape(x, n, ex);
 
 end % Newton steps
 
