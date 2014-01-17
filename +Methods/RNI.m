@@ -63,12 +63,12 @@ end
 if nargout == 0,
     disp(Gamma);
 elseif nargout == 1;
-    varargout{1} = PS;
+    varargout{1} = double(PS);
 elseif nargout == 2;
-    varargout{1} = PS;
+    varargout{1} = double(PS);
     varargout{2} = Gamma;
 elseif nargout == 3;
-    varargout{1} = PS;
+    varargout{1} = double(PS);
     varargout{2} = Gamma;
     varargout{3} = NrPS;
 end
