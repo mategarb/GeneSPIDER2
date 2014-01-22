@@ -12,9 +12,9 @@ parentFunc = dbout(2).name;
 optionNames = fieldnames(options);
 
 nArgs = length(varargin);
-if round(nArgs/2)~=nArgs/2
+if round(nArgs/2) ~= nArgs/2
     disp(optionNames)
-    error([parentFunc,' needs propertyName/propertyValue pairs with names as above')
+    error([parentFunc,' needs propertyName/propertyValue pairs with names as above'])
 end
 
 for pair = reshape(varargin,2,[]) %# pair is {propName;propValue}
