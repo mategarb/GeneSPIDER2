@@ -1,6 +1,6 @@
 function options = optionParser(options,varargin)
 % options = optionParser(options,varargin)
-%
+% parses input options in to a struct
 
 if isempty(varargin)
     return
