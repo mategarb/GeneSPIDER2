@@ -1,0 +1,9 @@
+[submodule "+GeneSpider"]
+	path = +GeneSpider
+	url = git@bitbucket.org:xparx/genespider.git
+[submodule "+tools"]
+	path = +tools
+	url = git@bitbucket.org:xparx/tools.git
+[submodule "+Methods"]
+	path = +Methods
+	url = git@bitbucket.org:xparx/Methods.git
