@@ -145,7 +145,7 @@ classdef NetworkComparison < hgsetget
 
         function set.A(M,net)
             A = M.A;
-            if ~isempty(A)
+            if ~isempty(A) && ~isempty(net)
                 warning('True A already set, overwriting')
             end
             if isa(net,'GeneSpider.Network')
@@ -183,6 +183,11 @@ classdef NetworkComparison < hgsetget
             M.ntl = sum(sum(DiGraphA));
         end
 
+        function delA(M)
+        % Deletes the compare network when object is no longer associated with a single network
+            setA(M,[])
+        end
+        
         function zsst = sst2z(M)
         % Calculates similarity of signed topology for an empty network
             zsst = sum(sum(M.A == 0))/M.npl;
@@ -449,6 +454,10 @@ classdef NetworkComparison < hgsetget
                 varargout{2} = maxind;
             end
         end
+        
+        function varargout = maxmax(M,varargin);
+        % Function returning a new Compare object with max for all measures.
+        end
 
         function varargout = min(M,varargin);
         % Find minimum values of specified measures or all values dependant on a single measure.
@@ -513,6 +522,21 @@ classdef NetworkComparison < hgsetget
                 N = varargin{j};
                 for i=1:length(props)
                     vertM.(props{i}) = [M.(props{i}); N.(props{i})];
+                end
+            end
+        end
+
+        function horzM = horzcat(M,varargin)
+            props = show(M);
+            horzM = tools.NetworkComparison(M.A);
+            for j=1:length(varargin)
+                N = varargin{j};
+                for i=1:length(props)
+                    propiM = M.(props{i});
+                    propiN = N.(props{i});
+                    if isrow(propiM), propiM = propiM'; end
+                    if isrow(propiN), propiN = propiN'; end
+                    horzM.(props{i}) = [propiM, propiN];
                 end
             end
         end
