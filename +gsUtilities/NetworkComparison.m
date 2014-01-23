@@ -187,7 +187,7 @@ classdef NetworkComparison < hgsetget
         % Deletes the compare network when object is no longer associated with a single network
             setA(M,[])
         end
-        
+
         function zsst = sst2z(M)
         % Calculates similarity of signed topology for an empty network
             zsst = sum(sum(M.A == 0))/M.npl;
@@ -269,7 +269,7 @@ classdef NetworkComparison < hgsetget
                 M.TPTN(length(M.TPTN)+1) = M.TP(end) + M.TN(end);
                 M.structsim(length(M.structsim)+1) = M.TPTN(end)/M.npl;
                 M.FEL(length(M.FEL)+1) = nnz(M.DGA & DiGraphT)/M.ntl;
-                
+
                 n = (M.TP(end) + M.FP(end)) * (M.TP(end) + M.FN(end)) * (M.TN(end)+M.FP(end)) * (M.TN(end)+M.FN(end));
                 if n == 0
                     M.MCC(length(M.MCC)+1) = 0;
@@ -454,9 +454,26 @@ classdef NetworkComparison < hgsetget
                 varargout{2} = maxind;
             end
         end
-        
+
         function varargout = maxmax(M,varargin);
-        % Function returning a new Compare object with max for all measures.
+        % Function returning a new NetworkCompare object with max for all measures.
+            T = tools.NetworkComparison();
+            props = show(T);
+            maxes = max(M);
+
+            for i=1:length(props)
+                T.(props{i}) = maxes(i,:)';
+            end
+
+            for i=1:length(varargin)
+                N = varargin{i};
+                maxes = max(M);
+                for i=1:length(props)
+                    T = maxes(i,:);
+                end
+            end
+
+            varargout{1} = T;
         end
 
         function varargout = min(M,varargin);
@@ -518,6 +535,10 @@ classdef NetworkComparison < hgsetget
         function vertM = vertcat(M,varargin)
             props = show(M);
             vertM = tools.NetworkComparison(M.A);
+            for i=1:length(props)
+                vertM.(props{i}) = [vertM.(props{i}); M.(props{i})];
+            end
+
             for j=1:length(varargin)
                 N = varargin{j};
                 for i=1:length(props)
@@ -537,6 +558,21 @@ classdef NetworkComparison < hgsetget
                     if isrow(propiM), propiM = propiM'; end
                     if isrow(propiN), propiN = propiN'; end
                     horzM.(props{i}) = [propiM, propiN];
+                end
+            end
+        end
+
+        function stackM = stack(M,varargin)
+            props = show(M);
+            stackM = tools.NetworkComparison();
+            for i=1:length(props)
+                stackM.(props{i}) = cat(3,stackM.(props{i}),M.(props{i}));
+            end
+
+            for j=1:length(varargin)
+                N = varargin{j};
+                for i=1:length(props)
+                    stackM.(props{i}) = cat(3,stackM.(props{i}),N.(props{i}));
                 end
             end
         end
