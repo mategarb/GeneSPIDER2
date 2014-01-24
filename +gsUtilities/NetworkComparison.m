@@ -404,7 +404,7 @@ classdef NetworkComparison < hgsetget
         end
 
         function varargout = max(M,varargin);
-        % Find maximum values of specified measures or all values dependant on
+        % Find maximum values over rows of specified measures or all values dependant on
         % a single measure.
         %
         %   Input Arguments: max(M [,<measure>])
@@ -435,11 +435,11 @@ classdef NetworkComparison < hgsetget
             maximums = [];
             if strcmp(m,'all')
                 for i=1:length(props)
-                    [maximums(i,:), maxind] = max((M.(props{i}))');
+                    [maximums(i,:), maxind] = max((M.(props{i}))',[],1);
                 end
             else
                 ind = find(strcmp(props,m));
-                [junk,maxind] = max((M.(props{ind}))');
+                [junk,maxind] = max((M.(props{ind}))',[],1);
                 for i=1:length(props)
                     prop = M.(props{i})';
                     for j=1:size(prop,2)
@@ -469,7 +469,7 @@ classdef NetworkComparison < hgsetget
                 N = varargin{i};
                 maxes = max(M);
                 for i=1:length(props)
-                    T = maxes(i,:);
+                    T.(props{i}) = [T.(props{i}), maxes(i,:)];
                 end
             end
 
@@ -555,10 +555,16 @@ classdef NetworkComparison < hgsetget
                 for i=1:length(props)
                     propiM = M.(props{i});
                     propiN = N.(props{i});
-                    if isrow(propiM), propiM = propiM'; end
-                    if isrow(propiN), propiN = propiN'; end
                     horzM.(props{i}) = [propiM, propiN];
                 end
+            end
+        end
+
+        function transM = transpose(M)
+        % transposes all measures in object
+            props = show(M);
+            for i=1:length(props)
+                M.(props{i}) = M.(props{i})';
             end
         end
 
