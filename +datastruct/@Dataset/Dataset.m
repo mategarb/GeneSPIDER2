@@ -195,6 +195,20 @@ classdef Dataset < hgsetget
             % data.E = sqrt(lambda/preLambda).*data.E;
         end
 
+        function scale_lambda_SNRv(data,SNRv)
+        % scale the noise variance by setting the theoretic lambda with wished SNRm
+            for i=1:data.N
+                lambda(i) = norm(data.Y(i,:))/(chi2inv(1-data.alpha,data.M)*SNRv^2);
+            end
+            data.lambda = min(lambda);
+
+            % alpha = data.alpha;
+            % for i=1:data.N
+            %     snr(i) = norm(data.Y(i,:))/sqrt(chi2inv(1-alpha,data.M)*data.lambda(1));
+            % end
+            % SNR = min(snr);
+        end
+
         function newdata = scaleSNR(data,net,SNR)
         % scales the noise variance to achieve desired SNR. A new dataset is
         % created based on the old data and the new SNR.
@@ -490,7 +504,7 @@ classdef Dataset < hgsetget
             if ~exist('etaLim','var')
                 SY = svd(response(data));
                 SP = svd(data.P+data.F);
-                included = [and(data.etay >= SY(end), data.etau >= SP(end))];
+                included = [and(data.etay >= SY(data.N), data.etau >= SP(data.N))];
             elseif exist('etaLim','var')
                 if numel(etaLim) == 1
                     included = [and(data.etay >= etaLim, data.etau >= etaLim)];
