@@ -532,24 +532,18 @@ classdef NetworkComparison < hgsetget
             end
         end
 
-        function vertM = vertcat(M,varargin)
+        function M = vertcat(M,varargin)
             props = show(M);
-            vertM = tools.NetworkComparison(M.A);
-            for i=1:length(props)
-                vertM.(props{i}) = [vertM.(props{i}); M.(props{i})];
-            end
-
             for j=1:length(varargin)
                 N = varargin{j};
                 for i=1:length(props)
-                    vertM.(props{i}) = [M.(props{i}); N.(props{i})];
+                    M.(props{i}) = [M.(props{i}); N.(props{i})];
                 end
             end
         end
 
-        function horzM = horzcat(M,varargin)
+        function M = horzcat(M,varargin)
             props = show(M);
-            horzM = tools.NetworkComparison(M.A);
             for j=1:length(varargin)
                 N = varargin{j};
                 for i=1:length(props)
@@ -557,18 +551,14 @@ classdef NetworkComparison < hgsetget
                     propiN = N.(props{i});
                     if isrow(propiM), propiM = propiM'; end
                     if isrow(propiN), propiN = propiN'; end
-                    horzM.(props{i}) = [propiM, propiN];
+                    M.(props{i}) = [propiM, propiN];
                 end
             end
         end
 
-        function stackM = stack(M,varargin)
-            props = show(M);
-            stackM = tools.NetworkComparison();
-            for i=1:length(props)
-                stackM.(props{i}) = cat(3,stackM.(props{i}),M.(props{i}));
-            end
-
+        function stackM = stack(stackM,varargin)
+        % stack each measure in the 3rd dimension
+            props = show(stackM);
             for j=1:length(varargin)
                 N = varargin{j};
                 for i=1:length(props)
