@@ -595,9 +595,22 @@ classdef NetworkComparison < hgsetget
         function vM = var(M)
         % calculate variance of all measures
             props = show(M);
-            mM = tools.NetworkComparison(M.A);
+            vM = tools.NetworkComparison(M.A);
             for i=1:length(props)
-                mM.(props{i}) = var(M.(props{i}));
+                vM.(props{i}) = var(M.(props{i}));
+            end
+        end
+
+        function T = getIndex(M,index)
+        % returns an object with index given for each measure
+            T = tools.NetworkComparison();
+            props = show(T);
+
+            for i=1:length(props)
+                for j=1:size(M.(props{i}),1)
+                    tmp(j) =  M.(props{i})(j,index(j));
+                end
+                T.(props{i}) = [T.(props{i}), tmp'];
             end
         end
     end
