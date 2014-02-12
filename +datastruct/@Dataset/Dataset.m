@@ -39,6 +39,7 @@ classdef Dataset < hgsetget
     properties (SetAccess = public)
         alpha = 0.05; % Confidence
         desc = ''; % description
+        names = {};
     end
 
     properties (Hidden = true)
@@ -170,6 +171,17 @@ classdef Dataset < hgsetget
                 end
             end
             data.dataset = [namer.creator,'-ID',data.network(regexpi(data.network,'-ID')+3:end),'-D',datestr(namer.time,'yyyymmdd'),'-E',num2str(size(data.P,2)),'-SNR',num2str(round(data.SNRm*1000)),'-IDY',namer.id];
+        end
+
+        function names = get.names(net)
+            names = net.names;
+            if isempty(names)
+                for i=1:net.N
+                    names{i} = sprintf(['G%0',num2str(floor(log10(net.N))+1),'d'],i);
+                end
+            else
+                names = net.names;
+            end
         end
 
         function varargout = std(data)
