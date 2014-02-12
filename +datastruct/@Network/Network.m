@@ -26,6 +26,7 @@ classdef Network < hgsetget
 
     properties
         names = {};
+        desc = '';
     end
 
     properties (Hidden = true)
@@ -102,6 +103,7 @@ classdef Network < hgsetget
         function show(net)
             networkProperties = {
                 'Name'                 net.network;
+                'Description'          net.desc;
                 'interrampatteness'    net.interrampatteness;
                 '# Network Components' net.NetworkComponents;
                 '\tau G'               net.tauG
@@ -112,7 +114,7 @@ classdef Network < hgsetget
             f = figure('Position', [100 100 752 500]);
             t1 = uitable('Parent', f, 'Position', [10 10 730 310],'ColumnWidth',{65});
             set(t1, 'Data', net.A,'BackgroundColor',[1,1,1]);
-            t2 = uitable('Parent', f, 'Position', [10 330 620 140],'ColumnWidth',{200,370});
+            t2 = uitable('Parent', f, 'Position', [10 330 730 170],'ColumnWidth',{200,480});
             set(t2, 'Data', networkProperties,'BackgroundColor',[1,1,1],'ColumnName',{'Property','Value'});
         end
 

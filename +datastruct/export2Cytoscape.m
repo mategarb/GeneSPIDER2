@@ -20,6 +20,13 @@ nGenes = size(A,1);
 outfile = [outf, '.tsv'];
 fid = fopen(outfile,'w');
 
+if isempty(genes)
+    for i=1:nGenes
+        genes{i} = sprintf(['G%0',num2str(floor(log10(nGenes))+1),'d'],i);
+    end
+end
+
+
 for src = 1:nGenes  % Loop through the source genes (columns)
     for tgt = 1:nGenes  % Loop through the target genes (rows)
         strength = A(tgt,src);
