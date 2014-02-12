@@ -11,8 +11,8 @@ classdef Network < hgsetget
 %   nnz(net)
 %   size(net)
 %
-%   ============== display
-%   displaying the Network will launch a graphics window and display a matrix
+%   ============== show
+%   show() the Network will launch a graphics window and display a matrix
 %   of the network and a table with network properties.
 %
     properties (SetAccess = private)

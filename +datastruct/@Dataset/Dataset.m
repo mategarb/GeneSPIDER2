@@ -73,6 +73,10 @@ classdef Dataset < hgsetget
                     elseif isa(varargin{i},'struct')
                         input = varargin{i};
                         populate(data,input);
+                        if ispc; data.created.creator = getenv('USERNAME');
+                        else; data.created.creator = getenv('USER');
+                        end
+                        data.created.id = num2str(round(cond(data.Y)*10000));
                     end
                 end
                 setname(data)
