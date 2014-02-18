@@ -601,5 +601,14 @@ classdef NetworkComparison < hgsetget
                 T.(props{i}) = [T.(props{i}), tmp'];
             end
         end
+
+        function T = reshape(M,varargin)
+        % returns an object with index given for each measure
+            T = tools.NetworkComparison();
+            props = show(T);
+            for i=1:length(props)
+                T.(props{i}) = reshape(M.(props{i}),varargin{:});
+            end
+        end
     end
 end
