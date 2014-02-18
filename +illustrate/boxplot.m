@@ -38,10 +38,11 @@ function varargout = boxplot(Data,varargin)
 % X = 20*randn(1,12);
 % illustrate.boxplot(Data,'xpos',X)
 
-options = struct('title','this is a title','x','x','y','y','c','rgbkcmy','width',1);
+options = struct('title','','x','x','y','y','c','rgbkcmy','width',1,'scale','lin','ylim',[]);
 options(1).legend = {};
 options(1).highlight = [];
 options(1).xpos = [];
+options(1).xtick = {' '};
 options(1).xticklabel = {' '};
 if nargin == 0
     if nargout == 0
@@ -57,32 +58,43 @@ X = options.xpos;
 [n,m,d] = size(Data);
 Data = reshape(Data,n,m*d);
 
-g1 = repmat(1:m,1,d)';
-g2 = repmat(1:d,m,1);
-g2 = g2(:);
 g = length(X);
-
-options.c = options.c(1:d);
 
 h = figure('color',[1,1,1]);
 if g == 0
+    g1 = repmat(1:m,1,d)';
+    g2 = repmat(1:d,m,1);
+    g2 = g2(:);
+    if ischar(options.c)
+        options.c = options.c(1:d);
+    end
     boxplot(Data, {g1 g2}, 'factorgap', 10, 'symbol', '+', 'color', options.c)
-    % set(gca,'xticklabel',{' '})
     set(gca,'xtick',linspace(min(xlim)+d/2,max(xlim)-d/2,m))
-    % set(gca,'xticklabel',linspace(min(xlim)+d/2,max(xlim)-d/2,m))
     set(gca,'xticklabel',options.xticklabel)
     grid on
     set(gca,'XGrid','off')
 else
-    boxplot(Data, X, 'positions', X, 'symbol', '+','width',options.width)
+    [X,D] = sort(X);
+    boxplot(Data(:,D), 'positions', X, 'symbol', '+','width',options.width)
+
     if strcmp(' ',options.xticklabel)
-        set(gca,'xtick',linspace(min(xlim),max(xlim),8))
-        set(gca,'xticklabel',get(gca,'xtick'))
+        if strcmp('log',options.scale)
+            set(gca,'xtick',logspace(min(log10(xlim)),max(log10(xlim)),8))
+            set(gca,'XScale','log');
+        else
+            set(gca,'xtick',linspace(min(xlim),max(xlim),8))
+        end
+        xticklabel = strtrim(cellstr(num2str(get(gca,'xtick')','% 0.2g')));
+        set(gca,'xticklabel',xticklabel)
     else
-        set(gca,'xtick',options.xticklabel)
+        set(gca,'xtick',options.xtick)
         set(gca,'xticklabel',options.xticklabel)
     end
     grid on
+end
+
+if ~isempty(options.ylim)
+    ylim(options.ylim)
 end
 
 if ~isempty(options.highlight)
@@ -93,10 +105,6 @@ if ~isempty(options.highlight)
 end
 
 
-% if ~isempty(options.labels) % rearange xticks to fit to each group
-%     set(gca,'XTickLabel',{' '})
-% end
-
 xlabel(options.x)
 ylabel(options.y)
 title(options.title)
@@ -105,8 +113,6 @@ if ~isempty(options.legend)
     warning('off','MATLAB:legend:IgnoringExtraEntries')
     lgh = legend(findobj(gca,'Tag','Box'),names,'location','Best'); % The legend can be fixed. Check the handle and it's children
 end
-
-
 
 
 if nargout >= 1
@@ -122,27 +128,3 @@ if nargout >= 3
 end
 
 return
-% , 'positions', X
-
-
-% stuff = get(findobj(gca,'Type','text'))
-% t = get(stuff(1).Parent,'Children') % Gets all
-% now look for the Type
-% get(t(n))
-% tmp = get(t(40))
-% tmp.Type should be text
-
-% text objects
-% nanan = get(findobj(gca,'Type','text'))
-% This could probably be done in an easier way
-% tmp = get(findobj(gca,'Type','text'));
-% t = get(tmp(1).Parent,'Children');
-% tmp = get(t(40));
-% tt = get(findobj(get(get(gca,'Children'),'Children'),'Type','text'))
-textobj = findobj(get(get(gca,'Children'),'Children'),'Type','text');
-for i=1:length(textobj)
-    xtext(i,:) = get(textobj(i),'Position');
-end
-
-% h = xtext;
-h = textobj;
