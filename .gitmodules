@@ -7,3 +7,6 @@
 [submodule "+Methods"]
 	path = +Methods
 	url = git@bitbucket.org:xparx/Methods.git
+[submodule "+illustrate"]
+	path = +illustrate
+	url = git@bitbucket.org:xparx/illustrate.git
