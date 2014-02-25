@@ -616,7 +616,7 @@ classdef NetworkComparison < hgsetget
             T = tools.NetworkComparison();
             props = show(T);
             for i=1:length(props)
-                T.(props{i}) = M.(props{i})(varargin{:});
+                T.(props{i}) = subsref(M.(props{i}),varargin{1});
             end
         end
     end
