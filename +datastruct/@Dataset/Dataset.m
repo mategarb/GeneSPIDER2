@@ -173,14 +173,18 @@ classdef Dataset < hgsetget
             data.dataset = [namer.creator,'-ID',data.network(regexpi(data.network,'-ID')+3:end),'-D',datestr(namer.time,'yyyymmdd'),'-E',num2str(size(data.P,2)),'-SNR',num2str(round(data.SNRm*1000)),'-IDY',namer.id];
         end
 
-        function names = get.names(net)
-            names = net.names;
+        function desc = get.desc(data)
+            desc = sprintf([data.desc,'\n']);
+        end
+
+        function names = get.names(data)
+            names = data.names;
             if isempty(names)
-                for i=1:net.N
-                    names{i} = sprintf(['G%0',num2str(floor(log10(net.N))+1),'d'],i);
+                for i=1:data.N
+                    names{i} = sprintf(['G%0',num2str(floor(log10(data.N))+1),'d'],i);
                 end
             else
-                names = net.names;
+                names = data.names;
             end
         end
 
