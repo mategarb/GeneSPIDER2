@@ -100,6 +100,10 @@ classdef Network < hgsetget
             end
         end
 
+        function desc = get.desc(net)
+            desc = sprintf([net.desc,'\n']);
+        end
+
         function show(net)
             networkProperties = {
                 'Name'                 net.network;
