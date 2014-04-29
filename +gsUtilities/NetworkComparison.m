@@ -197,7 +197,11 @@ classdef NetworkComparison < hgsetget
             for i=1:length(Alist(1,1,:))
                 T = Alist(:,:,i);
                 M.abs2norm(length(M.abs2norm)+1) = norm(T-M.A);
-                M.rel2norm(length(M.rel2norm)+1) = norm(pinv(T)*T-M.A);
+                try
+                    M.rel2norm(length(M.rel2norm)+1) = norm(pinv(T)*T-M.A);
+                catch err
+                    M.rel2norm(length(M.rel2norm)+1) = NaN;
+                end
                 M.maee(length(M.maee)+1) = max(max(abs(T-M.A)));
                 M.mree(length(M.mree)+1) = max(max(diag(1./max(abs(T),[],2))*abs(T-M.A)));
 
@@ -221,7 +225,11 @@ classdef NetworkComparison < hgsetget
                 M.mrede(length(M.mrede)+1) = max(abs(diag(temp2)*(1./diag(temp))));
 
                 M.afronorm(length(M.afronorm)+1) = norm(T-M.A,'fro');
-                M.rfronorm(length(M.rfronorm)+1) = norm(pinv(T)*(T-M.A),'fro');
+                try
+                    M.rfronorm(length(M.rfronorm)+1) = norm(pinv(T)*(T-M.A),'fro');
+                catch err
+                    M.rfronorm(length(M.rfronorm)+1) = NaN;
+                end
                 M.al1norm(length(M.rl1norm)+1) = sum(abs(T(~M.DGA)));
                 M.rl1norm(length(M.rl1norm)+1) = sum(abs(T(~M.DGA)))/sum(sum(abs(M.A)));
                 M.n0larger(length(M.n0larger)+1) = sum(abs(T(~M.DGA)) > min(abs(M.A(M.DGA))));
