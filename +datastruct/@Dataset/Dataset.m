@@ -24,7 +24,7 @@ classdef Dataset < hgsetget
         E         % Expression noise
         cvY = []; % Covariance of noisy Y
         sdY = []; % measurement point variation of Y
-        lambda    % Noise variance
+        lambda    % Noise variance, lambda
         SNR       % Signal to noise ratio, \sigma_N(Y)/\sigma_1(E)
         SNRnu     % Signal to noise ratio, \argmin_i min(norm(\Fi_i)/norm(\nu_i))
         SNRm      % Signal to noise ratio,
@@ -309,25 +309,20 @@ classdef Dataset < hgsetget
             data.cvP = cvP;
         end
 
-        function varargout = informativeness(data,varargin)
+        function varargout = informativeness(data,net)
         % Gives the level of informativeness of the data set given the network
         % it was produced from.
         %
         % [info{, uninfo}] = informativeness(data,net)
         %
-            net = [];
-            if length(varargin) == 1
-                if isa(varargin{1},'GeneSpider.Network')
-                    net = varargin{1};
-                end
-            end
+
             lambda = data.lambda;
             if numel(lambda) == 2
                 o = ones(size(data.P));
-                [conf,infotopo] = tools.RInorm(response(data,net)',data.P',diag(lambda(1:length(lambda)/2))*o',diag(lambda(length(lambda)/2+1:end))*o'+eps,data.alpha);
+                [conf,infotopo] = tools.RInorm(response(data)',data.P',diag(lambda(1:length(lambda)/2))*o',diag(lambda(length(lambda)/2+1:end))*o'+eps,data.alpha);
             else
                 o = ones(size(data.P),2);
-                [conf,infotopo] = tools.RInorm(response(data,net)',data.P',(diag(lambda(1:length(lambda)/2))'*o)',(diag(lambda(length(lambda)/2+1:end))'*o)'+eps,data.alpha);
+                [conf,infotopo] = tools.RInorm(response(data)',data.P',(diag(lambda(1:length(lambda)/2))'*o)',(diag(lambda(length(lambda)/2+1:end))'*o)'+eps,data.alpha);
             end
 
             L = sum(sum(logical(net)));
