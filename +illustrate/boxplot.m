@@ -1,5 +1,5 @@
 function varargout = boxplot(Data,varargin)
-% <[options ,h, lgh]> = illustrate.boxplot(X,Data,<name>,<value>)
+% <[options ,h, lgh]> = illustrate.boxplot(Data,<name>,<value>)
 % function for plotting structured results from the Network Inference pipeline
 %
 % Data: data matrix, if dim=3 then a group for each 3rd dimension.
@@ -32,18 +32,21 @@ function varargout = boxplot(Data,varargin)
 % Data(:,:,4) = 1;
 % 
 % % Grouping the data
-% illustrate.boxplot(Data,'legend',{'rand','0.5','randn','1'},)
+% illustrate.boxplot(Data,'legend',{'rand','0.5','randn','1'})
 % 
 % % plotting all on specified positions X
 % X = 20*randn(1,12);
 % illustrate.boxplot(Data,'xpos',X)
+%
 
-options = struct('title','','x','x','y','y','c','rgbkcmy','width',1,'scale','lin','ylim',[]);
+options = struct('title','','x','x','y','y','c','rgbkcmy','width',1,'scale','lin','ylim',[],'factorgap',10);
 options(1).legend = {};
 options(1).highlight = [];
 options(1).xpos = [];
 options(1).xtick = {' '};
 options(1).xticklabel = {' '};
+options(1).orientation = 'vertical';
+
 if nargin == 0
     if nargout == 0
         help illustrate.boxplot
@@ -66,16 +69,21 @@ if g == 0
     g2 = repmat(1:d,m,1);
     g2 = g2(:);
     if ischar(options.c)
-        options.c = options.c(1:d);
+        if length(options.c) > d
+            options.c = options.c(1:d);
+        else
+            c = repmat(options.c,1,length(options.c)*d);
+            options.c = c(1:d);
+        end
     end
-    boxplot(Data, {g1 g2}, 'factorgap', 10, 'symbol', '+', 'color', options.c)
+    boxplot(Data, {g1 g2}, 'factorgap', options.factorgap, 'symbol', '+', 'color', options.c,'width',options.width,'orientation',options.orientation)
     set(gca,'xtick',linspace(min(xlim)+d/2,max(xlim)-d/2,m))
     set(gca,'xticklabel',options.xticklabel)
     grid on
     set(gca,'XGrid','off')
 else
     [X,D] = sort(X);
-    boxplot(Data(:,D), 'positions', X, 'symbol', '+','width',options.width)
+    boxplot(Data(:,D), 'positions', X, 'symbol', '+','width',options.width,'orientation',options.orientation)
 
     if strcmp(' ',options.xticklabel)
         if strcmp('log',options.scale)
