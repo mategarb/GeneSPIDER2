@@ -395,7 +395,7 @@ classdef NetworkComparison < hgsetget
 
             if nargout == 0
                 for i=1:length(allprops)
-                    fprintf('%i %s\n',i,allprops{i})
+                    fprintf('\t%i\t%s\n',i,allprops{i})
                 end
             elseif nargout == 1
                 if length(varargin) == 0
@@ -443,7 +443,7 @@ classdef NetworkComparison < hgsetget
             maximums = [];
             if strcmp(m,'all')
                 for i=1:length(props)
-                    [maximums(i,:), maxind] = max((M.(props{i}))',[],1);
+                    [maximums(i,:), maxind(i,:)] = max((M.(props{i}))',[],1);
                 end
             else
                 ind = find(strcmp(props,m));
@@ -619,13 +619,5 @@ classdef NetworkComparison < hgsetget
             end
         end
 
-        function T = subsref(M,varargin)
-        % returns an object with the specified indexes for each measure
-            T = tools.NetworkComparison();
-            props = show(T);
-            for i=1:length(props)
-                T.(props{i}) = subsref(M.(props{i}),varargin{1});
-            end
-        end
     end
 end
