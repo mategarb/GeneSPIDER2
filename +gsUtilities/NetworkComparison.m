@@ -467,20 +467,21 @@ classdef NetworkComparison < hgsetget
         % Function returning a new NetworkCompare object with max for all measures.
             T = tools.NetworkComparison();
             props = show(T);
-            maxes = max(M);
 
-            for i=1:length(props)
-                T.(props{i}) = maxes(i,:)';
-            end
-
-            for i=1:length(varargin)
-                N = varargin{i};
+            if length(varargin) == 0
                 maxes = max(M);
                 for i=1:length(props)
-                    T.(props{i}) = [T.(props{i}), maxes(i,:)];
+                    T.(props{i}) = maxes(i,:)';
+                end
+            else
+                for j=1:length(varargin)
+                    mess = varargin{j};
+                    maxes = max(M,mess);
+                    for i=1:length(props)
+                        T.(props{i}) = [T.(props{i}), maxes(i,:)];
+                    end
                 end
             end
-
             varargout{1} = T;
         end
 
