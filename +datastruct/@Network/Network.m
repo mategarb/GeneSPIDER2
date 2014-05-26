@@ -100,6 +100,10 @@ classdef Network < hgsetget
             end
         end
 
+        function desc = get.desc(net)
+            desc = sprintf([net.desc,'\n']);
+        end
+
         function show(net)
             networkProperties = {
                 'Name'                 net.network;
@@ -111,10 +115,11 @@ classdef Network < hgsetget
                 '# Nodes'              size(net.A,1)
                 '# links'              nnz(net)};
 
-            f = figure('Position', [100 100 752 500]);
+            f = figure();
             t1 = uitable('Parent', f, 'Position', [10 10 730 310],'ColumnWidth',{65});
-            set(t1, 'Data', net.A,'BackgroundColor',[1,1,1]);
-            t2 = uitable('Parent', f, 'Position', [10 330 730 170],'ColumnWidth',{200,480});
+            set(t1, 'Data', net.A,'ColumnName',net.names,'RowName',net.names,'BackgroundColor',[1,1,1]);
+            f = figure();
+            t2 = uitable('Parent', f,'ColumnWidth',{200,480});
             set(t2, 'Data', networkProperties,'BackgroundColor',[1,1,1],'ColumnName',{'Property','Value'});
         end
 
