@@ -38,8 +38,8 @@ classdef Dataset < hgsetget
 
     properties (SetAccess = public)
         alpha = 0.05; % Confidence
-        desc = ''; % description
         names = {};
+        desc = ''; % description
     end
 
     properties (Hidden = true)
