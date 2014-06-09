@@ -10,7 +10,7 @@ classdef dataRunParameters
           range = logspace(-1,3,5);
         zetavec = logspace(-6,0,100);
           looco = false;
-            nit = 1;
+            nit = [1:100];
          method = '';
         dataset = '';
         network = '';
