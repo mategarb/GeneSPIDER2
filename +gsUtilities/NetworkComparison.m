@@ -486,7 +486,8 @@ classdef NetworkComparison < hgsetget
         end
 
         function varargout = min(M,varargin);
-        % Find minimum values of specified measures or all values dependant on a single measure.
+        % Find minimum values over rows of specified measures or all values dependant on
+        % a single measure.
         %
         %   Input Arguments: min(M [,<measure>])
         %   ================
@@ -494,35 +495,38 @@ classdef NetworkComparison < hgsetget
         %   <measure> = Optional measure to get minimum value of as given by the
         %               measures availible by show(M), may be both string or integer. ('all')
         %
-        %   Output Arguments: [minimums,minind]
+        %   Output Arguments: [minimums, minind]
         %   ================
         %   minimums  = If <measure> is not given then returns minimum values for each measure
         %               else the minimum value of given <measure> along with corresponding
         %               value for all other measures.
-        %   maxind    = Gives the index of the minimum value for the given measures.
+        %   minind    = Gives the index of the minimum value for the given measures.
         %
 
             m = 'all';
-            if nargin == 1
+            if nargin >= 1
                 props = show(M);
             end
             if nargin == 2;
                 m = varargin{1};
             end
             if isa(m,'double')
-                mainprop = props{m};
+                m = props{m};
             end
 
             minimums = [];
             if strcmp(m,'all')
                 for i=1:length(props)
-                    [minimums(i,:),minind] = min(M.(props{i}));
+                    [minimums(i,:), minind(i,:)] = min((M.(props{i}))',[],1);
                 end
             else
                 ind = find(strcmp(props,m));
-                minind = find(M.(props{ind}) == min(M.(props{ind})));
+                [junk,minind] = min((M.(props{ind}))',[],1);
                 for i=1:length(props)
-                    minimums(i,:) = M.(props{i})(minind);
+                    prop = M.(props{i})';
+                    for j=1:size(prop,2)
+                        minimums(i,j) = prop(minind(j),j);
+                    end
                 end
             end
 
@@ -531,6 +535,28 @@ classdef NetworkComparison < hgsetget
             if nargout == 2
                 varargout{2} = minind;
             end
+        end
+
+        function varargout = minmin(M,varargin);
+        % Function returning a new NetworkCompare object with min for all measures.
+            T = tools.NetworkComparison();
+            props = show(T);
+
+            if length(varargin) == 0
+                mines = min(M);
+                for i=1:length(props)
+                    T.(props{i}) = mines(i,:)';
+                end
+            else
+                for j=1:length(varargin)
+                    mess = varargin{j};
+                    mines = min(M,mess);
+                    for i=1:length(props)
+                        T.(props{i}) = [T.(props{i}), mines(i,:)];
+                    end
+                end
+            end
+            varargout{1} = T;
         end
 
         function pM = plus(M,N)
@@ -599,7 +625,7 @@ classdef NetworkComparison < hgsetget
         end
 
         function T = getIndex(M,index)
-        % returns an object with index given for each measure
+        % returns an object with measure at index for each measure
             T = tools.NetworkComparison();
             props = show(T);
 
