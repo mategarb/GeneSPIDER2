@@ -38,8 +38,8 @@ classdef Dataset < hgsetget
 
     properties (SetAccess = public)
         alpha = 0.05; % Confidence
-        desc = ''; % description
         names = {};
+        desc = ''; % description
     end
 
     properties (Hidden = true)
@@ -528,6 +528,39 @@ classdef Dataset < hgsetget
                     included = [and(data.etay >= etaLim(1), data.etau >= etaLim(2))];
                 end
             end
+        end
+
+        function varargout = bootstrap(data,varargin)
+        % Botstraps a new data set from the old data set.
+            if length(varargin) == 1
+                boots = varargin{1};
+            else
+                boots = randi([1 data.M],1,data.M);
+            end
+
+            tmpdata = GeneSpider.Dataset();
+            tmpdata.populate(data);
+
+            tmp = struct([]);
+
+            tmp(1).P = data.P(:,boots);
+            tmp(1).Y = data.Y(:,boots);
+            if ~isempty(data.sdY)
+                tmp(1).sdY = data.sdY(:,boots);
+            end
+            if ~isempty(data.sdP)
+                tmp(1).sdP = data.sdP(:,boots);
+            end
+            if ~isempty(data.E)
+                tmp(1).E = data.E(:,boots);
+            end
+            if ~isempty(data.F)
+                tmp(1).F = data.F(:,boots);
+            end
+
+            tmpdata.populate(tmp);
+            varargout{1} = tmpdata;
+
         end
 
         function varargout = populate(data,input)
