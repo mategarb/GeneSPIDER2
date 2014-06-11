@@ -36,11 +36,11 @@ end
 if ~exist('net')
     X = (data.Y+data.E)';
 else
-    X = responce(data,net)';
+    X = response(data,net)';
 end
 
 %% Determine how to handle zeta %%
-% X = normalize(responce(data,net)')
+% X = normalize(response(data,net)')
 if ~rawZeta
     zmax = 0;
     for i = 1:size(data.P,1)
