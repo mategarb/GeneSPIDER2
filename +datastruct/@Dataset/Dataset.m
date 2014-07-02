@@ -14,8 +14,8 @@ classdef Dataset < hgsetget
 %
 
     properties (SetAccess = private)
-        dataset   % Name of the data set
-        network   % Name of complementary network
+        dataset ='';  % Name of the data set
+        network ='';  % Name of complementary network
         P         % True perturbations
         F         % Perturbation noise
         cvP = []; % Covariance of P
@@ -560,7 +560,9 @@ classdef Dataset < hgsetget
 
             tmpdata.populate(tmp);
             varargout{1} = tmpdata;
-
+            if nargout == 2
+               varargout{2} = boots;
+            end
         end
 
         function varargout = populate(data,input)
@@ -568,7 +570,7 @@ classdef Dataset < hgsetget
         %
         % == Usage ==
         % {data =} populate(data,input)
-        %          where input can be a struct, GeneSpider.Dataset,
+        %          With input being a struct, GeneSpider.Dataset,
         %          GeneSpider.Experiment or GeneSpider.Network
 
             if ~isa(input,'struct') && ~isa(input,'GeneSpider.Dataset') && ~isa(input,'GeneSpider.Experiment') && ~isa(input,'GeneSpider.Network')
