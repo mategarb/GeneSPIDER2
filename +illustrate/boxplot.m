@@ -39,7 +39,7 @@ function varargout = boxplot(Data,varargin)
 % illustrate.boxplot(Data,'xpos',X)
 %
 
-options = struct('title','','x','x','y','y','c','rgbkcmy','width',1,'scale','lin','ylim',[],'factorgap',10);
+options = struct('title','','x','x','y','y','c','rgbkcmy','width',0.5,'scale','lin','ylim',[],'factorgap',10);
 options(1).legend = {};
 options(1).highlight = [];
 options(1).xpos = [];
