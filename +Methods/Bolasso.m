@@ -21,7 +21,7 @@ function varargout = Bolasso(varargin)
 %%  Parse input arguments %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 rawZeta = 0;
-zetavec = [];
+tmpzetas = [];
 net = [];
 alpha = 1;
 tmpstraps = 1;
@@ -35,8 +35,8 @@ for i=1:nargin
     elseif varargin{i}==floor(varargin{i}) & length(varargin{i}) == 1 & varargin{i} ~= 1 % is integer of length 1 and is not 1
         tmpstraps = varargin{i};
     else
-        if isempty(zetavec)
-            zetavec = varargin{i};
+        if isempty(tmpzetas)
+            tmpzetas = varargin{i};
         else
             alpha = varargin{i};
         end
@@ -55,13 +55,15 @@ end
 
 Alogical = [];
 for j=1:straps
+    zetavec = tmpzetas;
     bdata = bootstrap(data);
 
     reps = 1;
     while rank(bdata.P) < min(bdata.N,bdata.M)
         bdata = bootstrap(data);
-        if reps > 100
-            break
+        if ~mod(reps,10000)
+            disp('number of booot tries')
+            disp(reps)
         end
         reps = reps+1;
     end
@@ -113,6 +115,12 @@ for j=1:straps
     end
 end
 
-Alogical(Alogical < 0.9*straps) = 0;
+Alogical = Alogical/straps;
+Afrac = Alogical;
+Alogical(Alogical < 1) = 0;
+varargout{1} = Alogical;
 
-varargout{1} = double(logical(Alogical));
+if nargout > 1
+    varargout{2} = Afrac;
+end
+% varargout{1} = double(logical(Alogical));
