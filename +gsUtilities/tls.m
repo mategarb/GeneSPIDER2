@@ -18,12 +18,14 @@ VYY      = V(1+n:end,1+n:end); % Take the bottom-right block of V.
 hatTheta = -VXY/VYY;           % Generate TLS estimate
 
 S1 = S;
-% S2 = S;
-
 S1(n+1:end,n+1:end) = 0;
-% S2(1:n,1:n) = 0;
-
 hatC = U*S1*V;
 
 hatXi = hatC(:,1:n);
 hatPhi = hatC(:,n+1:end);
+
+
+% S2 = S;
+% S2(1:n,1:n) = 0;
+% deltaC = U*S2*V;
+
