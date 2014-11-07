@@ -18,7 +18,7 @@ VYY      = V(1+n:end,1+n:end); % Take the bottom-right block of V.
 hatTheta = -VXY/VYY;           % Generate TLS estimate
 
 S1 = S;
-S2 = S;
+% S2 = S;
 
 S1(n+1:end,n+1:end) = 0;
 % S2(1:n,1:n) = 0;
