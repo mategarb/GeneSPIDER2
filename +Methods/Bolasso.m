@@ -110,8 +110,10 @@ for j=1:straps
     Afit(:, :, :) = Afit(:, :, end:-1:1); % Glmnet reverses the order. Need to undo.
     if isempty(Alogical)
         Alogical = double(logical(Afit));
+        nlinksBo(j) = nnz(logical(Afit));
     else
         Alogical = Alogical + double(logical(Afit));
+        nlinksBo(j) = nnz(logical(Afit));
     end
 end
 
@@ -123,4 +125,10 @@ varargout{1} = Alogical;
 if nargout > 1
     varargout{2} = Afrac;
 end
+
+if nargout > 2
+    varargout{3} = nlinksBo;
+end
+
+
 % varargout{1} = double(logical(Alogical));
