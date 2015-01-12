@@ -53,6 +53,7 @@ else
     straps = tmpstraps;
 end
 
+zR = [];
 Alogical = [];
 for j=1:straps
     zetavec = tmpzetas;
@@ -95,7 +96,8 @@ for j=1:straps
 
         zetaRange(1) = 0;
         zetaRange(2) = zmax;
-        varargout{3} = zetaRange;
+        zR(:,j) = zetaRange;
+        varargout{3} = zR;
         % Convert to interval.
         delta = zetaRange(2)-zetaRange(1);
         zetavec = zetavec*delta + zetaRange(1);
@@ -110,10 +112,10 @@ for j=1:straps
     Afit(:, :, :) = Afit(:, :, end:-1:1); % Glmnet reverses the order. Need to undo.
     if isempty(Alogical)
         Alogical = double(logical(Afit));
-        nlinksBo(j) = nnz(logical(Afit));
+        nlinksBo(:,j) = squeeze(sum(sum(double(logical(Afit)))));
     else
         Alogical = Alogical + double(logical(Afit));
-        nlinksBo(j) = nnz(logical(Afit));
+        nlinksBo(:,j) = squeeze(sum(sum(double(logical(Afit)))));
     end
 end
 
@@ -126,8 +128,8 @@ if nargout > 1
     varargout{2} = Afrac;
 end
 
-if nargout > 2
-    varargout{3} = nlinksBo;
+if nargout > 3
+    varargout{4} = nlinksBo;
 end
 
 

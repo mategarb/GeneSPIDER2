@@ -91,3 +91,7 @@ Afit(:, :, :) = Afit(:, :, end:-1:1); % Glmnet reverses the order. Need to undo.
 varargout{1} = Afit;
 
 varargout{2} = fit;
+
+if ~rawZeta
+    varargout{3} = zetaRange;
+end
