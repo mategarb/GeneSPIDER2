@@ -2,7 +2,7 @@ function [hatTheta hatXi hatPhi] = tls(Phi,Xi)
 % hatTheta = tls(Xi,Phi)
 % Basic total least squares estimation algorithm (cite:Markovsky2007)
 % 
-% From the model $(\Phi - \Upsilon) \times \Theta = (\Xi - \Pi)$
+% From the model $$(\Phi - \Upsilon) \times \Theta = (\Xi - \Pi)$$
 % where
 % $\Xi = -P^T$
 % $\Phi = Y^T$
