@@ -12,6 +12,9 @@ function export2Cytoscape(A,genes,outf)
 %
 
 if isa(A,'GeneSpider.Network')
+    if ispempty(genes)
+        genes = A.names;
+    end
     A = A.A;
 end
 
