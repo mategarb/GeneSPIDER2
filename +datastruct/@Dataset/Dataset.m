@@ -217,7 +217,7 @@ classdef Dataset < hgsetget
         end
 
         function scale_lambda_SNRv(data,SNRv)
-        % scale the noise variance by setting the theoretic lambda with wished SNRm
+        % scale the noise variance by setting the theoretic lambda with wished SNRv
             for i=1:data.N
                 lambda(i) = norm(data.Y(i,:))/(chi2inv(1-data.alpha,data.M)*SNRv^2);
             end
@@ -594,7 +594,7 @@ classdef Dataset < hgsetget
         % saves a GeneSpider.Dataset to file, either mat or xml.
         % The name of the file will be the name of the data set.
         %
-        %   Input Arguments: savedata(dataset[,path,<fileext>])
+        %   Input Arguments: save(dataset[,path,<fileext>])
         %   ================
         %   (none) :        Save data file to current directory as a .mat file.
         %   path :          Path to directory.
