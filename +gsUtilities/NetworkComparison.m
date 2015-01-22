@@ -646,5 +646,13 @@ classdef NetworkComparison < hgsetget
             end
         end
 
+        function square = issquare(M,A)
+            square = true;
+            [n,m] = size(A);
+
+            if n ~= m
+                square = false;
+            end
+        end
     end
 end
