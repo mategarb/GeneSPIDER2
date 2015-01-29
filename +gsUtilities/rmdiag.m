@@ -1,7 +1,9 @@
 function varargout = rmdiag(net)
-% removes diagonal elements and shifts the matrix along the second dimension.
+% Removes diagonal elements and shifts upper triangular elements -1 along the second dimension.
+% Ad = rmdiag(A)
 %
-% A = rmdiag(A)
+% A: initial network (n x n)
+% Ad: non diag network (n x n-1)
 %
 
 if isa(net,'GeneSpider.Network') || isa(net,'tools.NetworkComparison')

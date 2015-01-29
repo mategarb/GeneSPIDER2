@@ -1,8 +1,9 @@
 function results = matcls(Ainit, Y, P, R, verbo)
-%
 % Solve CLS with an unconstrained Newton method. Really it's an
 % equality-constrained problem, but I've eliminated the constraints with an
 % affine function.
+%
+% results = matcls(Ainit, Y, P, R, verbo)
 %
 % Ainit: initial network (n x n)
 % Y: expression matrix (n x m)

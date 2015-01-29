@@ -1,6 +1,20 @@
 function options = optionParser(options,varargin)
-% options = optionParser(options,varargin)
 % parses input options in to a struct
+% options = optionParser(options,varargin)
+%
+%   Input arguments
+%   ===============
+%   options: struct containing default options and values.
+%   varargin: name value pair of input options. names must be part
+%             of the options namespace.
+%
+%   Output arguments
+%   ================
+%   options: struct with translated values from input name/value pairs.
+%            If input name/value pairs is empty this will return the input
+%            options structure.
+%
+
 
 if isempty(varargin)
     return
@@ -26,4 +40,3 @@ for pair = reshape(varargin,2,[]) %# pair is {propName;propValue}
         error('%s is not a recognized parameter name',inpName)
     end
 end
-

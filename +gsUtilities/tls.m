@@ -1,6 +1,6 @@
 function [hatTheta hatXi hatPhi] = tls(Phi,Xi)
+% Basic total least squares estimation algorithm (Markovsky and Van Huffel 2007 http://www.sciencedirect.com/science/article/pii/S0165168407001405)
 % hatTheta = tls(Xi,Phi)
-% Basic total least squares estimation algorithm (cite:Markovsky2007)
 % 
 % From the model $$(\Phi - \Upsilon) \times \Theta = (\Xi - \Pi)$$
 % where

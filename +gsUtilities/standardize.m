@@ -1,6 +1,6 @@
 function Mhat = standardize(M)
 %
-% Standardize the given matrix so that:
+% Standard normalize the given matrix so that:
 %       1. The sum of all values in each row = 0
 %       2. The sum of the square of all values in each row = #columns
 %

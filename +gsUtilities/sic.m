@@ -1,5 +1,7 @@
 function varargout = sic(Y,A)
 % Calculates the strong irrepresentability condition of Y
+% Zhao and Yu 2006 (http://portal.acm.org/citation.cfm?id=1248547.1248637)
+%
 % [irr, SIC] = sic(Y,A)
 %
 % Y: NxM expression matrix, N genes, M samples.
@@ -7,6 +9,7 @@ function varargout = sic(Y,A)
 %
 % irr = min(1-SIC(~logical(A)))
 % SIC = abs(Phiz'*Phipc*pinv(Phipc'*Phipc)*sign(A(i,A(i,:)~=0))'), if A(i,j) = 0
+%
 
 [N,M] = size(A);
 Phi = Y';
@@ -16,25 +19,25 @@ reg0 = [];
 regN0 = [];
 for i = 1:N
     Phiz = Phi(:,A(i,:) == 0);
-    Phipc = Phi(:,A(i,:) ~= 0);    
+    Phipc = Phi(:,A(i,:) ~= 0);
 
     nPhiz = [nPhiz, Phiz(:)'];
     nPhipc = [nPhipc, Phipc(:)'];
-    
+
     reg0tmp = [];
     for k=1:size(Phiz,2)
         reg0tmp(k) = norm(Phiz(:,k));
     end
     reg0 = [reg0, reg0tmp];
-    
+
     regN0tmp = [];
     for k=1:size(Phipc,2)
         regN0tmp(k) = norm(Phipc(:,k));
     end
     regN0 = [regN0, regN0tmp];
-    
+
     lregDiff(i) = min(regN0tmp)/max(reg0tmp);
-    
+
     sic = abs(Phiz'*Phipc*pinv(Phipc'*Phipc)*sign(A(i,A(i,:)~=0))');
     k = 1;
     for j=1:N
@@ -80,5 +83,3 @@ end
 if nargout >= 7
     varargout{7} = lregDiff;
 end
-
-
