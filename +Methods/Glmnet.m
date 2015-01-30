@@ -15,6 +15,11 @@ function varargout = Glmnet(varargin)
 %   Output Arguments: estA
 %   =================
 %   estA: the estimated networks as a 3d array.
+%   fit: The glmnet algorithm output data, outputs the last fit if
+%        a range of sparsity penalties are supplied.
+%   zetaRange: the sparsity range used when a scaled zeta are used (default).
+%
+%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%  Parse input arguments %%
