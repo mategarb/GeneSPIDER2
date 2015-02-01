@@ -1,6 +1,6 @@
-[submodule "+GeneSpider"]
-	path = +GeneSpider
-	url = git@bitbucket.org:xparx/genespider.git
+[submodule "+datastruct"]
+	path = +datastruct
+	url = git@bitbucket.org:xparx/datastruct.git
 [submodule "+tools"]
 	path = +tools
 	url = git@bitbucket.org:xparx/tools.git
