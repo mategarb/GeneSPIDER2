@@ -1,6 +1,3 @@
-[submodule "+GeneSpider"]
-	path = +GeneSpider
-	url = git@bitbucket.org:xparx/genespider.git
 [submodule "+tools"]
 	path = +tools
 	url = git@bitbucket.org:xparx/tools.git
@@ -10,3 +7,6 @@
 [submodule "+illustrate"]
 	path = +illustrate
 	url = git@bitbucket.org:xparx/illustrate.git
+[submodule "+datastruct"]
+	path = +datastruct
+	url = ssh://git@bitbucket.org/xparx/datastruct.git
