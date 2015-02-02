@@ -1,18 +1,22 @@
 function varargout = Bolsco(varargin)
-% function estA = Bolsco(data,require,zetavec,rawZeta)
+% Bootstrap sampling applied for least squares with cut off
 %
-%   Input Arguments: Bolsco(data,net,zetavec,rawZeta)
+% function [estA,Asupport] = Bolsco(data,bootstraps,zetavec{,net,rawZeta})
+%
+%   Input Arguments:
 %   ================
 %   data:    GeneSpider.Dataset
 %   net:     GeneSpider.Network
 %   zetavec: vector containing zeta values. In the context of lsco
 %            this is a threshold value of the range from min to max element
+%   bootstraps: number of bootstraps, (default = 100, will not accept = 1)
 %   rawZeta: logical to determine if the zeta values should be
 %            converted.  default 0
 %
 %   Output Arguments: estA
 %   =================
-%   estA: the estimated networks as a 3d array.
+%   estA: the estimated networks as a 3d array (100% bootstrap supported network, binary).
+%   Asupport: the support after <straps> bootstraps.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%  Parse input arguments %%
@@ -82,7 +86,7 @@ for j = 1:straps
         estA = -data.P*pinv(response(data,net));
         zetaRange(1) = min(abs(estA(estA~=0)))-eps;
         zetaRange(2) = max(abs(estA(estA~=0)))+10*eps;
-        
+
         % Convert to interval.
         delta = zetaRange(2)-zetaRange(1);
         zetavec = zetavec*delta + zetaRange(1);
