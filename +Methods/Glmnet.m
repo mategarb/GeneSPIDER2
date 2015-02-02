@@ -1,4 +1,8 @@
 function varargout = Glmnet(varargin)
+% This is a wrapper function for the glmnet algorihtm:
+% (Glmnet for Matlab (2013) Qian, J., Hastie, T., Friedman, J., Tibshirani, R. and Simon, N.
+% http://www.stanford.edu/~hastie/glmnet_matlab/)
+%
 % function estA = Glmnet(data,net,zetavec[,alpha,rawZeta])
 %
 %   Input Arguments: Glmnet(data,net,zetavec[,alpha,rawZeta])
@@ -21,9 +25,9 @@ function varargout = Glmnet(varargin)
 %
 %
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%  Parse input arguments %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  Parse input arguments  %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 rawZeta = 0;
 zetavec = [];
 net = [];

@@ -1,7 +1,11 @@
 function varargout = Bolasso(varargin)
-% function estA = Glmnet(data,net,zetavec[,alpha,rawZeta,straps])
+% A function wrapper that implements bootstrap lasso, the lasso algorithm used is the glmnet algorithm:
+% (Glmnet for Matlab (2013) Qian, J., Hastie, T., Friedman, J., Tibshirani, R. and Simon, N.
+% http://www.stanford.edu/~hastie/glmnet_matlab/)
 %
-%   Input Arguments: Glmnet(data,net,zetavec[,alpha,rawZeta,straps])
+% function estA = Bolasso(data,net,zetavec[,alpha,rawZeta,straps])
+%
+%   Input Arguments: Bolasso(data,net,zetavec[,alpha,rawZeta,straps])
 %   ================
 %   data:    GeneSpider.Dataset
 %   net:     GeneSpider.Network
