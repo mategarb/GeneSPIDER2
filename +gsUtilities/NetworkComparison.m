@@ -1,8 +1,5 @@
 classdef NetworkComparison < hgsetget
-% CompareNetworks calculates difference measures between weighted network
-% adjacency matrices.
-% For a nice overview do:
-% doc tools.NetworkCopmarison
+% CompareNetworks calculates difference measures between weighted network adjacency matrices.
 %
 %   Input Arguments: NetworkComparison(A, Alist, selected)
 %   ================
@@ -19,7 +16,16 @@ classdef NetworkComparison < hgsetget
 %   Use Examples:
 %   ================
 %
-%   M = NetworkComparison();                  % initiate comparision
+%   % Create sparse random network:
+%   A = randn(10);
+%   A(A < 0.75) = 0;
+%
+%   % Create random Alist networks:
+%   Alist = randn(10,10,20);
+%   Alist(Alist < 0.75) = 0;
+%
+%
+%   M = tools.NetworkComparison();            % initiate comparision
 %   % set(M,'tol',value)                      % set tolerance {eps}
 %   M.A = A;                                  % set true A
 %   <results> = compare(M,Alist[,selected]);  % Update M with comparisons between A and Alist
@@ -27,9 +33,9 @@ classdef NetworkComparison < hgsetget
 %
 %   ================ % initiate comparison with or without Alist
 %
-%   M = NetworkComparison(A); % Initiate with true network
+%   M = tools.NetworkComparison(A); % Initiate with true network
 %   % or
-%   M = NetworkComparison(A,Alist); % Initiate and do comparison returning an object
+%   M = tools.NetworkComparison(A,Alist); % Initiate and do comparison returning an object
 %
 %   ================ % querie object
 %
@@ -134,7 +140,7 @@ classdef NetworkComparison < hgsetget
     methods
         function M = NetworkComparison(varargin)
             if nargin >= 1
-                setA(M,varargin{1});
+                M.A = varargin{1};
             end
 
             if nargin >= 2
@@ -149,13 +155,21 @@ classdef NetworkComparison < hgsetget
                 warning('True A already set, overwriting')
             end
             if isa(net,'GeneSpider.Network')
+                if length(size(net.A)) > 2
+                    error('3d matrices are not allowed as golden standard')
+                end
                 M.A = net.A;
             else
+                if length(size(net)) > 2
+                    error('3d matrices are not allowed as golden standard')
+                end
                 M.A = net;
             end
+            setA(M,M.A);
         end
 
         function setA(M,net)
+        % Calculate network properties
             M.A = net;
             [UA SA VA] = svd(M.A);
             if issquare(M.A)
@@ -194,7 +208,10 @@ classdef NetworkComparison < hgsetget
         end
 
         function systemMeasures(M,Alist)
-            for i=1:length(Alist(1,1,:))
+        % Calculate only system measures
+        % systemMeasures(M,Alist)
+
+            for i=1:size(Alist,3)
                 T = Alist(:,:,i);
                 M.abs2norm(length(M.abs2norm)+1) = norm(T-M.A);
                 try
@@ -238,7 +255,10 @@ classdef NetworkComparison < hgsetget
         end
 
         function topologyMeasures(M,Alist)
-            for i=1:length(Alist(1,1,:))
+        % Calculate only topololigcal measures
+        % topologyMeasures(M,Alist)
+
+            for i=1:size(Alist,3)
                 T = Alist(:,:,i);
                 STopoT = zeros(size(M.A));
                 STopoT(T > M.tol) = 1;
@@ -252,15 +272,21 @@ classdef NetworkComparison < hgsetget
         end
 
         function correlationMeasures(M,Alist)
-            for i=1:length(Alist(1,1,:))
+        % calculate only correlation measures
+        % correlationMeasures(M,Alist)
+
+            for i=1:size(Alist,3)
                 T = Alist(:,:,i);
                 M.plc(length(M.plc)+1) = corr(M.A(:),T(:));
             end
         end
 
         function graphMeasures(M,Alist)
+        % Calculate only non directional graph measures
+        % graphMeasures(M,Alist)
+
             Z = zeros(size(M.A));
-            for i=1:length(Alist(1,1,:))
+            for i=1:size(Alist,3)
                 T = Alist(:,:,i);
                 DiGraphT = logical(Z);
                 DiGraphT(abs(T) > M.tol) = true;
@@ -288,7 +314,10 @@ classdef NetworkComparison < hgsetget
         end
 
         function dirGraphMeasures(M,Alist)
-            for i=1:length(Alist(1,1,:))
+        % Calculate only directional graph measures
+        % dirGraphMeasures(M,Alist)
+
+            for i=1:size(Alist,3)
                 T = Alist(:,:,i);
                 STT = zeros(size(M.A));
                 STT(T > M.tol) = 1;
@@ -414,6 +443,8 @@ classdef NetworkComparison < hgsetget
         function varargout = max(M,varargin);
         % Find maximum values over rows of specified measures or all values dependant on
         % a single measure.
+        % [maximums, maxind] = max(M [,<measure>])
+        %
         %
         %   Input Arguments: max(M [,<measure>])
         %   ================
@@ -464,7 +495,8 @@ classdef NetworkComparison < hgsetget
         end
 
         function varargout = maxmax(M,varargin);
-        % Function returning a new NetworkCompare object with max for all measures.
+        % Function returning a new NetworkComparison object with max for all measures.
+
             T = tools.NetworkComparison();
             props = show(T);
 
@@ -560,6 +592,7 @@ classdef NetworkComparison < hgsetget
         end
 
         function pM = plus(M,N)
+        % Execute plus operation for each measure between each measure.
             props = show(M);
             pM = tools.NetworkComparison(M.A);
             for i=1:length(props)
@@ -568,6 +601,7 @@ classdef NetworkComparison < hgsetget
         end
 
         function M = vertcat(M,varargin)
+        % Use vertical concatenation
             props = show(M);
             for j=1:length(varargin)
                 N = varargin{j};
@@ -578,6 +612,7 @@ classdef NetworkComparison < hgsetget
         end
 
         function M = horzcat(M,varargin)
+        % Use horizontal concatenation
             props = show(M);
             for j=1:length(varargin)
                 N = varargin{j};
@@ -596,7 +631,7 @@ classdef NetworkComparison < hgsetget
         end
 
         function M = stack(M,varargin)
-        % stack each measure in the 3rd dimension
+        % stack each measure in the 3rd dimension (concatenation in 3rd dim)
             props = show(M);
             for j=1:length(varargin)
                 N = varargin{j};
@@ -607,7 +642,8 @@ classdef NetworkComparison < hgsetget
         end
 
         function mM = mean(M)
-        % calculate mean of all measures
+        % calculate mean of all measures,
+        % if matrix then columnwise operation.
             props = show(M);
             mM = tools.NetworkComparison(M.A);
             for i=1:length(props)
@@ -616,7 +652,8 @@ classdef NetworkComparison < hgsetget
         end
 
         function vM = var(M)
-        % calculate variance of all measures
+        % calculate variance of all measures,
+        % if matrix then columnwise operation.
             props = show(M);
             vM = tools.NetworkComparison(M.A);
             for i=1:length(props)
@@ -625,7 +662,7 @@ classdef NetworkComparison < hgsetget
         end
 
         function T = getIndex(M,index)
-        % returns an object with measure at index for each measure
+        % returns an object with measure at index for each measure.
             T = tools.NetworkComparison();
             props = show(T);
 
@@ -647,6 +684,7 @@ classdef NetworkComparison < hgsetget
         end
 
         function square = issquare(M,A)
+        % helper function if issquare
             square = true;
             [n,m] = size(A);
 
