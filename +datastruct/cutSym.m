@@ -2,7 +2,7 @@ function A = cutSym(A,inchance)
 % removes links in a symmetric matrix with a probability to be in or out degree.
 % A small chance of keeping feedback loops.
 %
-% A = GeneSpider.cutSym(A,inchance)
+% A = datastruct.cutSym(A,inchance)
 %
 % A: network matrix nxm n=outdegree, m=indegree
 % inchance: the chance of removing in n instead of m

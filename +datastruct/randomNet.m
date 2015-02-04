@@ -1,7 +1,7 @@
 function A = randomNet(N,sparsity)
 % creates a random network with N nodes and specific sparseness.
 %
-% A = GeneSpider.randomNet(N,sparsity)
+% A = datastruct.randomNet(N,sparsity)
 %
 % A: undirected random network matrix
 % N: number of nodes

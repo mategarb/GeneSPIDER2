@@ -157,8 +157,8 @@ classdef Network < hgsetget
 
         function Y = response(net,data)
         % Gives the network response to input from data.
-            if ~isa(data,'GeneSpider.Dataset')
-                error('Must give a GeneSpider.Dataset to calculate response')
+            if ~isa(data,'datastruct.Dataset')
+                error('Must give a datastruct.Dataset to calculate response')
             end
             Y = net.G*(data.P-data.F) + data.E;
         end
@@ -166,7 +166,7 @@ classdef Network < hgsetget
         function net = populate(net,input)
         % populate the Network object with fields of the network struct.
         %
-            if ~isa(input,'struct') && ~isa(input,'GeneSpider.Network')
+            if ~isa(input,'struct') && ~isa(input,'datastruct.Network')
                 error('Needs to be a struct or Genespider.Network class')
             end
             inputnames = fieldnames(input);
@@ -179,7 +179,7 @@ classdef Network < hgsetget
         end
 
         function save(net,varargin)
-        % saves a GeneSpider.Network to file, either mat or xml.
+        % saves a datastruct.Network to file, either mat or xml.
         % The name of the file will be the name of the data set.
         %
         %   Input Arguments: savenet(network[,path,<fileext>])
@@ -229,9 +229,9 @@ classdef Network < hgsetget
     methods (Static)
         function varargout = load(varargin)
         % Load a network data-file back in to a Network object
-        % net = GeneSpider.Network.loadnet(['path/file'] or [path,file]);
+        % net = datastruct.Network.loadnet(['path/file'] or [path,file]);
         %
-        %   Input Arguments: GeneSpider.Network.loadnet([,path,file])
+        %   Input Arguments: datastruct.Network.loadnet([,path,file])
         %   ================
         %   (none) :        Outputs a list of datasets availible in the current directory.
         %   path :          Path to direcotry or full path with filename. If no file is specified
@@ -308,7 +308,7 @@ classdef Network < hgsetget
                 end
             end
 
-            net = GeneSpider.Network;
+            net = datastruct.Network;
             fetchfile = fullfile(lpath,lfile);
             [p,f,e] = fileparts(fetchfile);
             if strcmp(e,'.mat')

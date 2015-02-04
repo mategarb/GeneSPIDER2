@@ -1,7 +1,7 @@
 function A = scalefree(N,sparsity)
 % Create a scalefree network with N nodes and specific sparseness.
 %
-% A = GeneSpider.scalefree(N,sparsity)
+% A = datastruct.scalefree(N,sparsity)
 %
 % A: undirected scalefree network matrix
 % N: number of nodes

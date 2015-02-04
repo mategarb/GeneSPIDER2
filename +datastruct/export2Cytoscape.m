@@ -11,7 +11,7 @@ function export2Cytoscape(A,genes,outf)
 %       existing files
 %
 
-if isa(A,'GeneSpider.Network')
+if isa(A,'datastruct.Network')
     if ispempty(genes)
         genes = A.names;
     end

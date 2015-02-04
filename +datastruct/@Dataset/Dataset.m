@@ -1,6 +1,6 @@
 classdef Dataset < hgsetget
-% The Dataset class is used to store a GeneSpider.Dataset
-% complementary to a GeneSpider.Network
+% The Dataset class is used to store a datastruct.Dataset
+% complementary to a datastruct.Network
 %
 %   Input arguments: Dataset([Network ,Experiment])
 %   ================
@@ -54,9 +54,9 @@ classdef Dataset < hgsetget
             warning('off','MATLAB:structOnObject')
             if nargin > 0
                 for i=1:nargin
-                    if isa(varargin{i},'GeneSpider.Network')
+                    if isa(varargin{i},'datastruct.Network')
                         populate(data,varargin{i});
-                    elseif isa(varargin{i},'GeneSpider.Experiment')
+                    elseif isa(varargin{i},'datastruct.Experiment')
                         experiment = struct(varargin{i});
                         experiment.Y = trueY(varargin{i});
                         populate(data,experiment);
@@ -64,7 +64,7 @@ classdef Dataset < hgsetget
                         else; data.created.creator = getenv('USER');
                         end
                         data.created.id = num2str(round(cond(data.Y)*10000));
-                    elseif isa(varargin{i},'GeneSpider.Dataset')
+                    elseif isa(varargin{i},'datastruct.Dataset')
                         newdata = struct(varargin{i});
                         populate(data,newdata);
                         if ispc; data.created.creator = getenv('USERNAME');
@@ -237,7 +237,7 @@ classdef Dataset < hgsetget
         % == Usage ==
         % newdata = scaleSNR(data,net,SNR)
         %
-            newdata = GeneSpider.Dataset(data,net);
+            newdata = datastruct.Dataset(data,net);
             sY = svd(newdata.Y);
             sE = svd(newdata.E);
             scale = 1/SNR*min(sY)/max(sE);
@@ -358,7 +358,7 @@ classdef Dataset < hgsetget
 
             [n,m] = size(data.P);
             if length(varargin) == 1
-                if isa(varargin{1},'GeneSpider.Network')
+                if isa(varargin{1},'datastruct.Network')
                     net = varargin{1};
                     Y = net.G*(data.P-data.F(:,1:m)) + data.E(:,1:m);
                 else
@@ -375,7 +375,7 @@ classdef Dataset < hgsetget
         % == Usage ==
         % newdata = without(data,i [,net])
         %           where 'i' is the sample that should be removed
-        %           and net is a GeneSpider.Network.
+        %           and net is a datastruct.Network.
         %
             M = data.M;
 
@@ -402,9 +402,9 @@ classdef Dataset < hgsetget
             end
 
             if length(varargin) == 1
-                newdata = GeneSpider.Dataset(data,net);
+                newdata = datastruct.Dataset(data,net);
             else
-                newdata = GeneSpider.Dataset(data);
+                newdata = datastruct.Dataset(data);
             end
 
             newdata = populate(newdata,tmp);
@@ -450,7 +450,7 @@ classdef Dataset < hgsetget
         %
             net = [];
             if length(varargin) == 1
-                if isa(varargin{1},'GeneSpider.Network')
+                if isa(varargin{1},'datastruct.Network')
                     net = varargin{1};
                 end
             end
@@ -479,7 +479,7 @@ classdef Dataset < hgsetget
 
             net = [];
             if length(varargin) == 1
-                if isa(varargin{1},'GeneSpider.Network')
+                if isa(varargin{1},'datastruct.Network')
                     net = varargin{1};
                 end
             end
@@ -551,7 +551,7 @@ classdef Dataset < hgsetget
                 boots = randi([1 data.M],1,data.M);
             end
 
-            tmpdata = GeneSpider.Dataset();
+            tmpdata = datastruct.Dataset();
             tmpdata.populate(data);
 
             tmp = struct([]);
@@ -583,11 +583,11 @@ classdef Dataset < hgsetget
         %
         % == Usage ==
         % {data =} populate(data,input)
-        %          With input being a struct, GeneSpider.Dataset,
-        %          GeneSpider.Experiment or GeneSpider.Network
+        %          With input being a struct, datastruct.Dataset,
+        %          datastruct.Experiment or datastruct.Network
 
-            if ~isa(input,'struct') && ~isa(input,'GeneSpider.Dataset') && ~isa(input,'GeneSpider.Experiment') && ~isa(input,'GeneSpider.Network')
-                error('Needs to be a struct,\n GeneSpider.Dataset,\n GeneSpider.Experiment or GeneSpider.Network class')
+            if ~isa(input,'struct') && ~isa(input,'datastruct.Dataset') && ~isa(input,'datastruct.Experiment') && ~isa(input,'datastruct.Network')
+                error('Needs to be a struct,\n datastruct.Dataset,\n datastruct.Experiment or datastruct.Network class')
             end
 
             inputnames = fieldnames(input);
@@ -604,7 +604,7 @@ classdef Dataset < hgsetget
         end
 
         function save(data,varargin)
-        % saves a GeneSpider.Dataset to file, either mat or xml.
+        % saves a datastruct.Dataset to file, either mat or xml.
         % The name of the file will be the name of the data set.
         %
         %   Input Arguments: save(dataset[,path,<fileext>])
@@ -653,9 +653,9 @@ classdef Dataset < hgsetget
     methods (Static)
         function varargout = load(varargin)
         % Load a dataset file back in to a Dataset object
-        % dataset = GeneSpider.Dataset.loaddata(['path/file'] or [path,file]);
+        % dataset = datastruct.Dataset.loaddata(['path/file'] or [path,file]);
         %
-        %   Input Arguments: GeneSpider.Dataset.loaddata([path,file])
+        %   Input Arguments: datastruct.Dataset.loaddata([path,file])
         %   ================
         %   (none) :        Outputs a list of datasets availible in the current directory.
         %   path :          Path to directory or full path with filename. If no file is specified
@@ -729,7 +729,7 @@ classdef Dataset < hgsetget
                 end
             end
 
-            data = GeneSpider.Dataset;
+            data = datastruct.Dataset;
             fetchfile = fullfile(lpath,lfile);
             [p,f,e] = fileparts(fetchfile);
             if strcmp(e,'.mat')
