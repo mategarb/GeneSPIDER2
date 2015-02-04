@@ -6,7 +6,7 @@ function varargout = rmdiag(net)
 % Ad: non diag network (n x n-1)
 %
 
-if isa(net,'GeneSpider.Network') || isa(net,'tools.NetworkComparison')
+if isa(net,'datastruct.Network') || isa(net,'tools.NetworkComparison')
     A = net.A;
 elseif isa(net,'double')
     A = net;

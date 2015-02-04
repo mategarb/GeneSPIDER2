@@ -154,7 +154,7 @@ classdef NetworkComparison < hgsetget
             if ~isempty(A) && ~isempty(net)
                 warning('True A already set, overwriting')
             end
-            if isa(net,'GeneSpider.Network')
+            if isa(net,'datastruct.Network')
                 if length(size(net.A)) > 2
                     error('3d matrices are not allowed as golden standard')
                 end
