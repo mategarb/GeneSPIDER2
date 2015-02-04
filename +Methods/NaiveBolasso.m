@@ -3,8 +3,8 @@ function varargout = NaiveBolasso(varargin)
 %
 %   Input Arguments: Glmnet(data,net,zetavec[,alpha,rawZeta,straps])
 %   ================
-%   data:    GeneSpider.Dataset
-%   net:     GeneSpider.Network
+%   data:    datastruct.Dataset
+%   net:     datastruct.Network
 %   zetavec: method parameter for tuning the network fitting.
 %   alpha:   The elasticnet mixing parameter, with 0 < alpha <= 1. (default = 1, Lasso)
 %            Currently alpha < 0.01 is not reliable, unless you
@@ -26,9 +26,9 @@ net = [];
 alpha = 1;
 tmpstraps = 1;
 for i=1:nargin
-    if isa(varargin{i},'GeneSpider.Dataset')
+    if isa(varargin{i},'datastruct.Dataset')
         data = varargin{i};
-    elseif isa(varargin{i},'GeneSpider.Network')
+    elseif isa(varargin{i},'datastruct.Network')
         net = varargin{i};
     elseif isa(varargin{i},'logical')
         rawZeta = varargin{i};

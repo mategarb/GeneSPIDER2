@@ -20,9 +20,9 @@ function varargout = cls(varargin)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 net = [];
 for i=1:nargin
-    if isa(varargin{i},'GeneSpider.Dataset')
+    if isa(varargin{i},'datastruct.Dataset')
         data = varargin{i};
-    elseif isa(varargin{i},'GeneSpider.Network')
+    elseif isa(varargin{i},'datastruct.Network')
         net = varargin{i};
     else
         initA = varargin{i};

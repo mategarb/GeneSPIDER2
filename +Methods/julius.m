@@ -5,8 +5,8 @@ function varargout = julius(varargin)
 %
 %   Input Arguments: julius(data,net,zetavec [,rawZeta,'initA',initA])
 %   ================
-%   data:    GeneSpider.Dataset
-%   net:     GeneSpider.Network
+%   data:    datastruct.Dataset
+%   net:     datastruct.Network
 %   zetavec: method parameter for tuning the network fitting. (optinal)
 %   rawZeta: logical to determine if the zeta values should be
 %            converted.  default = false
@@ -24,9 +24,9 @@ zetavec = [];
 net = [];
 
 for i=1:nargin
-    if isa(varargin{i},'GeneSpider.Dataset')
+    if isa(varargin{i},'datastruct.Dataset')
         data = varargin{i};
-    elseif isa(varargin{i},'GeneSpider.Network')
+    elseif isa(varargin{i},'datastruct.Network')
         net = varargin{i};
     elseif isa(varargin{i},'logical')
         rawZeta = varargin{i};

@@ -3,11 +3,11 @@ function varargout = GLasso(varargin)
 %
 %   Input Arguments: GLasso(data,zetavec[,rawZeta,net])
 %   ================
-%   data:    GeneSpider.Dataset
+%   data:    datastruct.Dataset
 %   zetavec: method parameter for tuning the network fitting. (optional)
 %   rawZeta: logical to determine if the zeta values should be
 %            converted.  default = false
-%   net:     GeneSpider.Network
+%   net:     datastruct.Network
 %
 %   Output Arguments: estA
 %   =================
@@ -20,9 +20,9 @@ rawZeta = false;
 
 net = [];
 for i=1:nargin
-    if isa(varargin{i},'GeneSpider.Dataset')
+    if isa(varargin{i},'datastruct.Dataset')
         data = varargin{i};
-    elseif isa(varargin{i},'GeneSpider.Network')
+    elseif isa(varargin{i},'datastruct.Network')
         net = varargin{i};
     elseif isa(varargin{i},'logical')
         rawZeta = varargin{i};

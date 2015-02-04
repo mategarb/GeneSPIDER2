@@ -3,8 +3,8 @@ function varargout = NIR(varargin)
 % 
 %   Input Arguments: NIR(data,net,zetavec[,rawZeta])
 %   ================
-%   data:    GeneSpider.Dataset
-%   net:     GeneSpider.Network
+%   data:    datastruct.Dataset
+%   net:     datastruct.Network
 %   zetavec: method parameter for tuning the network fitting.
 %   rawZeta: logical to determine if the zeta values should be
 %            converted.  default = false
@@ -23,9 +23,9 @@ rawZeta = 0;
 zetavec = [];
 net = [];
 for i=1:nargin
-    if isa(varargin{i},'GeneSpider.Dataset')
+    if isa(varargin{i},'datastruct.Dataset')
         data = varargin{i};
-    elseif isa(varargin{i},'GeneSpider.Network')
+    elseif isa(varargin{i},'datastruct.Network')
         net = varargin{i};
     elseif isa(varargin{i},'logical')
         rawZeta = varargin{i};

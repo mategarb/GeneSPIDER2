@@ -3,8 +3,8 @@ function varargout = RNI(varargin)
 %
 %   Input Arguments: RNI(data <,net>)
 %   ================
-%   data:    GeneSpider.Dataset
-%   net:     GeneSpider.Network <optional>
+%   data:    datastruct.Dataset
+%   net:     datastruct.Network <optional>
 %   alpha:   confidense level of inference.
 %
 %   Output Arguments: confA
@@ -19,9 +19,9 @@ rawZeta = 0;
 
 net = [];
 for i=1:nargin
-    if isa(varargin{i},'GeneSpider.Dataset')
+    if isa(varargin{i},'datastruct.Dataset')
         data = varargin{i};
-    elseif isa(varargin{i},'GeneSpider.Network')
+    elseif isa(varargin{i},'datastruct.Network')
         net = varargin{i};
     elseif isa(varargin{i},'logical')
         rawZeta = varargin{i}; % Obsolete

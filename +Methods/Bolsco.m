@@ -5,8 +5,8 @@ function varargout = Bolsco(varargin)
 %
 %   Input Arguments:
 %   ================
-%   data:    GeneSpider.Dataset
-%   net:     GeneSpider.Network
+%   data:    datastruct.Dataset
+%   net:     datastruct.Network
 %   zetavec: vector containing zeta values. In the context of lsco
 %            this is a threshold value of the range from min to max element
 %   bootstraps: number of bootstraps, (default = 100, will not accept = 1)
@@ -27,9 +27,9 @@ net = [];
 alpha = 1;
 tmpstraps = 1;
 for i=1:nargin
-    if isa(varargin{i},'GeneSpider.Dataset')
+    if isa(varargin{i},'datastruct.Dataset')
         data = varargin{i};
-    elseif isa(varargin{i},'GeneSpider.Network')
+    elseif isa(varargin{i},'datastruct.Network')
         net = varargin{i};
     elseif isa(varargin{i},'logical')
         rawZeta = varargin{i};
