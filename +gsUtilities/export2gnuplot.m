@@ -37,20 +37,21 @@ function export2gnuplot(file,varargin)
         error([tmp.name,' needs variables (cell array)/data (2d matrix) pairs as input, see: help tools.export2gnuplot'])
     end
 
+
     [path,f,ext] = fileparts(file);
     if ~isdir(path)
         mkdir(path);
     end
 
     if ~exist(fullfile(path,f,ext),'file')
-        fid = fopen(fullfile(path,f,ext),'w');
+        fid = fopen(fullfile(path,[f,ext]),'w');
     else
-        fid = fopen(fullfile(path,f,ext),'a');
+        fid = fopen(fullfile(path,[f,ext]),'a');
         fpintf(fid,'\n\n')
     end
 
     if fid == -1
-        error('File could not be opened for writing')
+        error('File %s could not be opened for writing',fullfile(path,f,ext))
     end
 
     for i=1:2:nArgs
@@ -60,13 +61,17 @@ function export2gnuplot(file,varargin)
         fprintf(fid,'#');
         fprintf(fid,'\t%s',variables{:});
         fprintf(fid,'\n');
-        if ismepty(values)
+        if isempty(values)
             continue
         end
-        
-        for j=size(values,1)
+
+        for j=1:size(values,1)
             fprintf(fid,'\t%g',values(j,:));
             fprintf(fid,'\n');
+        end
+
+        if i ~= nArgs-1
+            fprintf(fid,'\n\n');
         end
     end
 
