@@ -47,7 +47,7 @@ function export2gnuplot(file,varargin)
         fid = fopen(fullfile(path,[f,ext]),'w');
     else
         fid = fopen(fullfile(path,[f,ext]),'a');
-        fpintf(fid,'\n\n')
+        fprintf(fid,'\n\n');
     end
 
     if fid == -1
