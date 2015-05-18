@@ -1,13 +1,13 @@
-function varargout = Bolsco(varargin)
+function varargout = Botlsco(varargin)
 % Bootstrap sampling applied for least squares with cut off
 %
-% function [estA,Asupport] = Bolsco(data,bootstraps,zetavec[,net,rawZeta,straps])
+% function [estA,Asupport] = Botlsco(data,bootstraps,zetavec[,net,rawZeta,straps])
 %
 %   Input Arguments:
 %   ================
 %   data:    datastruct.Dataset
 %   net:     datastruct.Network
-%   zetavec: vector containing zeta values. In the context of lsco
+%   zetavec: vector containing zeta values. In the context of tlsco
 %            this is a threshold value of the range from min to max element
 %   bootstraps: number of bootstraps, (default = 100, will not accept = 1)
 %   rawZeta: logical to determine if the zeta values should be
@@ -57,7 +57,8 @@ end
 
 %% Run
 if ~exist('tmpzetas','var')
-    estA = -data.P*pinv(response(data,net));
+    hatTheta = tools.tls(response(data,net)',data.P');
+    estA = hatTheta';
     varargout{1} = estA;
     return
 end
@@ -85,7 +86,8 @@ for j = 1:straps
 
     if ~rawZeta
         zetaRange = [];
-        estA = -data.P*pinv(response(data,net));
+        hatTheta = tools.tls(response(data,net)',data.P');
+        estA = hatTheta';
         zetaRange(1) = min(abs(estA(estA~=0)))-eps;
         zetaRange(2) = max(abs(estA(estA~=0)))+10*eps;
         zR(:,j) = zetaRange;
@@ -99,10 +101,11 @@ for j = 1:straps
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    Als = -data.P*pinv(response(data,net));
+    hatTheta = tools.tls(response(data,net)',data.P');
+    Atls = hatTheta';
     for i=1:length(zetavec)
-        temp = find(abs(Als) <= zetavec(i));
-        Atmp = Als;
+        temp = find(abs(Atls) <= zetavec(i));
+        Atmp = Atls;
         Atmp(temp) = 0;
 
         estA(:,:,i) = Atmp;

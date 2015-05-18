@@ -15,7 +15,7 @@ function varargout = Bolasso(varargin)
 %            supply your own zeta sequence. zetavec needs to be set first
 %   rawZeta: logical to determine if the zeta values should be
 %            converted.  default = false
-%   straps:  integer, number of bootstrap runs. must be > 1, default = ceil(sqrt(data.M))
+%   straps:  integer, number of bootstrap runs. must be > 1, default = 100
 %
 %   Output Arguments: estA
 %   =================
@@ -57,7 +57,7 @@ else
     straps = tmpstraps;
 end
 
-zR = [];
+zR = []; % zeta range for all bootstraps
 Alogical = [];
 for j=1:straps
     zetavec = tmpzetas;
@@ -116,9 +116,14 @@ for j=1:straps
     Afit(:, :, :) = Afit(:, :, end:-1:1); % Glmnet reverses the order. Need to undo.
     if isempty(Alogical)
         Alogical = double(logical(Afit));
+        Aposs = double(sign(Afit));
+        Aposs(Aposs < 0) = 0;
         nlinksBo(:,j) = squeeze(sum(sum(double(logical(Afit)))));
     else
         Alogical = Alogical + double(logical(Afit));
+        tmp = double(sign(Afit));
+        tmp(tmp < 0) = 0;
+        Aposs = Aposs + double(tmp);
         nlinksBo(:,j) = squeeze(sum(sum(double(logical(Afit)))));
     end
 end
@@ -136,5 +141,8 @@ if nargout > 3
     varargout{4} = nlinksBo;
 end
 
+if nargout > 4
+    varargout{5} = Aposs;
+end
 
 % varargout{1} = double(logical(Alogical));
