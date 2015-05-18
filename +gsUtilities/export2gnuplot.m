@@ -43,6 +43,10 @@ function export2gnuplot(file,varargin)
         mkdir(path);
     end
 
+    if isempty(ext)
+        ext = '.tsv'
+    end
+
     if ~exist(fullfile(path,f,ext),'file')
         fid = fopen(fullfile(path,[f,ext]),'w');
     else
