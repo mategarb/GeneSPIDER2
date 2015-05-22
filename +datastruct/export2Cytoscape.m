@@ -1,5 +1,5 @@
-function export2Cytoscape(A,genes,outf)
-% export2Cytoscape(A,genes,outf)
+function export2Cytoscape(A,genes,outf,varargin)
+% export2Cytoscape(A,genes,outf{,altA})
 %
 % Make a Cytoscape input file from Network class.
 % This will output the interaction node fields <source> <target> <strength>
@@ -9,6 +9,7 @@ function export2Cytoscape(A,genes,outf)
 % genes: cell array (n x 1) with gene names
 % outf: name of output text file "<outf>.tsv"; it will overwrite any
 %       existing files
+% altA: alternative weights for the links. (optional)
 %
 
 if isa(A,'datastruct.Network')
@@ -16,6 +17,10 @@ if isa(A,'datastruct.Network')
         genes = A.names;
     end
     A = A.A;
+end
+
+if length(varargin) > 0
+    altA = varargin{1};
 end
 
 % Initialize
@@ -33,13 +38,29 @@ end
 for src = 1:nGenes  % Loop through the source genes (columns)
     for tgt = 1:nGenes  % Loop through the target genes (rows)
         strength = A(tgt,src);
+        if exist('altA','var')
+            alt_strength = altA(tgt,src);
+        end
+
         if strength ~= 0
             if issparse(strength)
                 strength = full(strength);
             end
+            if exist('altA','var')
+                if issparse(alt_strength)
+                    alt_strength = full(alt_strength);
+                end
+            end
+
+
             c_src = genes{src};
             c_tgt = genes{tgt};
-            fprintf(fid,'%s\t%s\t%i\t%g\n',c_src,c_tgt,sign(strength),strength);
+
+            if exist('altA','var')
+                fprintf(fid,'%s\t%s\t%i\t%g\t%g\t%g\n',c_src,c_tgt,sign(strength),strength,abs(strength),alt_strength);
+            else
+                fprintf(fid,'%s\t%s\t%i\t%g\t%g\n',c_src,c_tgt,sign(strength),strength,abs(strength));
+            end
         end
     end % target genes
 end % source genes
