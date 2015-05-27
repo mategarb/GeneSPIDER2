@@ -1,12 +1,12 @@
 [submodule "+datastruct"]
 	path = +datastruct
-	url = git@bitbucket.org:xparx/datastruct.git
+	url = git@bitbucket.org:sonnhammergrni/datastruct.git
 [submodule "+tools"]
 	path = +tools
-	url = git@bitbucket.org:xparx/tools.git
+	url = git@bitbucket.org:sonnhammergrni/tools.git
 [submodule "+Methods"]
 	path = +Methods
-	url = git@bitbucket.org:xparx/Methods.git
+	url = git@bitbucket.org:sonnhammergrni/Methods.git
 [submodule "+illustrate"]
 	path = +illustrate
-	url = git@bitbucket.org:xparx/illustrate.git
+	url = git@bitbucket.org:sonnhammergrni/illustrate.git
