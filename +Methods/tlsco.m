@@ -74,4 +74,8 @@ for i=1:length(zetavec)
 end
 
 varargout{1} = estA;
+
+
+varargout{2} = zetaRange;
+
 return

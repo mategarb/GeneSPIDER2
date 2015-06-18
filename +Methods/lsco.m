@@ -71,4 +71,8 @@ for i=1:length(zetavec)
 end
 
 varargout{1} = estA;
+
+if nargout > 1
+    varargout{2} = zetaRange;
+end
 return
