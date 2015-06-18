@@ -63,6 +63,7 @@ if ~exist('tmpzetas','var')
 end
 
 zR = []; % zeta range for all bootstraps
+Apos = zeros(data.N,data.N,straps);
 Alogical = [];
 for j = 1:straps
     zetavec = tmpzetas;
@@ -99,7 +100,7 @@ for j = 1:straps
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    Als = -data.P*pinv(response(data,net));
+    Als = -bdata.P*pinv(response(bdata,net));
     for i=1:length(zetavec)
         temp = find(abs(Als) <= zetavec(i));
         Atmp = Als;
@@ -110,8 +111,13 @@ for j = 1:straps
 
     if isempty(Alogical)
         Alogical = double(logical(estA));
+        Asign=(double(sign(estA))<0);
+        tmp = estA > 0;
+        Apos = double(tmp);
     else
         Alogical = Alogical + double(logical(estA));
+        tmp = estA > 0;
+        Apos = Apos + double(tmp);
     end
 
 end
@@ -123,6 +129,10 @@ varargout{1} = Alogical;
 
 if nargout > 1
     varargout{2} = Afrac;
+end
+
+if nargout > 2
+    varargout{3} = Apos;
 end
 
 return

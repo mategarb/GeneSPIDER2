@@ -58,6 +58,7 @@ else
 end
 
 zR = []; % zeta range for all bootstraps
+Apos = zeros(data.N,data.N,straps);
 Alogical = [];
 for j=1:straps
     zetavec = tmpzetas;
@@ -119,12 +120,16 @@ for j=1:straps
         Aposs = double(sign(Afit));
         Aposs(Aposs < 0) = 0;
         nlinksBo(:,j) = squeeze(sum(sum(double(logical(Afit)))));
+        tmp2 = estA > 0;
+        Apos = double(tmp2);
     else
         Alogical = Alogical + double(logical(Afit));
         tmp = double(sign(Afit));
         tmp(tmp < 0) = 0;
         Aposs = Aposs + double(tmp);
         nlinksBo(:,j) = squeeze(sum(sum(double(logical(Afit)))));
+        tmp2 = estA > 0;
+        Apos = Apos + double(tmp2);
     end
 end
 
@@ -143,6 +148,10 @@ end
 
 if nargout > 4
     varargout{5} = Aposs;
+end
+
+if nargout > 2
+    varargout{3} = Apos;
 end
 
 % varargout{1} = double(logical(Alogical));

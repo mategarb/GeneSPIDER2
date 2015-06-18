@@ -64,6 +64,7 @@ if ~exist('tmpzetas','var')
 end
 
 zR = []; % zeta range for all bootstraps
+Apos = zeros(data.N,data.N,straps);
 Alogical = [];
 for j = 1:straps
     zetavec = tmpzetas;
@@ -101,20 +102,24 @@ for j = 1:straps
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    hatTheta = tools.tls(response(data,net)',data.P');
+    hatTheta = tools.tls(response(bdata,net)',bdata.P');
     Atls = hatTheta';
     for i=1:length(zetavec)
-        temp = find(abs(Atls) <= zetavec(i));
+        temp = abs(Atls) <= zetavec(i);
         Atmp = Atls;
         Atmp(temp) = 0;
-
         estA(:,:,i) = Atmp;
     end
 
     if isempty(Alogical)
         Alogical = double(logical(estA));
+        Asign=(double(sign(estA))<0);
+        tmp = estA > 0;
+        Apos = double(tmp);
     else
         Alogical = Alogical + double(logical(estA));
+        tmp = estA > 0;
+        Apos = Apos + double(tmp);
     end
 
 end
@@ -126,6 +131,10 @@ varargout{1} = Alogical;
 
 if nargout > 1
     varargout{2} = Afrac;
+end
+
+if nargout > 2
+    varargout{3} = Apos;
 end
 
 return
