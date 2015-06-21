@@ -7,8 +7,10 @@
      \_____|\___|_| |_|\___| |_____/|_|   |_____|_____/|______|_|  \_\
 
 # Generation and Simulation Package for Informative Data ExploRation #
+
 This is the umbrella repository for the GeneSPIDER toolbox.
 The toolbox is comprised of four parts:
+
 * [datastruct](https://bitbucket.org/sonnhammergrni/datastruct) repository containing classes which is used for handling relevant data structure formats.
 * [Methods](https://bitbucket.org/sonnhammergrni/methods) repository containing original scripts and wrappers for various inference methods accepting special `datastruct` objects for analysis.
 * [tools](https://bitbucket.org/sonnhammergrni/tools), for analysing data and inference methods.
