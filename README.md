@@ -41,10 +41,12 @@ A wide range of available tools have been created to be able to simulate, model 
 
 * To develop and keep track of changes for each submodule you need to check out the master branch from each submodule with the command `git checkout master`.
 * Dependencies:
-  * [MATLAB](https://se.mathworks.com/products/matlab/)
-  * [git](https://git-scm.com/) for easily keeping up to date with the GeneSpider toolbox.
-  * [Glmnet](https://web.stanford.edu/~hastie/glmnet_matlab/) for Matlab (2013) Qian, J., Hastie, T., Friedman, J., Tibshirani, R. and Simon, N. used with the wrapper script `Methods.Glmnet`, `Methods.Bolasso`
-  * [xml4mat](https://www.mathworks.com/matlabcentral/fileexchange/6268-xml4mat-v2-0) is nessessary for exporting to storage format xml.
+
+    * [MATLAB](https://se.mathworks.com/products/matlab/)
+    * [git](https://git-scm.com/) for easily keeping up to date with the GeneSpider toolbox.
+    * [Glmnet](https://web.stanford.edu/~hastie/glmnet_matlab/) for Matlab (2013) Qian, J., Hastie, T., Friedman, J., Tibshirani, R. and Simon, N. used with the wrapper script `Methods.Glmnet`, `Methods.Bolasso`
+    * [xml4mat](https://www.mathworks.com/matlabcentral/fileexchange/6268-xml4mat-v2-0) is nessessary for exporting to storage format xml.
+
 * Datasets are available [here]()
 * How to run tests
 
