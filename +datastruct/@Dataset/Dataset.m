@@ -611,8 +611,20 @@ classdef Dataset < hgsetget
         %   ================
         %   (none) :        Save data file to current directory as a .mat file.
         %   path :          Path to directory.
-        %   fileext :       File extension: .xml or (.mat)
+        %   fileext :       File extension: .xml,  eXtensible Markup Language
+        %                                   .json, JavaScript Object Notation
+        %                                   .ubj,  Universal Binary JSON
+        %                               or  .mat   matlab native format (default)
         %
+        %
+        % Support for writing json or ubj formats can be found here:
+        %     https://www.mathworks.com/matlabcentral/fileexchange/33381-jsonlab--a-toolbox-to-encode-decode-json-files-in-matlab-octave
+        %
+        % Support for writing xml formats can be found here:
+        %     https://www.mathworks.com/matlabcentral/fileexchange/6268-xml4mat-v2-0
+        % a slightly optimized version is contained here:
+        %    <my-repo>
+
             warning('off','MATLAB:structOnObject')
             fending = '.mat';
             savepath = './';
@@ -633,6 +645,14 @@ classdef Dataset < hgsetget
                     if exist('mat2xml') ~= 2
                         error('Save method for xml files does not seem to exist')
                     end
+                elseif strcmp(fending,'.json')
+                    if exist('savejson') ~= 2
+                        error('Save method for json files does not seem to exist')
+                    end
+                elseif strncmp(fending,'.ubj',4)
+                    if exist('saveubjson') ~= 2
+                        error('Save method for universal binary json files does not seem to exist')
+                    end
                 end
             end
 
@@ -640,8 +660,12 @@ classdef Dataset < hgsetget
             savevar = 'dataset';
 
             if strcmp(fending,'.xml')
-                xmlString = simplify_mbml( spcharout( mat2xml(dataset,savevar)) );
-                xmlwrite(fullfile(savepath,[name,'.xml']), str2DOMnode(xmlString));
+                xmlString = simplify_mbml( spcharout( regexprep(mat2xml(dataset,savevar),'\n',' ')) ); % spcharout can not handle newlines
+                xmlwrite(fullfile(savepath,[name,fending]), str2DOMnode(xmlString));
+            elseif strcmp(fending,'.json')
+                savejson(savevar,dataset,fullfile(savepath,[name,fending]));
+            elseif strncmp(fending,'.ubj',4)
+                saveubjson(savevar,dataset,fullfile(savepath,[name,fending]));
             elseif strcmp(fending,'.mat')
                 save(fullfile(savepath,name),savevar)
             else
@@ -710,7 +734,7 @@ classdef Dataset < hgsetget
                 for i = 1:length(datasets)
                     if ~datasets(i).isdir
                         [pa,fi,fext] = fileparts(datasets(i).name);
-                        if strcmp(fext,'.mat') || strcmp(fext,'.xml')
+                        if strcmp(fext,'.mat') || strcmp(fext,'.xml') || strcmp(fext,'.json') || strncmp(fext,'.ubj',4)
                             j = j+1;
                             output{j} = datasets(i).name;
                         end
@@ -734,6 +758,12 @@ classdef Dataset < hgsetget
             [p,f,e] = fileparts(fetchfile);
             if strcmp(e,'.mat')
                 load(fetchfile);
+            elseif strcmp(e,'.json')
+                dataset = loadjson(fetchfile);
+                dataset = dataset.dataset;
+            elseif strncmp(e,'.ubj',4)
+                dataset = loadubjson(fetchfile);
+                dataset = dataset.dataset;
             elseif strcmp(e,'.xml')
                 [MAT,dataset] = xml2mat(fetchfile);
                 eval([dataset,'=MAT;']);
