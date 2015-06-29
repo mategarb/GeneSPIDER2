@@ -33,7 +33,6 @@ classdef Dataset < hgsetget
         SNRnum    % Signal to noise ratio,
         etay      % Linear independance from data per sample.
         etau      % Linear independance from data per perturbation.
-        info      % Level of informativeness [0,1]
     end
 
     properties (SetAccess = public)
@@ -307,50 +306,6 @@ classdef Dataset < hgsetget
 
         function setcovP(data,cvP)
             data.cvP = cvP;
-        end
-
-        function varargout = informativeness(data,net)
-        % Gives the level of informativeness of the data set given the
-        % network it was produced from. If the network is not
-        % supplied it will give the number of links with
-        % confidence >= 1
-        %
-        % [info{, uninfo}] = informativeness(data[,net])
-        %
-            if ~exist('net','var')
-                net = ones(data.N);
-            end
-
-            lambda = data.lambda;
-            if numel(lambda) == 2
-                o = ones(size(data.P));
-                [conf,infotopo] = tools.RInorm(response(data)',data.P',diag(lambda(1:length(lambda)/2))*o',diag(lambda(length(lambda)/2+1:end))*o'+eps,data.alpha);
-            else
-                o = ones(size(data.P),2);
-                [conf,infotopo] = tools.RInorm(response(data)',data.P',(diag(lambda(1:length(lambda)/2))'*o)',(diag(lambda(length(lambda)/2+1:end))'*o)'+eps,data.alpha);
-            end
-
-            L = sum(sum(logical(net)));
-            if nargout == 0
-                if L == 0
-                    data.info = 0;
-                else
-                    data.info = sum(sum(logical(net) & infotopo))/L;
-                end
-                return
-            elseif nargout >= 1
-                if L == 0
-                    varargout{1} = 0;
-                else
-                    varargout{1} = sum(sum(logical(net) & infotopo))/L;
-                end
-            end
-            if nargout >= 2
-                varargout{2} = sum(conf(~logical(net)))/(data.N^2-L);
-            end
-            if nargout >= 3
-                varargout{3} = conf;
-            end
         end
 
         function Y = response(data,varargin)
