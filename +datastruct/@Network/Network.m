@@ -1,4 +1,4 @@
-classdef Network < hgsetget
+classdef Network < datastruct.Exchange
 % Stores a network matrix, A and calculates the most important network properties.
 %
 %   net = Network(A);
@@ -30,13 +30,15 @@ classdef Network < hgsetget
     end
 
     properties (Hidden = true)
-        created = struct('creator','', 'time',now,'id','','nodes','','type','','sparsity','')
+        created = struct('creator','', 'time',now,'id','','nodes','','type','unknown','sparsity','')
         tol = eps;
         N                 % # Nodes in network
     end
 
     methods
         function net = Network(varargin)
+
+        net = net@datastruct.Exchange();
             if nargin == 2
                 setA(net,varargin{1});
                 net.created.type = varargin{2};
@@ -172,146 +174,14 @@ classdef Network < hgsetget
         end
 
         function save(net,varargin)
-        % saves a datastruct.Network to file, either mat or xml.
-        % The name of the file will be the name of the data set.
-        %
-        %   Input Arguments: savenet(network[,path,<fileext>])
-        %   ================
-        %   (none):        Save network file to current directory as a .mat file.
-        %   path:          Path to directory.
-        %   fileext:       File extension: .xml or (.mat)
-        %
-
-            warning('off','MATLAB:structOnObject')
-            fending = '.mat';
-            savepath = './';
-            network = struct(net);
-            if nargin > 1
-                if ~isa(varargin{1},'char')
-                    error('Input arguments must be a string')
-                end
-                savepath = varargin{1};
-            end
-
-            if nargin == 3
-                if ~isa(varargin{2},'char')
-                    error('Input arguments must be a string')
-                end
-                fending = varargin{2};
-                if strcmp(fending,'.xml')
-                    if exist('mat2xml') ~= 2
-                        error('Save method for xml files does not seem to exist')
-                    end
-                end
-            end
-
-            name = network.network;
-            savevar = 'network';
-
-            if strcmp(fending,'.xml')
-                xmlString = simplify_mbml( spcharout( mat2xml(network,savevar)) );
-                xmlwrite(fullfile(savepath,[name,'.xml']), str2DOMnode(xmlString));
-            elseif strcmp(fending,'.mat')
-                save(fullfile(savepath,name),savevar)
-            else
-                error('unknown file extension')
-            end
+            save@datastruct.Exchange(net,varargin{:});
         end
     end
 
     methods (Static)
         function varargout = load(varargin)
-        % Load a network data-file back in to a Network object
-        % net = datastruct.Network.loadnet(['path/file'] or [path,file]);
-        %
-        %   Input Arguments: datastruct.Network.loadnet([,path,file])
-        %   ================
-        %   (none) :        Outputs a list of datasets availible in the current directory.
-        %   path :          Path to direcotry or full path with filename. If no file is specified
-        %                   it will output a list of availible data sets in that directory.
-        %   file :          Filename or number of its place in the list of files.
-        %                   Have to include the path input variable.
-        %
-        %   Output Arguments:
-        %   ================
-        %   net :           Populate the Network object with the loaded file.
-        %   list :          If no file is specified a list of availible datasets is returned.
-        %
+            [net,network] = load@datastruct.Exchange(varargin{:});
 
-            lpath = pwd;
-            lfile = [];
-            if nargin == 1
-                if isa(varargin{1},'double')
-                    lfile = varargin{1};
-                else
-                    if exist(varargin{1}) == 2
-                        [p,f,e] = fileparts(varargin{1});
-                        lpath = p;
-                        lfile = [f,e];
-                    elseif exist(varargin{1}) == 7
-                        lpath = varargin{1};
-                    else
-                        error('Unknown path or file')
-                    end
-                end
-            elseif nargin == 2
-                lpath = varargin{1};
-                if exist(lpath) ~= 7
-                    error('Unknown path')
-                end
-                if isa(varargin{2},'double')
-                    lfile = varargin{2};
-                else
-                    if exist(fullfile(lpath,varargin{2})) == 2
-                        lfile = varargin{2};
-                    else
-                        error('Unknown file')
-                    end
-                end
-            elseif nargin > 2
-                error('wrong number of input arguments.')
-            end
-
-            if isa(lfile,'double')
-                networks = dir(lpath);
-                j = 0;
-                for i = 1:length(networks)
-                    if ~networks(i).isdir
-                        [pa,fi,fext] = fileparts(networks(i).name);
-                        if strcmp(fext,'.mat') || strcmp(fext,'.xml')
-                            j = j+1;
-                            output{j} = networks(i).name;
-                        end
-                    end
-                end
-                if nargout == 1 && isempty(lfile)
-                    varargout{1} = output;
-                    return
-                elseif isempty(lfile)
-                    if exist('output','var')
-                        for j=1:length(output)
-                            fprintf('%d %s\n',j,output{j});
-                        end
-                        return
-                    else
-                        error('No mat- or xml-files to list in dir %s',lpath)
-                    end
-                else
-                    lfile = output{lfile};
-                end
-            end
-
-            net = datastruct.Network;
-            fetchfile = fullfile(lpath,lfile);
-            [p,f,e] = fileparts(fetchfile);
-            if strcmp(e,'.mat')
-                load(fetchfile);
-            elseif strcmp(e,'.xml')
-                [MAT,network] = xml2mat(fetchfile);
-                eval([network,'=MAT;']);
-            end
-
-            populate(net,network);
             if nargout == 1
                 varargout{1} = net;
             elseif nargout == 2
