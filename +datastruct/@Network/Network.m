@@ -49,12 +49,12 @@ classdef Network < hgsetget
 
         function setA(net,A)
             net.A = A;
-            net.G = -pinv(A);
-            net.interrampatteness = cond(A);
+            net.G = -pinv(full(A));
+            net.interrampatteness = cond(full(A));
             net.NetworkComponents = graphconncomp(sparse(sign(A)), 'Directed', true);
-            net.tauG = min(sort(1./abs(real(eig(-pinv(A))))));
+            net.tauG = min(sort(1./abs(real(eig(-pinv(full(A)))))));
 
-            net.created.id = num2str(round(cond(A)*10000));
+            net.created.id = num2str(round(cond(full(A))*10000));
             net.created.nodes = num2str(size(A,1));
             net.created.sparsity = nnz(net);
             if ispc; net.created.creator = getenv('USERNAME');
@@ -145,14 +145,7 @@ classdef Network < hgsetget
 
         function s = svd(net)
         % returns the singular values (only) of A. To get the singular vectors use svd(net.A)
-            s = svd(net.A);
-        end
-
-        function info = informativeness(net,data)
-            o = ones(size(net));
-            [conf,infotopo] = tools.RInorm(response(net,data)',data.P',diag(lambda(1:length(lambda)/2))*o,diag(lambda(length(lambda)/2+1:end))*o+eps);
-
-            info = sum(sum(logical(net) & infotopo));
+            s = svd(full(net.A));
         end
 
         function Y = response(net,data)
