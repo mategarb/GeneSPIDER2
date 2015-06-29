@@ -59,25 +59,19 @@ classdef Dataset < hgsetget
                         experiment = struct(varargin{i});
                         experiment.Y = trueY(varargin{i});
                         populate(data,experiment);
-                        if ispc; data.created.creator = getenv('USERNAME');
-                        else; data.created.creator = getenv('USER');
-                        end
                         data.created.id = num2str(round(cond(data.Y)*10000));
                     elseif isa(varargin{i},'datastruct.Dataset')
                         newdata = struct(varargin{i});
                         populate(data,newdata);
-                        if ispc; data.created.creator = getenv('USERNAME');
-                        else; data.created.creator = getenv('USER');
-                        end
                         data.created.id = num2str(round(cond(data.Y)*10000));
                     elseif isa(varargin{i},'struct')
                         input = varargin{i};
                         populate(data,input);
-                        if ispc; data.created.creator = getenv('USERNAME');
-                        else; data.created.creator = getenv('USER');
-                        end
                         data.created.id = num2str(round(cond(data.Y)*10000));
                     end
+                end
+                if ispc; data.created.creator = getenv('USERNAME');
+                else; data.created.creator = getenv('USER');
                 end
                 setname(data)
             end
@@ -169,7 +163,12 @@ classdef Dataset < hgsetget
                     namer.(inpNames{i}) = namestruct.(inpNames{i});
                 end
             end
-            data.dataset = [namer.creator,'-ID',data.network(regexpi(data.network,'-ID')+3:end),'-D',datestr(namer.time,'yyyymmdd'),'-E',num2str(size(data.P,2)),'-SNR',num2str(round(data.SNRm*1000)),'-IDY',namer.id];
+            if isempty(data.lambda)
+                SNRm = '0';
+            else
+                SNRm = num2str(round(data.SNRm*1000));
+            end
+            data.dataset = [namer.creator,'-ID',data.network(regexpi(data.network,'-ID')+3:end),'-D',datestr(namer.time,'yyyymmdd'),'-E',num2str(size(data.P,2)),'-SNR',SNRm,'-IDY',namer.id];
         end
 
         function desc = get.desc(data)
@@ -468,7 +467,7 @@ classdef Dataset < hgsetget
         end
 
         function included = include(data,varargin)
-        % based on eta limit, returns samples ok to inkclude in LOCO
+        % based on eta limit, returns samples ok to include in LOOCO
         %
         % Currently assumes F = 0
         %

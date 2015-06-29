@@ -160,7 +160,7 @@ classdef Network < hgsetget
         % populate the Network object with fields of the network struct.
         %
             if ~isa(input,'struct') && ~isa(input,'datastruct.Network')
-                error('Needs to be a struct or Genespider.Network class')
+                error('Needs to be a struct or datastruct.Network object')
             end
             inputnames = fieldnames(input);
             names = fieldnames(net);
