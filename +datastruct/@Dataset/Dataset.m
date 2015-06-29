@@ -1,12 +1,12 @@
-classdef Dataset < hgsetget
+classdef Dataset < datastruct.Exchange
 % The Dataset class is used to store a datastruct.Dataset
 % complementary to a datastruct.Network
 %
-%   Input arguments: Dataset([Network ,Experiment])
+%   Input arguments: Dataset([Network ,struct])
 %   ================
 %   (none) :      Initiate Dataset
 %   Network :     A Network object.
-%   Experiment :  An Experiment object or a structure with named fields.
+%   struct :      A structure with named fields.
 %                 If an Experiment is not supplied
 %                 then data needs to be added manualy later with the function populate
 %
@@ -52,6 +52,7 @@ classdef Dataset < hgsetget
     methods
         function data = Dataset(varargin)
             warning('off','MATLAB:structOnObject')
+            data = data@datastruct.Exchange();
             if nargin > 0
                 for i=1:nargin
                     if isa(varargin{i},'datastruct.Network')
@@ -604,172 +605,13 @@ classdef Dataset < hgsetget
         end
 
         function save(data,varargin)
-        % saves a datastruct.Dataset to file, either mat or xml.
-        % The name of the file will be the name of the data set.
-        %
-        %   Input Arguments: save(dataset[,path,<fileext>])
-        %   ================
-        %   (none) :        Save data file to current directory as a .mat file.
-        %   path :          Path to directory.
-        %   fileext :       File extension: .xml,  eXtensible Markup Language
-        %                                   .json, JavaScript Object Notation
-        %                                   .ubj,  Universal Binary JSON
-        %                               or  .mat   matlab native format (default)
-        %
-        %
-        % Support for writing json or ubj formats can be found here:
-        %     https://www.mathworks.com/matlabcentral/fileexchange/33381-jsonlab--a-toolbox-to-encode-decode-json-files-in-matlab-octave
-        %
-        % Support for writing xml formats can be found here:
-        %     https://www.mathworks.com/matlabcentral/fileexchange/6268-xml4mat-v2-0
-        % a slightly optimized version is contained here:
-        %    <my-repo>
-
-            warning('off','MATLAB:structOnObject')
-            fending = '.mat';
-            savepath = './';
-            dataset = struct(data);
-            if nargin > 1
-                if ~isa(varargin{1},'char')
-                    error('Input arguments must be a string')
-                end
-                savepath = varargin{1};
-            end
-
-            if nargin == 3
-                if ~isa(varargin{2},'char')
-                    error('Input arguments must be a string')
-                end
-                fending = varargin{2};
-                if strcmp(fending,'.xml')
-                    if exist('mat2xml') ~= 2
-                        error('Save method for xml files does not seem to exist')
-                    end
-                elseif strcmp(fending,'.json')
-                    if exist('savejson') ~= 2
-                        error('Save method for json files does not seem to exist')
-                    end
-                elseif strncmp(fending,'.ubj',4)
-                    if exist('saveubjson') ~= 2
-                        error('Save method for universal binary json files does not seem to exist')
-                    end
-                end
-            end
-
-            name = dataset.dataset;
-            savevar = 'dataset';
-
-            if strcmp(fending,'.xml')
-                xmlString = simplify_mbml( spcharout( regexprep(mat2xml(dataset,savevar),'\n',' ')) ); % spcharout can not handle newlines
-                xmlwrite(fullfile(savepath,[name,fending]), str2DOMnode(xmlString));
-            elseif strcmp(fending,'.json')
-                savejson(savevar,dataset,fullfile(savepath,[name,fending]));
-            elseif strncmp(fending,'.ubj',4)
-                saveubjson(savevar,dataset,fullfile(savepath,[name,fending]));
-            elseif strcmp(fending,'.mat')
-                save(fullfile(savepath,name),savevar)
-            else
-                error('unknown file extension')
-            end
+            save@datastruct.Exchange(data,varargin{:});
         end
     end
-
     methods (Static)
         function varargout = load(varargin)
-        % Load a dataset file back in to a Dataset object
-        % dataset = datastruct.Dataset.loaddata(['path/file'] or [path,file]);
-        %
-        %   Input Arguments: datastruct.Dataset.loaddata([path,file])
-        %   ================
-        %   (none) :        Outputs a list of datasets availible in the current directory.
-        %   path :          Path to directory or full path with filename. If no file is specified
-        %                   it will output a list of availible data sets in that directory.
-        %   file :          Filename or number of its place in the list of files.
-        %                   Have to include the path input variable.
-        %
-        %   Output Arguments: net / list
-        %   ================
-        %   net :           Populate the Network object with the loaded file.
-        %   list :          If no file is specified a list of availible datasets
-        %                   is returned for the given directory.
-        %
+            [data,dataset] = load@datastruct.Exchange(varargin{:});
 
-            lpath = pwd;
-            lfile = [];
-            if nargin == 1
-                if isa(varargin{1},'double')
-                    lfile = varargin{1};
-                else
-                    if exist(varargin{1}) == 2
-                        [p,f,e] = fileparts(varargin{1});
-                        lpath = p;
-                        lfile = [f,e];
-                    elseif exist(varargin{1}) == 7
-                        lpath = varargin{1};
-                    else
-                        error('Unknown path or file')
-                    end
-                end
-            elseif nargin == 2
-                lpath = varargin{1};
-                if exist(lpath) ~= 7
-                    error('Unknown path')
-                end
-                if isa(varargin{2},'double')
-                    lfile = varargin{2};
-                else
-                    if exist(fullfile(lpath,varargin{2})) == 2
-                        lfile = varargin{2};
-                    else
-                        error('Unknown file')
-                    end
-                end
-            elseif nargin > 2
-                error('wrong number of input arguments.')
-            end
-
-            if isa(lfile,'double')
-                datasets = dir(lpath);
-                j = 0;
-                for i = 1:length(datasets)
-                    if ~datasets(i).isdir
-                        [pa,fi,fext] = fileparts(datasets(i).name);
-                        if strcmp(fext,'.mat') || strcmp(fext,'.xml') || strcmp(fext,'.json') || strncmp(fext,'.ubj',4)
-                            j = j+1;
-                            output{j} = datasets(i).name;
-                        end
-                    end
-                end
-                if nargout == 1 && isempty(lfile)
-                    varargout{1} = output;
-                    return
-                elseif isempty(lfile)
-                    for j=1:length(output)
-                        fprintf('%d %s\n',j,output{j});
-                    end
-                    return
-                else
-                    lfile = output{lfile};
-                end
-            end
-
-            data = datastruct.Dataset;
-            fetchfile = fullfile(lpath,lfile);
-            [p,f,e] = fileparts(fetchfile);
-            if strcmp(e,'.mat')
-                load(fetchfile);
-            elseif strcmp(e,'.json')
-                dataset = loadjson(fetchfile);
-                dataset = dataset.dataset;
-            elseif strncmp(e,'.ubj',4)
-                dataset = loadubjson(fetchfile);
-                dataset = dataset.dataset;
-            elseif strcmp(e,'.xml')
-                [MAT,dataset] = xml2mat(fetchfile);
-                eval([dataset,'=MAT;']);
-            end
-
-            populate(data,dataset);
             if nargout == 1
                 varargout{1} = data;
             elseif nargout == 2
