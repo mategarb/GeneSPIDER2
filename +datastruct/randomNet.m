@@ -1,5 +1,5 @@
 function A = randomNet(N,sparsity)
-% creates a random network with N nodes and specific sparseness.
+% creates a random network with N nodes and specific sparseness with no self loops.
 %
 % A = datastruct.randomNet(N,sparsity)
 %
