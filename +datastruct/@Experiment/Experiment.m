@@ -249,34 +249,6 @@ classdef Experiment  < hgsetget
             data.F = F;
         end
 
-        function varargout = informativeness(data,varargin)
-        % Gives the level of informativeness of the data set.
-        %
-        % [info{, uninfo}] = informativeness(data)
-        %
-            lambda = data.lambda;
-            if numel(lambda) == 2
-                o = ones(size(data.P));
-                [conf,infotopo] = tools.RInorm(noiseY(data)',data.P',diag(lambda(1:length(lambda)/2))*o',diag(lambda(length(lambda)/2+1:end))*o'+eps,data.alpha);
-            else
-                o = ones(size(data.P),2);
-                [conf,infotopo] = tools.RInorm(noiseY(data)',data.P',(diag(lambda(1:length(lambda)/2))'*o)',(diag(lambda(length(lambda)/2+1:end))'*o)'+eps,data.alpha);
-            end
-
-            if nargout == 0
-                data.info = sum(sum(logical(data.A) & infotopo))/sum(sum(logical(data.A)));
-                return
-            elseif nargout >= 1
-                varargout{1} = sum(sum(logical(data.A) & infotopo))/sum(sum(logical(data.A)));
-            end
-            if nargout >= 2
-                varargout{2} = sum(conf(~logical(data.A)))/sum(sum(~logical(data.A)));
-            end
-            if nargout >= 3
-                varargout{3} = conf;
-            end
-        end
-
         function gaussian(data)
         % generate gaussian noise with variance lambda for response and/or
         % perturbations.
