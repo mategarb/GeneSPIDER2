@@ -3,9 +3,9 @@ function varargout = Glmnet(varargin)
 % (Glmnet for Matlab (2013) Qian, J., Hastie, T., Friedman, J., Tibshirani, R. and Simon, N.
 % http://www.stanford.edu/~hastie/glmnet_matlab/)
 %
-% function estA = Glmnet(data,net,zetavec[,alpha,rawZeta])
+% function estA = Glmnet(data,zetavec[net,alpha,rawZeta])
 %
-%   Input Arguments: Glmnet(data,net,zetavec[,alpha,rawZeta])
+%   Input Arguments: Glmnet(data,zetavec[net,alpha,rawZeta])
 %   ================
 %   data:    datastruct.Dataset
 %   net:     datastruct.Network
