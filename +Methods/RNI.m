@@ -45,10 +45,10 @@ for i=1:length(alpha)
     lambda = data.lambda;
     if numel(lambda) == 2
         o = ones(size(data.P));
-        [gamma, ps, Nrps] = tools.RInorm(response(data,net)',data.P',diag(lambda(1:length(lambda)/2))*o',diag(lambda(length(lambda)/2+1:end))*o'+eps,alpha(i));
+        [gamma, ps, Nrps] = RInorm(response(data,net)',data.P',diag(lambda(1:length(lambda)/2))*o',diag(lambda(length(lambda)/2+1:end))*o'+eps,alpha(i));
     else
         o = ones(size(data.P),2);
-        [gamma, ps, Nrps] = tools.RInorm(response(data,net)',data.P',(diag(lambda(1:length(lambda)/2))'*o)',(diag(lambda(length(lambda)/2+1:end))'*o)'+eps,alpha(i));
+        [gamma, ps, Nrps] = RInorm(response(data,net)',data.P',(diag(lambda(1:length(lambda)/2))'*o)',(diag(lambda(length(lambda)/2+1:end))'*o)'+eps,alpha(i));
     end
     Gamma(:,:,i) = gamma;
     PS(:,:,i) = double(ps);
