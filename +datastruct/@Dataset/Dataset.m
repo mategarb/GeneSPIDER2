@@ -172,10 +172,6 @@ classdef Dataset < datastruct.Exchange
             data.dataset = [namer.creator,'-ID',data.network(regexpi(data.network,'-ID')+3:end),'-D',datestr(namer.time,'yyyymmdd'),'-E',num2str(size(data.P,2)),'-SNR',SNRm,'-IDY',namer.id];
         end
 
-        function desc = get.desc(data)
-            desc = sprintf([data.desc,'\n']);
-        end
-
         function names = get.names(data)
             names = data.names;
             if isempty(names)
@@ -499,7 +495,7 @@ classdef Dataset < datastruct.Exchange
         end
 
         function varargout = bootstrap(data,varargin)
-        % Botstraps a new data set from the old data set.
+        % Bootstraps a new data set from the old data set.
             if length(varargin) == 1
                 boots = varargin{1};
             else
@@ -564,6 +560,16 @@ classdef Dataset < datastruct.Exchange
     end
     methods (Static)
         function varargout = load(varargin)
+
+            if (length(varargin) == 1) & (exist(varargin{1}) == 7) & (nargout == 0)
+                load@datastruct.Exchange(varargin{:});
+                return
+            elseif (length(varargin) == 1) & (exist(varargin{1}) == 7) & (nargout == 1)
+                file_list = load@datastruct.Exchange(varargin{:});
+                varargout{1} = file_list;
+                return
+            end
+
             [data,dataset] = load@datastruct.Exchange(varargin{:});
 
             if nargout == 1

@@ -102,10 +102,6 @@ classdef Network < datastruct.Exchange
             end
         end
 
-        function desc = get.desc(net)
-            desc = sprintf([net.desc,'\n']);
-        end
-
         function show(net)
             networkProperties = {
                 'Name'                 net.network;
@@ -180,6 +176,15 @@ classdef Network < datastruct.Exchange
 
     methods (Static)
         function varargout = load(varargin)
+            if (length(varargin) == 1) & (exist(varargin{1}) == 7) & (nargout == 0)
+                load@datastruct.Exchange(varargin{:});
+                return
+            elseif (length(varargin) == 1) & (exist(varargin{1}) == 7) & (nargout == 1)
+                file_list = load@datastruct.Exchange(varargin{:});
+                varargout{1} = file_list;
+                return
+            end
+
             [net,network] = load@datastruct.Exchange(varargin{:});
 
             if nargout == 1
