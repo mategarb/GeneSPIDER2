@@ -176,22 +176,16 @@ classdef Network < datastruct.Exchange
 
     methods (Static)
         function varargout = load(varargin)
-            if (length(varargin) == 1) & (exist(varargin{1}) == 7) & (nargout == 0)
+
+            if nargout == 0
                 load@datastruct.Exchange(varargin{:});
                 return
-            elseif (length(varargin) == 1) & (exist(varargin{1}) == 7) & (nargout == 1)
-                file_list = load@datastruct.Exchange(varargin{:});
-                varargout{1} = file_list;
+            elseif nargout == 1
+                varargout{1} = load@datastruct.Exchange(varargin{:});
                 return
-            end
-
-            [net,network] = load@datastruct.Exchange(varargin{:});
-
-            if nargout == 1
-                varargout{1} = net;
             elseif nargout == 2
-                varargout{1} = net;
-                varargout{2} = network;
+                [varargout{1},varargout{2}] = load@datastruct.Exchange(varargin{:});
+                return
             end
         end
     end

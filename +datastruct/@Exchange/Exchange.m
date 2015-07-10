@@ -164,6 +164,9 @@ classdef Exchange < hgsetget
                     varargout{1} = output;
                     return
                 elseif isempty(lfile)
+                    if nargout == 2
+                        error('To many output arguments defined. Only file list can be returned')
+                    end
                     for j=1:length(output)
                         fprintf('%d %s\n',j,output{j});
                     end
