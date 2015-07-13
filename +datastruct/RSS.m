@@ -24,8 +24,8 @@ for j = 1:size(Alist,3)
     end
     y = -pinv(A)*P(:,i);
     p = -A*Y(:,i);
-    
-    if strcmp(type,'WRSS') % weighted residual sum ofsquares 
+
+    if strcmp(type,'WRSS') % weighted residual sum of squares
         [cvY, cvP] = cov(data);
         if ~isempty(data.cvY), cvY = data.cvY; end
         if ~isempty(data.cvP), cvP = data.cvP; end

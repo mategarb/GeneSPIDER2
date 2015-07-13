@@ -1,8 +1,13 @@
 function candidateP = weightP(A,P)
+% Function for creating optimal perturbations, implied by
+% minimizing the condition number of the output Y.
+% The algorithm is an itterative aproach where small changes are
+% made to search for an optimal weighting.
+%
 % candidateP = weightP(A,P)
 %
 % A: network
-% P: inital Perturbations
+% P: inital Perturbations (structure)
 
 [UA SA VA] = svd(A);
 G = -pinv(A);
