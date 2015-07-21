@@ -1,25 +1,17 @@
-classdef Data
+classdef Data < analyse.DataModel
 
     properties (SetAccess = private)
-        dataset = ''; % identifier for dataset used
-        SNR_E         % Signal to noise ratio, \sigma_N(Y)/\sigma_1(E)
-        SNR_L         % Signal to noise ratio,
-        SNR_e         % Signal to noise ratio, \argmin_i min(norm(\Fi_i)/norm(\nu_i))
-        SNR_l         % Signal to noise ratio,
-        mean_SNR_e    % Signal to noise ratio,
-        mean_SNR_l    % Signal to noise ratio,
-        
-        % N             % Number of variables in model
-        % M             % Number of equations in data
+        dataset = '';     % identifier for dataset used
+        SNR_Phi_true      % Signal to noise ratio, \sigma_N(Y)/\sigma_1(E)
+        SNR_Phi_gauss     % Signal to noise ratio,
 
+        SNR_phi_true      % Signal to noise ratio, \argmin_i min(norm(\Fi_i)/norm(\nu_i))
+        SNR_phi_gauss     % Signal to noise ratio,
+        SNR_xi_true       % Signal to noise ratio, \argmin_i min(norm(\Fi_i)/norm(\nu_i))
+        SNR_xi_gauss      % Signal to noise ratio,
     end
 
     %  
-    
-    properties (SetAccess = public)
-        tol = eps;         % tolerance level
-        alpha = 0.05;      % confidence
-    end
 
     methods
         function analysis = Data(data,varargin)
@@ -48,6 +40,21 @@ classdef Data
     end
 
     methods (Static)
+        function val = alpha(varargin)
+        % significance level (default = 0.01)
+            val = alpha@analyse.DataModel(varargin{:});
+        end
+
+        function val = type(varargin)
+        % 'directed' or 'undirected'
+            val = type@analyse.DataModel(varargin{:});
+        end
+
+        function val = tol(varargin)
+        % if a tolernace value for computations is needed it can be set here.
+            val = tol@analyse.DataModel(varargin{:});
+        end
+
         function dataset = identifier(data)
             if isa(data,'datastruct.Dataset')
                 dataset = data.dataset;
@@ -55,11 +62,6 @@ classdef Data
                 dataset = '';
             end
         end
-
-        % function [N,M] = size(data)
-        %     N = data.N;
-        %     M = data.M;
-        % end
 
         function SNR = calc_SNR_E(data)
             SNR = min(svd(data.Y))/max(svd(data.E));
