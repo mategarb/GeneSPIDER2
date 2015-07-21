@@ -38,7 +38,7 @@ end
 
 %% Run
 if ~exist('zetavec','var')
-    hatTheta = tools.tls(response(data,net)',data.P');
+    hatTheta = Methods.tls(response(data,net)',data.P');
     estA = hatTheta';
     varargout{1} = estA;
     return
@@ -50,7 +50,7 @@ end
 
 if ~rawZeta
     zetaRange = [];
-    hatTheta = tools.tls(response(data,net)',data.P');
+    hatTheta = Methods.tls(response(data,net)',data.P');
     estA = hatTheta';
     zetaRange(1) = min(abs(estA(estA~=0)))-eps;
     zetaRange(2) = max(abs(estA(estA~=0)))+10*eps;
@@ -63,7 +63,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-hatTheta = tools.tls(response(data,net)',data.P');
+hatTheta = Methods.tls(response(data,net)',data.P');
 Atls = hatTheta';
 for i=1:length(zetavec)
     temp = find(abs(Atls) <= zetavec(i));
