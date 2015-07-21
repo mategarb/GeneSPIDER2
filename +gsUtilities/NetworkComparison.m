@@ -139,6 +139,7 @@ classdef NetworkComparison < hgsetget
 
     methods
         function M = NetworkComparison(varargin)
+            warning('deprecated class, use analyse.CompareModels instead')
             if nargin >= 1
                 M.A = varargin{1};
             end
