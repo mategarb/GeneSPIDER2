@@ -16,12 +16,9 @@ classdef Network < datastruct.Exchange
 %   of the network and a table with network properties.
 %
     properties (SetAccess = private)
+        network           % Uniq name of network
         A                 % network
         G                 % Static gain model
-        network           % Uniq name of network
-        interrampatteness % interrampatteness
-        NetworkComponents % Number of strong components in network
-        tauG              % Time
     end
 
     properties
@@ -38,7 +35,7 @@ classdef Network < datastruct.Exchange
     methods
         function net = Network(varargin)
 
-        net = net@datastruct.Exchange();
+            net = net@datastruct.Exchange();
             if nargin == 2
                 setA(net,varargin{1});
                 net.created.type = varargin{2};
@@ -52,9 +49,6 @@ classdef Network < datastruct.Exchange
         function setA(net,A)
             net.A = A;
             net.G = -pinv(full(A));
-            net.interrampatteness = cond(full(A));
-            net.NetworkComponents = graphconncomp(sparse(sign(A)), 'Directed', true);
-            net.tauG = min(sort(1./abs(real(eig(-pinv(full(A)))))));
 
             net.created.id = num2str(round(cond(full(A))*10000));
             net.created.nodes = num2str(size(A,1));
@@ -106,9 +100,6 @@ classdef Network < datastruct.Exchange
             networkProperties = {
                 'Name'                 net.network;
                 'Description'          net.desc;
-                'interrampatteness'    net.interrampatteness;
-                '# Network Components' net.NetworkComponents;
-                '\tau G'               net.tauG
                 'Sparseness'           nnz(net)/prod(size(net))
                 '# Nodes'              size(net.A,1)
                 '# links'              nnz(net)};
@@ -119,6 +110,17 @@ classdef Network < datastruct.Exchange
             f = figure();
             t2 = uitable('Parent', f,'ColumnWidth',{200,480});
             set(t2, 'Data', networkProperties,'BackgroundColor',[1,1,1],'ColumnName',{'Property','Value'});
+        end
+
+        function varargout = view(net)
+        % make a rough graphical network plot with biograph
+            A = net.A;
+            A(logical(eye(net.N))) = 0;
+            h = view(biograph(A,net.names,'ShowWeights','on'));
+
+            if nargout == 1
+                varargout{1} = h;
+            end
         end
 
         function SA = sign(net)

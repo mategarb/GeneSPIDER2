@@ -25,20 +25,15 @@ classdef Dataset < datastruct.Exchange
         cvY = []; % Covariance of noisy Y
         sdY = []; % measurement point variation of Y
         lambda    % Noise variance, lambda
-        SNR       % Signal to noise ratio, \sigma_N(Y)/\sigma_1(E)
-        SNRnu     % Signal to noise ratio, \argmin_i min(norm(\Fi_i)/norm(\nu_i))
-        SNRm      % Signal to noise ratio,
-        SNRv      % Signal to noise ratio,
-        SNRvm     % Signal to noise ratio,
-        SNRnum    % Signal to noise ratio,
+        SNR_L     % Signal to noise ratio,
+
         etay      % Linear independance from data per sample.
         etau      % Linear independance from data per perturbation.
     end
 
     properties (SetAccess = public)
-        alpha = 0.05; % Confidence
         names = {};
-        desc = ''; % description
+        description = '';
     end
 
     properties (Hidden = true)
@@ -103,46 +98,41 @@ classdef Dataset < datastruct.Exchange
             data.lambda = lambda;
         end
 
-        function SNR = get.SNR(data)
-            SNR = min(svd(data.Y))/max(svd(data.E));
-        end
-
-        function SNR = get.SNRnu(data)
-            snr = [];
-            for i=1:data.N
-                snr(i) = norm(data.Y(i,:))/norm(data.E(i,:));
-            end
-            SNR = min(snr);
-        end
-
-        function SNR = get.SNRnum(data)
-            snr = [];
-            for i=1:data.N
-                snr(i) = norm(data.Y(i,:))/norm(data.E(i,:));
-            end
-            SNR = mean(snr);
-        end
-
-        function SNR = get.SNRm(data)
+        function SNR = get.SNR_L(data)
             alpha = data.alpha;
             sigma = min(svd(data.Y));
             SNR = sigma/sqrt(chi2inv(1-alpha,prod(size(data.P)))*data.lambda(1));
         end
 
-        function SNR = get.SNRv(data)
-            alpha = data.alpha;
-            for i=1:data.N
-                snr(i) = norm(data.Y(i,:))/sqrt(chi2inv(1-alpha,data.M)*data.lambda(1));
-            end
-            SNR = min(snr);
+        function p = Phi(data)
+        % Y'
+            p = data.Y';
         end
 
-        function SNR = get.SNRvm(data)
-            alpha = data.alpha;
-            for i=1:data.N
-                snr(i) = norm(data.Y(i,:))/sqrt(chi2inv(1-alpha,data.M)*data.lambda(1));
-            end
-            SNR = mean(snr);
+        function x = Xi(data)
+        % -P'
+            x = -data.P';
+        end
+
+        function u = Upsilon(data)
+        % E'
+            u = data.E';
+        end
+
+        function p = Pi(data)
+        % -F'
+            p = -data.F';
+        end
+
+        function p = Psi(data)
+        % [Phi Xi]
+            p = [data.Phi data.Xi];
+
+        end
+
+        function o = Omicron(data)
+        % [Upsilon Pi]
+            o = [data.Upsilon, data.Pi];
         end
 
         function setname(data,varargin)
@@ -165,11 +155,11 @@ classdef Dataset < datastruct.Exchange
                 end
             end
             if isempty(data.lambda)
-                SNRm = '0';
+                SNR_L = '0';
             else
-                SNRm = num2str(round(data.SNRm*1000));
+                SNR_L = num2str(round(data.SNR_L*1000));
             end
-            data.dataset = [namer.creator,'-ID',data.network(regexpi(data.network,'-ID')+3:end),'-D',datestr(namer.time,'yyyymmdd'),'-E',num2str(size(data.P,2)),'-SNR',SNRm,'-IDY',namer.id];
+            data.dataset = [namer.creator,'-ID',data.network(regexpi(data.network,'-ID')+3:end),'-D',datestr(namer.time,'yyyymmdd'),'-E',num2str(size(data.P,2)),'-SNR',SNR_L,'-IDY',namer.id];
         end
 
         function names = get.names(data)
@@ -203,10 +193,10 @@ classdef Dataset < datastruct.Exchange
             data.lambda = lambda;
         end
 
-        function scale_lambda_SNRm(data,SNRm)
-        % scale the noise variance by setting the theoretic lambda with wished SNRm
+        function scale_lambda_SNR_L(data,SNR_L)
+        % scale the noise variance by setting the theoretic lambda with wished SNR_L
             s = min(svd(data.Y));
-            lambda = s^2/(chi2inv(1-data.alpha,prod(size(data.P)))*SNRm^2);
+            lambda = s^2/(chi2inv(1-data.alpha,prod(size(data.P)))*SNR_L^2);
             data.lambda = lambda;
             % data.E = sqrt(lambda/preLambda).*data.E;
         end
@@ -361,39 +351,6 @@ classdef Dataset < datastruct.Exchange
             newdata = populate(newdata,tmp);
         end
 
-        function varargout = irrepresentability(data,net)
-        % Calculates the irrepresentability of the data set for inference with
-        % LASSO
-            Y = data.Y;
-            Phi = Y';
-            for i = 1:net.N
-                Phiz = Phi(:,net.A(i,:) == 0);
-                Phipc = Phi(:,net.A(i,:) ~= 0);
-
-                sic = abs(Phiz'*Phipc*pinv(Phipc'*Phipc)*sign(net.A(i,net.A(i,:)~=0))');
-                k = 1;
-                for j=1:net.N
-                    if net.A(i,j) == 0
-                        SIC(i,j) = sic(k);
-                        k = k + 1;
-                    end
-                end
-            end
-            % SIC = SIC;
-            irr = min(1-SIC(~logical(net)));
-            if nargout == 0
-                % irr = sum(sum(SIC < 1))/data.N^2;
-                varargout{1} = irr;
-            end
-            if nargout >= 1
-                % irr = sum(sum(SIC < 1))/data.N^2;
-                varargout{1} = irr;
-            end
-            if nargout >= 2
-                varargout{2} = SIC;
-            end
-        end
-
         function eta(data,varargin)
         % calculates eta values for Y and P.
         %
@@ -544,7 +501,7 @@ classdef Dataset < datastruct.Exchange
             inputnames = fieldnames(input);
             names = fieldnames(data);
             for name = inputnames'
-                if any(strmatch(name,names))
+                if any(strcmp(name,names))
                     data.(name{1}) = input.(name{1});
                 end
             end
