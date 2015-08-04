@@ -4,14 +4,11 @@ classdef Data < analyse.DataModel
         dataset = '';     % identifier for dataset used
         SNR_Phi_true      % Signal to noise ratio, \sigma_N(Y)/\sigma_1(E)
         SNR_Phi_gauss     % Signal to noise ratio,
-
         SNR_phi_true      % Signal to noise ratio, \argmin_i min(norm(\Fi_i)/norm(\nu_i))
         SNR_phi_gauss     % Signal to noise ratio,
-        SNR_xi_true       % Signal to noise ratio, \argmin_i min(norm(\Fi_i)/norm(\nu_i))
-        SNR_xi_gauss      % Signal to noise ratio,
     end
 
-    %  
+    %
 
     methods
         function analysis = Data(data,varargin)
@@ -29,13 +26,11 @@ classdef Data < analyse.DataModel
         end
 
         function analysis = analyse_data(analysis,data,varargin);
-            analysis.dataset        = analyse.Data.identifier(data);
-            analysis.SNR_E          = analyse.Data.calc_SNR_E(data);
-            analysis.SNR_L          = analyse.Data.calc_SNR_L(data);
-            analysis.SNR_e          = analyse.Data.calc_SNR_e(data);
-            analysis.SNR_l          = analyse.Data.calc_SNR_l(data);
-            analysis.mean_SNR_e     = analyse.Data.calc_mean_SNR_e(data);
-            analysis.mean_SNR_l     = analyse.Data.calc_mean_SNR_l(data);
+            analysis.dataset       = analyse.Data.identifier(data);
+            analysis.SNR_Phi_true  = analyse.Data.calc_SNR_Phi_true(data);
+            analysis.SNR_Phi_gauss = analyse.Data.calc_SNR_Phi_gauss(data);
+            analysis.SNR_phi_true  = min(analyse.Data.calc_SNR_phi_true(data));
+            analysis.SNR_phi_gauss = min(analyse.Data.calc_SNR_phi_gauss(data));
         end
     end
 
@@ -63,52 +58,37 @@ classdef Data < analyse.DataModel
             end
         end
 
-        function SNR = calc_SNR_E(data)
-            SNR = min(svd(data.Y))/max(svd(data.E));
+        function SNR = calc_SNR_Phi_true(data)
+            SNR = min(svd(true_response(data)))/max(svd(data.E));
         end
 
-        function SNR = calc_SNR_e(data)
+        function snr = calc_SNR_phi_true(data)
             snr = [];
+            X = true_response(data);
             for i=1:data.N
-                snr(i) = norm(data.Y(i,:))/norm(data.E(i,:));
+                snr(i) = norm(X(i,:))/norm(data.E(i,:));
             end
-            SNR = min(snr);
         end
 
-        function SNR = calc_mean_SNR_e(data)
-            snr = [];
-            for i=1:data.N
-                snr(i) = norm(data.Y(i,:))/norm(data.E(i,:));
-            end
-            SNR = mean(snr);
-        end
-
-        function SNR = calc_SNR_L(data)
-            alpha = data.alpha;
-            sigma = min(svd(data.Y));
+        function SNR = calc_SNR_Phi_gauss(data)
+            alpha = analyse.Data.alpha;
+            sigma = min(svd(response(data)));
             SNR = sigma/sqrt(chi2inv(1-alpha,prod(size(data.P)))*data.lambda(1));
         end
 
-        function SNR = calc_SNR_l(data)
-            alpha = data.alpha;
+        function SNR = calc_SNR_phi_gauss(data)
+            alpha = analyse.Data.alpha;
+            Y = response(data);
             for i=1:data.N
-                snr(i) = norm(data.Y(i,:))/sqrt(chi2inv(1-alpha,data.M)*data.lambda(1));
+                SNR(i) = norm(Y(i,:))/sqrt(chi2inv(1-alpha,data.M)*data.lambda(1));
             end
-            SNR = min(snr);
+
         end
 
-        function SNR = calc_mean_SNR_l(data)
-            alpha = data.alpha;
-            for i=1:data.N
-                snr(i) = norm(data.Y(i,:))/sqrt(chi2inv(1-alpha,data.M)*data.lambda(1));
-            end
-            SNR = mean(snr);
-        end
-        
         function varargout = irrepresentability(data,net)
         % Calculates the irrepresentability of the data set for inference with
         % LASSO
-            Y = data.Y;
+            Y = response(data,net);
             Phi = Y';
             for i = 1:net.N
                 Phiz = Phi(:,net.A(i,:) == 0);

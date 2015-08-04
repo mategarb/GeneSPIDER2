@@ -2,7 +2,7 @@ classdef Model < analyse.DataModel
 
     properties (SetAccess = private)
         network = '';     % identifier for network used
-        interrampatteness % interrampatteness
+        interampatteness  % interampatteness
         NetworkComponents % Number of strong components in network
         AvgPathLength     % Average path length
         tauG              % Time Constant
@@ -29,7 +29,7 @@ classdef Model < analyse.DataModel
 
         function analysis = analyse_model(analysis,mat,varargin);
             analysis.network           = analyse.Model.identifier(mat);
-            analysis.interrampatteness = analyse.Model.cond(mat);
+            analysis.interampatteness  = analyse.Model.cond(mat);
             analysis.NetworkComponents = analyse.Model.graphconncomp(mat);
             analysis.AvgPathLength     = analyse.Model.average_path_length(mat);
             analysis.tauG              = analyse.Model.time_constant(mat);
@@ -74,9 +74,9 @@ classdef Model < analyse.DataModel
             end
         end
 
-        function interrampatteness = cond(model)
+        function interampatteness = cond(model)
             A = analyse.Model.give_matrix(model);
-            interrampatteness = cond(full(A));
+            interampatteness = cond(full(A));
         end
 
         function varargout = average_path_length(model,varargin)
