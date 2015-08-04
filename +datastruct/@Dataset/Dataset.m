@@ -16,19 +16,19 @@ classdef Dataset < datastruct.Exchange
     properties (SetAccess = private)
         dataset ='';  % Name of the data set
         network ='';  % Name of complementary network
-        P         % True perturbations
+        P         % Observed/assumed perturbations
         F         % Perturbation noise
         cvP = []; % Covariance of P
         sdP = []; % measurement point variation of P
-        Y         % True expression response
+        Y         % Observed expression response
         E         % Expression noise
         cvY = []; % Covariance of noisy Y
         sdY = []; % measurement point variation of Y
         lambda    % Noise variance, lambda
         SNR_L     % Signal to noise ratio,
 
-        etay      % Linear independance from data per sample.
-        etau      % Linear independance from data per perturbation.
+        %% etay      % Linear independance from data per sample.
+        %% etau      % Linear independance from data per perturbation.
     end
 
     properties (SetAccess = public)
@@ -295,21 +295,38 @@ classdef Dataset < datastruct.Exchange
         end
 
         function Y = response(data,varargin)
+        % Gives the networks response + noise to input.
+
+            [n,m] = size(data.P);
+            if length(varargin) == 1
+                if isa(varargin{1},'datastruct.Network')
+                    net = varargin{1};
+                    X = net.G*(data.P);
+                    Y = X + data.E(:,1:m);
+                else
+                    Y = data.Y;
+                end
+            else
+                Y = data.Y;
+            end
+        end
+
+        function X = true_response(data,varargin)
         % Gives the networks response to input from data.
 
             [n,m] = size(data.P);
             if length(varargin) == 1
                 if isa(varargin{1},'datastruct.Network')
                     net = varargin{1};
-                    Y = net.G*(data.P-data.F(:,1:m)) + data.E(:,1:m);
+                    X = net.G*(data.P+data.F(:,1:m));
                 else
-                    Y = data.Y+data.E(:,1:m);
+                    X = data.Y - data.E(:,1:m);
                 end
             else
-                Y = data.Y+data.E(:,1:m);
+                X = data.Y - data.E(:,1:m);
             end
         end
-
+        
         function newdata = without(data,i,varargin)
         % creates a Dataset without sample i
         %
@@ -351,7 +368,7 @@ classdef Dataset < datastruct.Exchange
             newdata = populate(newdata,tmp);
         end
 
-        function eta(data,varargin)
+        function varargout = eta(data,varargin)
         % calculates eta values for Y and P.
         %
         % eta(data[,net])
@@ -363,7 +380,7 @@ classdef Dataset < datastruct.Exchange
                 end
             end
             Y = response(data,net);
-            P = data.P-data.F;
+            P = data.P;
 
             for i=1:data.M
                 Ytemp = Y;
@@ -375,8 +392,12 @@ classdef Dataset < datastruct.Exchange
                 etay(i) = sum( abs(Ytemp'*ytemp) );
                 etau(i) = sum( abs(Ptemp'*ptemp) );
             end
-            data.etay = etay;
-            data.etau = etau;
+            
+            varargout{1} = etay;
+            varargout{2} = etau;
+
+            % data.etay = etay;
+            % data.etau = etau;
         end
 
         function w_eta(data,varargin)
@@ -392,14 +413,14 @@ classdef Dataset < datastruct.Exchange
                 end
             end
             Y = response(data,net);
-            P = data.P-data.F;
+            P = data.P;
             etay = [];
             etau = [];
             for i=1:data.M
                 tmpdata = without(data,i);
 
                 [yiU, yiS, yiV] = svd(response(tmpdata,net));
-                [uiU, uiS, uiV] = svd(tmpdata.P-tmpdata.F);
+                [uiU, uiS, uiV] = svd(tmpdata.P);
                 dyiS = diag(yiS);
                 duiS = diag(uiS);
 
@@ -416,10 +437,18 @@ classdef Dataset < datastruct.Exchange
                 ug = duiS' * abs(uiU' * uv) / sum(duiS); %uiS(1);
                 etau(i) = ug;
             end
-            data.etay = etay;
-            data.etau = etau;
+            varargout{1} = etay;
+            varargout{2} = etau;
         end
 
+        function eta = etay(data)
+            [eta,junk] = data.eta();
+        end
+
+        function eta = etau(data)
+            [junk,eta] = data.eta();
+        end
+        
         function included = include(data,varargin)
         % based on eta limit, returns samples ok to include in LOOCO
         %
@@ -432,10 +461,6 @@ classdef Dataset < datastruct.Exchange
         %
             if length(varargin) == 1
                 etaLim = varargin{1};
-            end
-
-            if isempty(data.etay)
-                eta(data);
             end
 
             if ~exist('etaLim','var')
