@@ -18,10 +18,25 @@ This toolbox is comprised of five parts:
 * [tools](https://bitbucket.org/sonnhammergrni/tools), include helper functions.
 
 ### What is this repository for? ###
-A wide range of available tools have been created to be able to simulate, model and analyze gene regulatory networks (GRN). It's not always clear how or when to apply different modeling techniques and approaches to create a useful analysis.  We present a tool that describes and aids in creating a pipeline for how to evaluate and model GRN networks in a dynamical systems framework.  This tool (GeneSpider) not only supply essential components that has previously been missing but also aggregates approaches and sources found in the field that are, or should be, widely used.  GeneSpider is focused on gene regulatory networks from a systems engineering and dynamical systems perspective and will help to bring fourth necessary and useful analysis components both in terms of the data suitable for inferring these kinds of systems, to the systems themselves. The goal is to make it simpler to evaluate data quality and model hypothesis generated from that data.
+  A wide range of tools are available to model, simulate and
+  analyze gene regulatory networks (GRN). However, it is not
+  always clear how or when to apply different modeling techniques
+  to create a meaningful analysis. We present a tool that aids in
+  the GRN evaluation and model creation pipeline in a dynamical
+  systems framework. This toolbox, (GeneSPIDER) not only supplies
+  essential components that have been missing but also aggregates
+  approaches and field sources that are, or could be incorporated
+  into common use.  The systems engineering perspective of \gs
+  focuses on gene regulatory networks to help bring forth the
+  necessary and useful analytical components to the dynamical
+  systems themselves, both in terms of the data and systems.  The
+  goal is to make it simpler to evaluate data quality and model
+  hypotheses generated from that data. This package can be fetched from the
+  online =git= repository [GeneSPIDER](https://bitbucket.org/sonnhammergrni/genespider).
 
 * Version 0.1
 * [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+* [Learn Org-mode](http://orgmode.org/)
 
 ### How do I get set up? ###
 
@@ -44,7 +59,7 @@ A wide range of available tools have been created to be able to simulate, model 
 * Dependencies:
 
     * [MATLAB](https://se.mathworks.com/products/matlab/)
-    * [git](https://git-scm.com/) for easily keeping up to date with the GeneSpider toolbox.
+    * [git](https://git-scm.com/) for easily keeping up to date with the GeneSPIDER toolbox.
     * [Glmnet](https://web.stanford.edu/~hastie/glmnet_matlab/) for Matlab (2013) Qian, J., Hastie, T., Friedman, J., Tibshirani, R. and Simon, N. used with the wrapper script `Methods.Glmnet`, `Methods.Bolasso`
     * [JSONlab](http://www.mathworks.com/matlabcentral/fileexchange/33381-jsonlab--a-toolbox-to-encode-decode-json-files-in-matlab-octave) for exporting to storage format .json or .ubj.
     * [xml4mat](https://www.mathworks.com/matlabcentral/fileexchange/6268-xml4mat-v2-0) is nessessary for exporting to storage format xml.
