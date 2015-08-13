@@ -120,38 +120,42 @@ for j=1:straps
         Aposs = double(sign(Afit));
         Aposs(Aposs < 0) = 0;
         nlinksBo(:,j) = squeeze(sum(sum(double(logical(Afit)))));
-        tmp2 = estA > 0;
-        Apos = double(tmp2);
     else
         Alogical = Alogical + double(logical(Afit));
         tmp = double(sign(Afit));
         tmp(tmp < 0) = 0;
         Aposs = Aposs + double(tmp);
         nlinksBo(:,j) = squeeze(sum(sum(double(logical(Afit)))));
-        tmp2 = estA > 0;
-        Apos = Apos + double(tmp2);
     end
 end
 
 Alogical = Alogical/straps;
 Afrac = Alogical;
 Alogical(Alogical < 1) = 0;
-varargout{1} = Alogical;
 
-if nargout > 1
+Aposs_frac = Aposs./(straps*Afrac);
+Asign_frac = 2*Aposs_frac-1;
+
+if nargout > 0
+    varargout{1} = Alogical;
+end
+
+if nargout > 1 % Link support [0,1]
     varargout{2} = Afrac;
 end
 
-if nargout > 3
-    varargout{4} = nlinksBo;
+if nargout > 2 % Agnostic sign support
+    varargout{3} = abs(Asign_frac);
 end
 
-if nargout > 4
+if nargout > 3 % Explicit sign support -1 for 100% negative
+    varargout{4} = Asign_frac;
+end
+
+if nargout > 4 % # positive links
     varargout{5} = Aposs;
 end
 
-if nargout > 2
-    varargout{3} = Apos;
+if nargout > 5
+    varargout{6} = nlinksBo;
 end
-
-% varargout{1} = double(logical(Alogical));

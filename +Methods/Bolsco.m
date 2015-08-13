@@ -125,14 +125,27 @@ end
 Alogical = Alogical/straps;
 Afrac = Alogical;
 Alogical(Alogical < 1) = 0;
-varargout{1} = Alogical;
+Aposs_frac = Apos./(straps*Afrac);
+Asign_frac = 2*Aposs_frac-1;
+
+if nargout > 0
+    varargout{1} = Alogical;
+end
 
 if nargout > 1
     varargout{2} = Afrac;
 end
 
-if nargout > 2
-    varargout{3} = Apos;
+if nargout > 2 % Agnostic sign support
+    varargout{3} = abs(Asign_frac);
+end
+
+if nargout > 3 % Explicit sign support -1 for 100% negative
+    varargout{4} = Asign_frac;
+end
+
+if nargout > 4 % # positive links
+    varargout{5} = Apos;
 end
 
 return
