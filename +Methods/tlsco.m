@@ -50,7 +50,7 @@ end
 
 if ~rawZeta
     zetaRange = [];
-    hatTheta = Methods.tls(response(data,net)',data.P');
+    hatTheta = Methods.tls(response(data,net)',-data.P');
     estA = hatTheta';
     zetaRange(1) = min(abs(estA(estA~=0)))-eps;
     zetaRange(2) = max(abs(estA(estA~=0)))+10*eps;
