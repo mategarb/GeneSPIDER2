@@ -57,7 +57,7 @@ end
 
 %% Run
 if ~exist('tmpzetas','var')
-    hatTheta = tools.tls(response(data,net)',data.P');
+    hatTheta = Methods.tls(response(data,net)',data.P');
     estA = hatTheta';
     varargout{1} = estA;
     return
@@ -87,7 +87,7 @@ for j = 1:straps
 
     if ~rawZeta
         zetaRange = [];
-        hatTheta = tools.tls(response(data,net)',data.P');
+        hatTheta = Methods.tls(response(data,net)',data.P');
         estA = hatTheta';
         zetaRange(1) = min(abs(estA(estA~=0)))-eps;
         zetaRange(2) = max(abs(estA(estA~=0)))+10*eps;
@@ -102,7 +102,7 @@ for j = 1:straps
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    hatTheta = tools.tls(response(bdata,net)',bdata.P');
+    hatTheta = Methods.tls(response(bdata,net)',bdata.P');
     Atls = hatTheta';
     for i=1:length(zetavec)
         temp = abs(Atls) <= zetavec(i);
