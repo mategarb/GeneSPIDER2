@@ -99,8 +99,8 @@ classdef Dataset < datastruct.Exchange
         end
 
         function SNR = get.SNR_L(data)
-            alpha = data.alpha;
-            sigma = min(svd(data.Y));
+            alpha = 0.05;
+            sigma = min(svd(data.Y-data.E));
             SNR = sigma/sqrt(chi2inv(1-alpha,prod(size(data.P)))*data.lambda(1));
         end
 
@@ -127,7 +127,6 @@ classdef Dataset < datastruct.Exchange
         function p = Psi(data)
         % [Phi Xi]
             p = [data.Phi data.Xi];
-
         end
 
         function o = Omicron(data)
@@ -175,11 +174,11 @@ classdef Dataset < datastruct.Exchange
 
         function varargout = std(data)
             if numel(data.lambda) == 2,
-                sdY = data.lambda(1)*ones(size(data.P));
-                sdP = data.lambda(2)*ones(size(data.P));
+                sdY = sqrt(data.lambda(1))*ones(size(data.P));
+                sdP = sqrt(data.lambda(2))*ones(size(data.P));
             else
-                sdY = data.lambda(1:data.N)'*ones(1,size(data.P,2));
-                sdP = data.lambda(data.N+1:end)'*ones(1,size(data.P,2));
+                sdY = sqrt(data.lambda(1:data.N))'*ones(1,size(data.P,2));
+                sdP = sqrt(data.lambda(data.N+1:end))'*ones(1,size(data.P,2));
             end
             if nargout == 1
                varargout{1} = sdY;
@@ -187,10 +186,6 @@ classdef Dataset < datastruct.Exchange
                varargout{1} = sdY;
                varargout{2} = sdP;
             end
-        end
-
-        function set_new_lambda(data,lambda)
-            data.lambda = lambda;
         end
 
         function scale_lambda_SNR_L(data,SNR_L)
@@ -230,12 +225,12 @@ classdef Dataset < datastruct.Exchange
             newdata.E = scale*newdata.E;
         end
 
-        function gaussian(data)
+        function [E,F] = gaussian(data)
         % Generate new gaussian noise matrices E and F with variance lambda for
         % response and/or perturbations.
         %
         % == Usage ==
-        % gaussian(data)
+        % [E,F] = gaussian(data)
         %
 
             if numel(data.lambda) == 1,
@@ -251,8 +246,6 @@ classdef Dataset < datastruct.Exchange
                 E = sqrt(data.lambda(1:data.N))'*randn(1,data.N);
                 F = sqrt(data.lambda(data.N+1:end))'*randn(1,data.N);
             end
-            data.E = E;
-            data.F = F;
         end
 
         function setsdY(data,sdY)
@@ -326,7 +319,7 @@ classdef Dataset < datastruct.Exchange
                 X = data.Y - data.E(:,1:m);
             end
         end
-        
+
         function newdata = without(data,i,varargin)
         % creates a Dataset without sample i
         %
@@ -392,7 +385,7 @@ classdef Dataset < datastruct.Exchange
                 etay(i) = sum( abs(Ytemp'*ytemp) );
                 etau(i) = sum( abs(Ptemp'*ptemp) );
             end
-            
+
             varargout{1} = etay;
             varargout{2} = etau;
 
@@ -448,7 +441,7 @@ classdef Dataset < datastruct.Exchange
         function eta = etau(data)
             [junk,eta] = data.eta();
         end
-        
+
         function included = include(data,varargin)
         % based on eta limit, returns samples ok to include in LOOCO
         %
