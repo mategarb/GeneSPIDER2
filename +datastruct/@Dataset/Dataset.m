@@ -55,15 +55,15 @@ classdef Dataset < datastruct.Exchange
                         experiment = struct(varargin{i});
                         experiment.Y = trueY(varargin{i});
                         populate(data,experiment);
-                        data.created.id = num2str(round(cond(data.Y)*10000));
+                        data.created.id = num2str(round(cond(data.Y-data.E)*10000));
                     elseif isa(varargin{i},'datastruct.Dataset')
                         newdata = struct(varargin{i});
                         populate(data,newdata);
-                        data.created.id = num2str(round(cond(data.Y)*10000));
+                        data.created.id = num2str(round(cond(data.Y-data.E)*10000));
                     elseif isa(varargin{i},'struct')
                         input = varargin{i};
                         populate(data,input);
-                        data.created.id = num2str(round(cond(data.Y)*10000));
+                        data.created.id = num2str(round(cond(data.Y-data.E)*10000));
                     end
                 end
                 if ispc; data.created.creator = getenv('USERNAME');
@@ -99,7 +99,7 @@ classdef Dataset < datastruct.Exchange
         end
 
         function SNR = get.SNR_L(data)
-            alpha = 0.05;
+            alpha = 0.01;
             sigma = min(svd(data.Y-data.E));
             SNR = sigma/sqrt(chi2inv(1-alpha,prod(size(data.P)))*data.lambda(1));
         end
