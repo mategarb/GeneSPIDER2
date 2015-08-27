@@ -23,7 +23,7 @@ classdef Network < datastruct.Exchange
 
     properties
         names = {};
-        desc = '';
+        description = '';
     end
 
     properties (Hidden = true)
@@ -99,7 +99,7 @@ classdef Network < datastruct.Exchange
         function show(net)
             networkProperties = {
                 'Name'                 net.network;
-                'Description'          net.desc;
+                'Description'          net.description;
                 'Sparseness'           nnz(net)/prod(size(net))
                 '# Nodes'              size(net.A,1)
                 '# links'              nnz(net)};

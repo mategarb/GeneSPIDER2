@@ -2,10 +2,10 @@ function [A,s] = smallworld(N,k,p,undirected,varargin)
 % generate a small world network
 %
 % [A,s] = smallworld(N,k,p,undirected,d)
-% 
+%
 % A: undirected or directed adjacency matrix
 % s: random number generator state
-% 
+%
 % N: number of nodes
 % k: inital connections for each node, assumed even
 % p: probability of rewireing
@@ -14,7 +14,7 @@ function [A,s] = smallworld(N,k,p,undirected,varargin)
 %
 
 if isempty(varargin)
-    d = 0.5
+    d = 0.5;
 else
     d = varargin{1};
 end
@@ -24,12 +24,14 @@ A = zeros(N,N);
 s = rng();
 
 for i=1:N
-    for j=mod(i+1,N):(mod(i+k/2,N)+1)
+    for j=i+1:i+k/2
+        t = j;
+        if t > N
+            t = t - N;
+        end
+        A(i,t) = 1;
+        A(t,i) = 1;
 
-        A(i,j) = 1;
-        A(j,i) = 1;
-
-        
         r = rand();
         if p > r
             l = randi(N,1);
@@ -37,10 +39,10 @@ for i=1:N
                 if l == j, continue; end
                 l = randi(N,1);
             end
-            
+
             A(i,j) = 0;
             A(j,i) = 0;
-            
+
             if undirected
                 A(i,l) = 1;
                 A(l,i) = 1;
@@ -61,4 +63,3 @@ for i=1:N
         end
     end
 end
-
