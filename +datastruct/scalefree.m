@@ -1,35 +1,38 @@
-function A = scalefree(N,sparsity)
+function A = scalefree(N,sparsity,seed)
 % Create a scalefree network with N nodes and specific sparseness
 % with preferential attachment
 %
-% A = datastruct.scalefree(N,sparsity)
+% A = datastruct.scalefree(N,sparsity[, seed])
 %
-% A: undirected scalefree network matrix
-% N: number of nodes
-% sparsity: sparsity degree [0,1]
+% A:         undirected scalefree network matrix
+% N:         number of nodes
+% sparsity:  sparsity degree [0,1]
+% seed:      matrix to work as a seed, assumed to have size < N
 
 m0 = round(sparsity*N);
-seed = logical(full(sprand(m0*2,m0*2-1,m0/m0^2)));
-k = 0;
-while rank(double(seed)) < min(size(seed))
-    seed = randn(size(seed)).*logical(full(sprand(m0*2,m0*2-1,m0/m0^2)));
-    % seed(floor(rand*numel(seed)+1)) = 1;
-    k = k + 1;
+if ~exist('seed','var')
+    seed = logical(full(sprand(m0*2,m0*2-1,m0/m0^2)));
+    k = 0;
+    while rank(double(seed)) < min(size(seed))
+        seed = randn(size(seed)).*logical(full(sprand(m0*2,m0*2-1,m0/m0^2)));
+        % seed(floor(rand*numel(seed)+1)) = 1;
+        k = k + 1;
 
-    if ~mod(k,100)
-        fprintf('k = %d\n',k)
+        if ~mod(k,100)
+            fprintf('k = %d\n',k)
+        end
     end
-end
 
-tmp = zeros(m0*2);
-for i=1:size(seed,1)
-    tmp(i,i+1:end) = seed(i,i:end);
-end
+    tmp = zeros(m0*2);
+    for i=1:size(seed,1)
+        tmp(i,i+1:end) = seed(i,i:end);
+    end
 
-for i=2:size(seed,1)
-    tmp(i,1:i-1) = seed(i,1:i-1);
+    for i=2:size(seed,1)
+        tmp(i,1:i-1) = seed(i,1:i-1);
+    end
+    seed = logical(tmp+tmp');
 end
-seed = logical(tmp+tmp');
 
 A = zeros(N);
 A(1:size(seed,1),1:size(seed,2)) = seed;

@@ -10,7 +10,7 @@ function A = cutSym(A,inchance,feedback_fraction)
 
 N = size(A,1);
 
-if ~exist(feedback_fraction,'var')
+if ~exist('feedback_fraction','var')
     feedback = inchance/20;
 else
     feedback = inchance/feedback_fraction;
