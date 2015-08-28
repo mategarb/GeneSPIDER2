@@ -63,7 +63,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-hatTheta = Methods.tls(response(data,net)',data.P');
+hatTheta = Methods.tls(response(data,net)',-data.P');
 Atls = hatTheta';
 for i=1:length(zetavec)
     temp = find(abs(Atls) <= zetavec(i));
