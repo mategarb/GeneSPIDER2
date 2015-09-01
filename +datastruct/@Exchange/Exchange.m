@@ -191,6 +191,8 @@ classdef Exchange < hgsetget
                     obj_data = obj_data.dataset;
                 elseif isfield(obj_data,'network')
                     obj_data = obj_data.network;
+                else
+                    obj_data = obj_data.obj_data;
                 end
             elseif strcmp(e,'.json')
                 obj_data = loadjson(fetchfile);
