@@ -14,18 +14,19 @@ classdef Exchange < hgsetget
             end
         end
         
-        function save(obj,varargin)
+        function save(obj,savepath,fending,varargin)
         % saves a datastruct obj to file, either as a .mat, .json, .ubj or .xml file.
         % The name of the file will be the name of the obj set.
         %
-        %   Input Arguments: save(obj[,path,<fileext>])
+        %   Input Arguments: save(obj[,path,<ext>,<other_args>])
         %   ================
         %   (none) :        Save obj file to current directory as a .mat file.
         %   path :          Path to directory.
-        %   fileext :       File extension: .xml,  eXtensible Markup Language
+        %   ext :           File extension: .xml,  eXtensible Markup Language
         %                                   .json, JavaScript Object Notation
         %                                   .ubj,  Universal Binary JSON
         %                               or  .mat   matlab native format (default)
+        %   other_args:     These arguments are sent to the specific save function
         %
         %
         % Support for writing json or ubj formats can be found here:
@@ -37,21 +38,22 @@ classdef Exchange < hgsetget
         %    <my-repo>
 
             warning('off','MATLAB:structOnObject')
-            fending = '.mat';
-            savepath = './';
-            obj_data = struct(obj);
-            if nargin > 1
-                if ~isa(varargin{1},'char')
-                    error('Input arguments must be a string')
+            if ~exist('fending','var')
+                fending = '.mat';
+            end
+            if ~exist('savepath','var')
+                savepath = './';
+                if ~exist('savepath','dir')
+                    error('save path does not exist')
                 end
-                savepath = varargin{1};
             end
 
+            obj_data = struct(obj);
+
             if nargin == 3
-                if ~isa(varargin{2},'char')
+                if ~isa(fending,'char')
                     error('Input arguments must be a string')
                 end
-                fending = varargin{2};
                 if strcmp(fending,'.xml')
                     if exist('mat2xml') ~= 2
                         error('Save method for xml files does not seem to exist')
@@ -83,11 +85,11 @@ classdef Exchange < hgsetget
                 xmlString = simplify_mbml( spcharout( regexprep(mat2xml(obj_data,savevar),'\n',' ')) ); % spcharout can not handle newlines
                 xmlwrite(fullfile(savepath,[name,fending]), str2DOMnode(xmlString));
             elseif strcmp(fending,'.json')
-                savejson(savevar,obj_data,fullfile(savepath,[name,fending]));
+                savejson(savevar,obj_data,fullfile(savepath,[name,fending]),varargin{:});
             elseif strncmp(fending,'.ubj',4)
-                saveubjson(savevar,obj_data,fullfile(savepath,[name,fending]));
+                saveubjson(savevar,obj_data,fullfile(savepath,[name,fending]),varargin{:});
             elseif strcmp(fending,'.mat')
-                save(fullfile(savepath,name),savevar)
+                save(fullfile(savepath,name),savevar,varargin{:});
             else
                 error('unknown file extension')
             end
@@ -133,7 +135,7 @@ classdef Exchange < hgsetget
             elseif nargin == 2
                 lpath = varargin{1};
                 if exist(lpath) ~= 7
-                    error('Unknown path')
+                    error('Unknown path: %s',lpath)
                 end
                 if isa(varargin{2},'double')
                     lfile = varargin{2};
@@ -159,6 +161,10 @@ classdef Exchange < hgsetget
                             output{j} = obj_datas(i).name;
                         end
                     end
+                end
+                if ~exist('output','var')
+                    warning('no data files in directory:\n %s',lpath)
+                    return
                 end
                 if nargout == 1 && isempty(lfile)
                     varargout{1} = output;
@@ -188,10 +194,8 @@ classdef Exchange < hgsetget
                 end
             elseif strcmp(e,'.json')
                 obj_data = loadjson(fetchfile);
-                name = fieldnames(obj_data)
-                class(obj_data)
-                strcmp('obj_data',name)
-                obj_data = obj_data.(name);
+                name = fieldnames(obj_data);
+                obj_data = obj_data.(name{1});
             elseif strncmp(e,'.ubj',4)
                 obj_data = loadubjson(fetchfile);
                 name = fieldnames(obj_data);
