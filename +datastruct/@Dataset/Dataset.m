@@ -26,9 +26,6 @@ classdef Dataset < datastruct.Exchange
         sdY = []; % measurement point variation of Y
         lambda    % Noise variance, lambda
         SNR_L     % Signal to noise ratio,
-
-        %% etay      % Linear independance from data per sample.
-        %% etau      % Linear independance from data per perturbation.
     end
 
     properties (SetAccess = public)
@@ -186,28 +183,6 @@ classdef Dataset < datastruct.Exchange
                varargout{1} = sdY;
                varargout{2} = sdP;
             end
-        end
-
-        function scale_lambda_SNR_L(data,SNR_L)
-        % scale the noise variance by setting the theoretic lambda with wished SNR_L
-            s = min(svd(data.Y));
-            lambda = s^2/(chi2inv(1-data.alpha,prod(size(data.P)))*SNR_L^2);
-            data.lambda = lambda;
-            % data.E = sqrt(lambda/preLambda).*data.E;
-        end
-
-        function scale_lambda_SNRv(data,SNRv)
-        % scale the noise variance by setting the theoretic lambda with wished SNRv
-            for i=1:data.N
-                lambda(i) = norm(data.Y(i,:))/(chi2inv(1-data.alpha,data.M)*SNRv^2);
-            end
-            data.lambda = min(lambda);
-
-            % alpha = data.alpha;
-            % for i=1:data.N
-            %     snr(i) = norm(data.Y(i,:))/sqrt(chi2inv(1-alpha,data.M)*data.lambda(1));
-            % end
-            % SNR = min(snr);
         end
 
         function newdata = scaleSNR(data,net,SNR)
