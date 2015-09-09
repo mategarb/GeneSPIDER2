@@ -44,6 +44,7 @@ This toolbox is comprised of five parts:
 
         git clone git@bitbucket.org:sonnhammergrni/genespider.git ~/src/genespider
 
+    or download from `https://bitbucket.org/sonnhammergrni/genespider` to `~/src/genespider`
     and run `cd ~/src/genespider`.
 
     To fetch the complete toolbox run
