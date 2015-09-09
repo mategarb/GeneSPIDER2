@@ -85,6 +85,20 @@ classdef Data < analyse.DataModel
 
         end
 
+        function lambda = scale_lambda_SNR_L(data,SNR_L)
+        % scale the noise variance by setting the theoretic lambda with wished SNR_L
+            s = min(svd(data.Y));
+            lambda = s^2/(chi2inv(1-data.alpha,prod(size(data.P)))*SNR_L^2);
+            % data.E = sqrt(lambda/preLambda).*data.E;
+        end
+
+        function lambda = scale_lambda_SNRv(data,SNRv)
+        % scale the noise variance by setting the theoretic lambda with wished SNRv
+            for i=1:data.N
+                lambda(i) = norm(data.Y(i,:))/(chi2inv(1-data.alpha,data.M)*SNRv^2);
+            end
+        end
+
         function varargout = irrepresentability(data,net)
         % Calculates the irrepresentability of the data set for inference with
         % LASSO

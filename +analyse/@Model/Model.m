@@ -39,19 +39,40 @@ classdef Model < analyse.DataModel
     end
 
     methods (Static)
-        function val = alpha(varargin)
+        function varargout = alpha(varargin)
         % significance level (default = 0.01)
             val = alpha@analyse.DataModel(varargin{:});
+            if nargout == 1
+                varargout{1} = val;
+                return
+            end
+            if nargin == 0
+                disp(val)
+            end
         end
 
-        function val = type(varargin)
+        function varargout = type(varargin)
         % 'directed' or 'undirected'
             val = type@analyse.DataModel(varargin{:});
+            if nargout == 1
+                varargout{1} = val;
+                return
+            end
+            if nargin == 0
+                disp(val)
+            end
         end
 
-        function val = tol(varargin)
+        function varargout = tol(varargin)
         % if a tolernace value for computations is needed it can be set here.
             val = tol@analyse.DataModel(varargin{:});
+            if nargout == 1
+                varargout{1} = val;
+                return
+            end
+            if nargin == 0
+                disp(val)
+            end
         end
 
         function A = give_matrix(model,varargin)
