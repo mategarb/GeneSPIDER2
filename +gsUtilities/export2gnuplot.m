@@ -1,6 +1,6 @@
 function export2gnuplot(file,varargin)
 %   function for exporting vectors and variables to a gnuplot friendly tsv format.
-%   export2gnuplot(file{,variables,data})
+%   export2gnuplot(file<,variables,data>)
 %
 %
 %   Input arguments:
@@ -47,7 +47,7 @@ function export2gnuplot(file,varargin)
         ext = '.tsv'
     end
 
-    if ~exist(fullfile(path,f,ext),'file')
+    if ~exist(fullfile(path,[f,ext]),'file')
         fid = fopen(fullfile(path,[f,ext]),'w');
     else
         fid = fopen(fullfile(path,[f,ext]),'a');
