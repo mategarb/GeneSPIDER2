@@ -14,8 +14,8 @@ This toolbox is comprised of five parts:
 * [datastruct](https://bitbucket.org/sonnhammergrni/datastruct) repository containing classes which is used for handling relevant data structure formats.
 * [Methods](https://bitbucket.org/sonnhammergrni/methods) repository containing original scripts and wrappers for various inference methods accepting special `datastruct` objects for analysis.
 * [analyse](https://bitbucket.org/sonnhammergrni/analyse), for analysing data and inference methods.
+* [gsUtilities](https://bitbucket.org/sonnhammergrni/gsutilities), include helper functions.
 * [illustrate](https://bitbucket.org/sonnhammergrni/illustrate) toolbox for help with data visualization and exporting to other graphical tools/formats.
-* [tools](https://bitbucket.org/sonnhammergrni/tools), include helper functions.
 
 ### What is this repository for? ###
 Motivation:
@@ -25,7 +25,7 @@ Although several packages are available to model, simulate, and analyse GRN infe
 Independent control of these properties in simulations is key to drawing conclusions about which inference method to use in a given condition and what performance to expect from it, as well as to obtain properties representative of real biological systems.
 
 Results:
-We present a Matlab package \gs for generation and analysis of networks and data in a dynamical systems framework with focus on the ability to vary properties.
+We present a Matlab package GeneSPIDER for generation and analysis of networks and data in a dynamical systems framework with focus on the ability to vary properties.
 It supplies essential components that have been missing and wrappers to existing network inference methods in common use.
 \gs contains tools for controlling and evaluating network topology (random, small-world, scale-free), stability of linear time-invariant systems, signal to noise ratio (SNR), and network Interampatteness.
 Procedures for design of perturbation experiments, bootstrapping, analysis of linear dependence, sample selection, scaling of SNR, and performance evaluation are included.
@@ -73,4 +73,4 @@ Supplementary information: online-only supplementary data available at the journ
 
 * For questions contact [Andreas](https://bitbucket.org/xparx)
 * Other community or team contact
-* How to cite: Generation and Simulation Package for Informative Data ExploRation
+* How to cite: GeneSPIDER -- Generation and Simulation Package for Informative Data ExploRation
