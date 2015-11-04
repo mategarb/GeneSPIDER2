@@ -1,9 +1,9 @@
 [submodule "+datastruct"]
 	path = +datastruct
 	url = git@bitbucket.org:sonnhammergrni/datastruct.git
-[submodule "+tools"]
+[submodule "+gsUtilities"]
 	path = +tools
-	url = git@bitbucket.org:sonnhammergrni/tools.git
+	url = git@bitbucket.org:sonnhammergrni/gsutilities.git
 [submodule "+Methods"]
 	path = +Methods
 	url = git@bitbucket.org:sonnhammergrni/Methods.git
