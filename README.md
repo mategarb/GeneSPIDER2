@@ -18,25 +18,24 @@ This toolbox is comprised of five parts:
 * [tools](https://bitbucket.org/sonnhammergrni/tools), include helper functions.
 
 ### What is this repository for? ###
-  A wide range of tools are available to model, simulate and
-  analyze gene regulatory networks (GRN). However, it is not
-  always clear how or when to apply different modeling techniques
-  to create a meaningful analysis. We present a tool that aids in
-  the GRN evaluation and model creation pipeline in a dynamical
-  systems framework. This toolbox, (GeneSPIDER) not only supplies
-  essential components that have been missing but also aggregates
-  approaches and field sources that are, or could be incorporated
-  into common use.  The systems engineering perspective of \gs
-  focuses on gene regulatory networks to help bring forth the
-  necessary and useful analytical components to the dynamical
-  systems themselves, both in terms of the data and systems.  The
-  goal is to make it simpler to evaluate data quality and model
-  hypotheses generated from that data. This package can be fetched from the
-  online =git= repository [GeneSPIDER](https://bitbucket.org/sonnhammergrni/genespider).
+Motivation:
+Inference of gene regulatory networks (GRNs) is a central goal in systems biology.
+It is therefore important to evaluate the accuracy of GRN inference methods in the light of network and data properties.
+Although several packages are available to model, simulate, and analyse GRN inference, they offer limited control of network topology, system dynamics, experimental design, data properties, and noise characteristics.
+Independent control of these properties in simulations is key to drawing conclusions about which inference method to use in a given condition and what performance to expect from it, as well as to obtain properties representative of real biological systems.
 
-* Version 0.1
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
-* [Learn Org-mode](http://orgmode.org/)
+Results:
+We present a Matlab package \gs for generation and analysis of networks and data in a dynamical systems framework with focus on the ability to vary properties.
+It supplies essential components that have been missing and wrappers to existing network inference methods in common use.
+\gs contains tools for controlling and evaluating network topology (random, small-world, scale-free), stability of linear time-invariant systems, signal to noise ratio (SNR), and network Interampatteness.
+Procedures for design of perturbation experiments, bootstrapping, analysis of linear dependence, sample selection, scaling of SNR, and performance evaluation are included.
+The ability of \gs to independently control network and data properties in simulations, together with its tools to analyse these properties and the quality of inferred GRNs enables much more informative analysis of GRN inference performance than was previously possible.
+
+Availability and Implementation: Source code freely available for download at https://bitbucket.org/sonnhammergrni/genespider, implemented in Matlab.
+
+Contact: tn@kth.se
+
+Supplementary information: online-only supplementary data available at the journal's web site.
 
 ### How do I get set up? ###
 
@@ -60,19 +59,15 @@ This toolbox is comprised of five parts:
 * Dependencies:
 
     * [MATLAB](https://se.mathworks.com/products/matlab/)
-    * [git](https://git-scm.com/) for easily keeping up to date with the GeneSPIDER toolbox.
+    * [git](https://git-scm.com/) for easily keeping up to date with the GeneSPIDER toolbox and for fetching sub-module toolboxes.
     * [Glmnet](https://web.stanford.edu/~hastie/glmnet_matlab/) for Matlab (2013) Qian, J., Hastie, T., Friedman, J., Tibshirani, R. and Simon, N. used with the wrapper script `Methods.Glmnet`, `Methods.Bolasso`
     * [JSONlab](http://www.mathworks.com/matlabcentral/fileexchange/33381-jsonlab--a-toolbox-to-encode-decode-json-files-in-matlab-octave) for exporting to storage format .json or .ubj.
     * [xml4mat](https://www.mathworks.com/matlabcentral/fileexchange/6268-xml4mat-v2-0) is nessessary for exporting to storage format xml.
     * [CVX](http://cvxr.com/cvx/): Matlab software for disciplined convex programming for some implemented Methods.
 
-* Datasets are available [here]()
+* Datasets are available [here](https://bitbucket.org/sonnhammergrni/gs-datasets)
+* Networks are available [here](https://bitbucket.org/sonnhammergrni/gs-networks)
 
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
 
 ### Who do I talk to? ###
 
