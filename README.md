@@ -73,4 +73,4 @@ Supplementary information: online-only supplementary data available at the journ
 
 * For questions contact [Andreas](https://bitbucket.org/xparx)
 * How to cite: GeneSPIDER -- generation and simulation package for informative data exploration.
-  Tjärnberg *et. al.*, *manuscript.*, (2015).\\
+  Tjärnberg *et. al.*, *manuscript.*, (2015).
