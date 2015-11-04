@@ -1,5 +1,5 @@
 function L = regressorLength(v,w)
-% helper function for calculating,
+% helper function for calculating the length:
 %
 % $$L = \frac{\boldsymbol{v}^T \boldsymbol{w}}{||\boldsymbol{v}|| \cdot ||\boldsymbol{w}||}$$
 %

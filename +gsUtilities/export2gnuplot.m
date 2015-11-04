@@ -63,16 +63,31 @@ function export2gnuplot(file,varargin)
         values = varargin{i+1};
 
         fprintf(fid,'#');
-        fprintf(fid,'\t%s',variables{:});
+        if iscell(values)
+            fprintf(fid,' %s\t',variables{1,:});
+        else
+            fprintf(fid,'\t%s',variables{1,:});
+        end
         fprintf(fid,'\n');
         if isempty(values)
             continue
         end
 
-        for j=1:size(values,1)
-            fprintf(fid,'\t%g',values(j,:));
-            fprintf(fid,'\n');
+        if iscell(values) % assume labels are in the first column and values in the second column
+            for j=1:size(values,1)
+                for k=1:size(values,2)-1
+                    fprintf(fid,'%s',values{j,k});
+                end
+                fprintf(fid,'\t%g',values{j,end}(1,:));
+                fprintf(fid,'\n');
+            end
+        else
+            for j=1:size(values,1)
+                fprintf(fid,'\t%g',values(j,:));
+                fprintf(fid,'\n');
+            end
         end
+
 
         if i ~= nArgs-1
             fprintf(fid,'\n\n');
