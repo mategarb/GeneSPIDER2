@@ -9,6 +9,3 @@ or
 ```
 
 Add path to parent directory in MATLAB. This makes +datastruct a toolbox and is ready for use.
-
-## Dependencies
-bitbucket.org/xparx/tools.git
