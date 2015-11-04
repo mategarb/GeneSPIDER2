@@ -148,12 +148,17 @@ classdef Network < datastruct.Exchange
             s = svd(full(net.A));
         end
 
-        function Y = response(net,data)
-        % Gives the network response to input from data.
-            if ~isa(data,'datastruct.Dataset')
-                error('Must give a datastruct.Dataset to calculate response')
+        function Y = mtimes(net,p)
+        % generate a mapping of a perturbation through the network returning SS response
+        %
+        % y = net*p;
+        %
+
+            if isrow(p)
+                p = p';
             end
-            Y = net.G*(data.P-data.F) + data.E;
+            Y = net.G*p;
+
         end
 
         function net = populate(net,input)
