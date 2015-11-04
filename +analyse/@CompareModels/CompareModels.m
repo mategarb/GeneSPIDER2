@@ -1,7 +1,7 @@
 classdef CompareModels
 % CompareModels calculates difference measures between weighted network adjacency matrices.
 %
-%   Input Arguments: CompareModels(A, Alist, selected)
+%   Input Arguments: analyse.CompareModels(A, Alist, selected)
 %   ================
 %   (none)     Initiate object for later use.
 %   A        = The 'true' weighted adjacency matrix of the network, to which all

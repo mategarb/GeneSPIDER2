@@ -1,5 +1,8 @@
 classdef Data < analyse.DataModel
-
+% Data calculates data properties for the supplied data set.
+%
+%
+%
     properties (SetAccess = private)
         dataset = '';     % identifier for dataset used
         SNR_Phi_true      % Signal to noise ratio, \sigma_N(Y)/\sigma_1(E)
