@@ -8,7 +8,7 @@ function [A,s] = smallworld(N,k,p,undirected,varargin)
 %
 % N: number of nodes
 % k: inital connections for each node, assumed even
-% p: probability of rewireing
+% p: probability of rewiring
 % undirected: logical if undirected or directed
 % d: probability of rewiring direction
 %
@@ -31,17 +31,21 @@ for i=1:N
         end
         A(i,t) = 1;
         A(t,i) = 1;
-
         r = rand();
         if p > r
-            l = randi(N,1);
-            while any(l == mod([i-k/2:i+k/2],N))
-                if l == j, continue; end
-                l = randi(N,1);
+            notselection = mod([i-k/2:i+k/2],N)+1;
+            selection = [1:N];
+            selection(notselection) = 0;
+            selection = selection(find(selection));
+            l = randi(length(selection),1);
+            sel = selection(l);
+            while sel == t
+                l = randi(length(selection),1);
+                sel = selection(l);
             end
 
-            A(i,j) = 0;
-            A(j,i) = 0;
+            A(i,t) = 0;
+            A(t,i) = 0;
 
             if undirected
                 A(i,l) = 1;
@@ -53,11 +57,13 @@ for i=1:N
                     A(l,i) = 1;
                 else
                     A(i,l) = 1;
-                    h = randi(N,1);
-                    while any(h == mod([i-k/2:i+k/2],N))
-                        h = randi(N,1);
-                    end
-                    A(h,i) = 1;
+                    notselection = mod([i-k/2:i+k/2],N)+1;
+                    selection = [1:N];
+                    selection(notselection) = 0;
+                    selection = selection(find(selection));
+                    h = randi(length(selection),1);
+                    sel = selection(h);
+                    A(sel,i) = 1;
                 end
             end
         end
