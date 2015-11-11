@@ -155,7 +155,7 @@ classdef Dataset < datastruct.Exchange
             else
                 SNR_L = num2str(round(data.SNR_L*1000));
             end
-            data.dataset = [namer.creator,'-ID',data.network(regexpi(data.network,'-ID')+3:end),'-D',datestr(namer.time,'yyyymmdd'),'-E',num2str(size(data.P,2)),'-SNR',SNR_L,'-IDY',namer.id];
+            data.dataset = [namer.creator,'-ID',data.network(regexpi(data.network,'-ID')+3:end),'-D',datestr(namer.time,'yyyymmdd'),'-N',num2str(size(data.P,1)),'-E',num2str(size(data.P,2)),'-SNR',SNR_L,'-IDY',namer.id];
         end
 
         function names = get.names(data)
