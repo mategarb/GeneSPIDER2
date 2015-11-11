@@ -1,9 +1,9 @@
 classdef Exchange < hgsetget
-    
+
     methods
         function obj = Exchange()
         end
-        
+
         function obj = populate(obj,input)
             inputnames = fieldnames(input);
             names = fieldnames(obj);
@@ -13,7 +13,7 @@ classdef Exchange < hgsetget
                 end
             end
         end
-        
+
         function save(obj,savepath,fending,varargin)
         % saves a datastruct obj to file, either as a .mat, .json, .ubj or .xml file.
         % The name of the file will be the name of the obj set.
@@ -75,7 +75,7 @@ classdef Exchange < hgsetget
             elseif isa(obj,'datastruct.Network')
                 name = obj_data.network;
                 savevar = 'obj_data';
-            else 
+            else
                 warning('Unknown object type')
                 name = 'unknown_datatype';
                 savevar = 'obj_data';
@@ -181,7 +181,7 @@ classdef Exchange < hgsetget
                     lfile = output{lfile};
                 end
             end
-           
+
             fetchfile = fullfile(lpath,lfile);
             [p,f,e] = fileparts(fetchfile);
             if strcmp(e,'.mat')
@@ -206,8 +206,8 @@ classdef Exchange < hgsetget
                 [MAT,obj_data] = xml2mat(fetchfile);
                 eval([obj_data,'=MAT;']);
             end
-            
-            
+
+
             % regexprep(name,'(\<[a-z])','${upper($1)}')
             % Ugly hack if statement
             if isfield(obj_data,'Y') % is a dataset
@@ -217,14 +217,123 @@ classdef Exchange < hgsetget
             else
                 error('no compatible class for the data file')
             end
-            
+
             populate(obj,obj_data);
             if nargout == 1
                 varargout{1} = obj;
             elseif nargout == 2
                 varargout{1} = obj;
                 varargout{2} = obj_data;
-            end        
+            end
+        end
+
+        function varargout = fetch(options,varargin)
+        % Fetch data from remote repository returns a GeneSPIDER object.
+        %
+        %
+
+
+
+            if nargin == 2 % assume path is given.
+                [directurl,name,filetype] = fileparts(varargin{1});
+
+                if ~isempty(directurl)
+                    options.directurl = directurl;
+                end
+                if exist(name,'var')
+                    options.name = name;
+                end
+                if exist(filetype,'var')
+                    options.filetype = filetype;
+                end
+            end
+
+            if length(varargin) > 2
+                dbout = dbstack();
+                parentFunc = dbout(2).name;
+
+                optionNames = fieldnames(options);
+
+                nArgs = length(varargin);
+                if round(nArgs/2) ~= nArgs/2
+                    disp(optionNames)
+                    error([parentFunc,' needs propertyName/propertyValue pairs with names as above'])
+                end
+
+                for pair = reshape(varargin,2,[]) %# pair is {propName;propValue}
+                    inpName = lower(pair{1}); %# make case insensitive
+
+                    if any(strmatch(inpName,optionNames))
+                        options.(inpName) = pair{2};
+                    else
+                        error('%s is not a recognized parameter name',inpName)
+                    end
+                end
+            end
+
+            [junk,name,ext] = fileparts(options.name);
+            if ~isempty(ext)
+                options.name = name;
+                options.filetype = ext;
+            end
+
+            webread_options = weboptions('ContentType',options.filetype(2:end));
+
+            % If name or complete path is given
+            if nargin == 2
+                if ~isempty(options.directurl) % some part of the path is given
+                    failed = logical(0);
+                    try
+                        tmpurl1 = fullfile(options.directurl,[options.name,options.filetype]);
+                        obj_data =  webread(tmpurl1,webread_options);
+                    catch
+                        failed = logical(1);
+                    end
+
+                    if failed
+                        try
+                            tmpurl2 = fullfile(options.baseurl,options.directurl,[options.name,options.filetype]);
+                            obj_data =  webread(tmpurl2,webread_options);
+                        catch
+                            error(' Remote URL does not seem to be correct\n %s or\n %s\n does not work',tmpurl1,tmpurl2)
+                        end
+                    end
+                else % only name is given, try to parse the name and assume bitbucket GeneSPIDER repo.
+                    N = regexp(options.name,'-N\d+','match');
+                    optiones.N = str2num(N{1}(3:end));
+                    try
+                        if isfield(options,'type')
+                            type = regexp(options.name,'-[A-Za-z]+-','match');
+                            options.type = type{1}(2:end-1);
+                            tmpurl1 = fullfile(options.baseurl,options.version,options.type,['N',num2str(options.N)],[options.name,options.filetype]);
+                        else
+                            tmpurl1 = fullfile(options.baseurl,options.version,['N',num2str(options.N)],[options.name,options.filetype]);
+                        end
+                        obj_data =  webread(tmpurl1,webread_options);
+                    catch
+                        error(' File with name %s does not seem to exist\ at the locations %s',options.name,tmpurl1)
+                    end
+                end
+            else % name value pair input args.
+                'hello'
+                try
+                    if isfield(options,'type')
+                        tmpurl1 = fullfile(options.baseurl,options.version,options.type,['N',num2str(options.N)],[options.name,options.filetype]);
+                    else
+                        tmpurl1 = fullfile(options.baseurl,options.version,['N',num2str(options.N)],[options.name,options.filetype]);
+                    end
+                    obj_data =  webread(tmpurl1,webread_options);
+                catch
+
+                    error(' Could not fetch any data with the options')
+                end
+            end
+
+            if isfield(obj_data,'obj_data')
+                varargout{1} = obj_data.obj_data;
+            else
+                varargout{1} = obj_data;
+            end
         end
     end
 end

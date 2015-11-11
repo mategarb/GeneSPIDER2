@@ -522,5 +522,51 @@ classdef Dataset < datastruct.Exchange
                 return
             end
         end
+
+        function varargout = fetch(varargin)
+        % method to get GeneSPIDER datasets from https://bitbucket.org/sonnhammergrni/gs-datasets
+        % currently only supports json format.
+        %
+        % Several different callings are possible
+        %
+        % data = datastruct.Dataset.fetch('URL');
+        % where URL is the complete path to the file.
+        %
+        % data = datastruct.Dataset.fetch('name');
+        % where name is the name in the bitbucket repository
+        %
+        % data = datastruct.Dataset.fetch('option1',value1);
+        % set name value pairs to be able to parse options.
+
+            options(1).directurl = '';
+            options(1).baseurl = 'https://bitbucket.org/sonnhammergrni/gs-datasets/raw/';
+            options(1).version = 'master';
+            options(1).N = 10;
+            options(1).name = 'Nordling-ID1446937-D20150825-N10-E15-SNR3291-IDY15968';
+            options(1).filetype = '.json';
+
+            if nargin == 0
+                dbout = dbstack();
+                parentFunc = dbout(2).name;
+                optionNames = fieldnames(options);
+                disp(optionNames)
+                error([parentFunc,' needs propertyName/propertyValue pairs with names as above\n or alternatively a full filepath.'])
+            else
+                obj_data = fetch@datastruct.Exchange(options,varargin{:});
+            end
+            data = datastruct.Dataset();
+            data.populate(obj_data);
+
+            if nargout == 1
+                varargout{1} = data;
+                return
+            end
+
+            if nargout == 2
+                varargout{1} = data;
+                varargout{2} = obj_data;
+                return
+            end
+        end
     end
 end

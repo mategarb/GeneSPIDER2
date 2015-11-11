@@ -195,5 +195,51 @@ classdef Network < datastruct.Exchange
                 return
             end
         end
+
+        function varargout = fetch(varargin)
+        % method to get GeneSPIDER networks from https://bitbucket.org/sonnhammergrni/gs-networks
+        %
+        % Several different callings are possible
+        %
+        % net = datastruct.Network.fetch('URL');
+        % where URL is the complete path to the file.
+        %
+        % net = datastruct.Network.fetch('name');
+        % where name is the name in the bitbucket repository
+        %
+        % net = datastruct.Network.fetch('option1',value1);
+        % set name value pairs to be able to parse options.
+
+            options(1).directurl = '';
+            options(1).baseurl = 'https://bitbucket.org/sonnhammergrni/gs-networks/raw/';
+            options(1).version = 'master';
+            options(1).type = 'random';
+            options(1).N = 10;
+            options(1).name = 'Nordling-D20100302-random-N10-L25-ID1446937';
+            options(1).filetype = '.json';
+
+            if nargin == 0
+                dbout = dbstack();
+                parentFunc = dbout(2).name;
+                optionNames = fieldnames(options);
+                disp(optionNames)
+                error([parentFunc,' needs propertyName/propertyValue pairs with names as above\n or alternatively a full filepath.'])
+            else
+                obj_data = fetch@datastruct.Exchange(options,varargin{:});
+            end
+            net = datastruct.Network();
+            net.populate(obj_data);
+
+            if nargout == 1
+                varargout{1} = net;
+                return
+            end
+
+            if nargout == 2
+                varargout{1} = net;
+                varargout{2} = obj_data;
+                return
+            end
+        end
     end
 end
