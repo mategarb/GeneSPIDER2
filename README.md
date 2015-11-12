@@ -68,9 +68,17 @@ Supplementary information: online-only supplementary data available at the journ
 * Datasets are available [here](https://bitbucket.org/sonnhammergrni/gs-datasets)
 * Networks are available [here](https://bitbucket.org/sonnhammergrni/gs-networks)
 
+* To test that basic functionality after setup as detailed above open matlab and run the commands:
+
+        Net = datastruct.Network.fetch()
+        Data = datastruct.Dataset.fetch()
+
+    You should have the default network and a dataset loaded in matlab.
 
 ### Who do I talk to? ###
 
-* For questions contact [Andreas](https://bitbucket.org/xparx)
-* How to cite: GeneSPIDER -- generation and simulation package for informative data exploration.
-  Tjärnberg *et. al.*, *manuscript.*, (2015).
+* For questions contact [Torbjörn](https://bitbucket.org/temn/)
+* How to cite:
+
+    GeneSPIDER -- generation and simulation package for informative data exploration.
+    Tjärnberg *et. al.*, *manuscript.*, (2015).
