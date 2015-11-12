@@ -1,5 +1,4 @@
-
-      _____                   _____ _____ _____ _____  ______ _____
+_____                   _____ _____ _____ _____  ______ _____
      / ____|                 / ____|  __ \_   _|  __ \|  ____|  __ \
     | |  __  ___ _ __   ___ | (___ | |__) || | | |  | | |__  | |__) |
     | | |_ |/ _ \ '_ \ / _ \ \___ \|  ___/ | | | |  | |  __| |  _  /
@@ -80,5 +79,5 @@ Supplementary information: online-only supplementary data available at the journ
 * For questions contact [Torbjörn](https://bitbucket.org/temn/)
 * How to cite:
 
-    GeneSPIDER -- generation and simulation package for informative data exploration.
+    GeneSPIDER -- generation and simulation package for informative data exploration.  
     Tjärnberg *et. al.*, *manuscript.*, (2015).
