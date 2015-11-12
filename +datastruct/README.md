@@ -1,11 +1,19 @@
-# GeneSpider is a tool for creating and managing regulatory networks and data sets
+# datastruct is a tool for managing regulatory networks and datasets
+
 clone the repository
 ```
-  git clone git@bitbucket.org:xparx/datastruct.git +datastruct
+git clone git@bitbucket.org:sonnhammergrni/datastruct.git +datastruct
 ```
 or 
 ```
-  git clone https://xparx@bitbucket.org/xparx/datastruct.git +datastruct
+git clone https://$USER@bitbucket.org/sonnhammergrni/datastruct.git +datastruct
 ```
 
-Add path to parent directory in MATLAB. This makes +datastruct a toolbox and is ready for use.
+where `$USER` is your bitbucket user account name.
+
+Add the parent directory to the path in MATLAB. This makes +datastruct a MATLAB toolbox and ready for use.
+
+To test run in MATLAB:
+
+    Net = datastruct.Network.fetch()
+    Data = datastruct.Dataset.fetch()
