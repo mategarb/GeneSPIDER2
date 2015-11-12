@@ -22,7 +22,7 @@ n = size(A,1);
 L = zeros(n,tids);
 x = zeros(n,1); % Starting state is zero
 L(:,1) = x;
-if isrow
+if isrow(p)
     p = p';
 end
 
@@ -31,6 +31,10 @@ tau=min(abs(eig(A)));
 timestep = tau*0.1;
 
 if ~exist('stdp')
+    stdp = 0;
+end
+
+if isempty(stdp)
     stdp = 0;
 end
 

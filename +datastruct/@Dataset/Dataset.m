@@ -488,7 +488,7 @@ classdef Dataset < datastruct.Exchange
         %          datastruct.Experiment or datastruct.Network
 
             if ~isa(input,'struct') && ~isa(input,'datastruct.Dataset') && ~isa(input,'datastruct.Experiment') && ~isa(input,'datastruct.Network')
-                error('Needs to be a struct,\n datastruct.Dataset,\n datastruct.Experiment or datastruct.Network class')
+                error('Needs to be a struct\n datastruct.Dataset\n datastruct.Experiment or datastruct.Network class')
             end
 
             inputnames = fieldnames(input);
@@ -539,7 +539,7 @@ classdef Dataset < datastruct.Exchange
         % set name value pairs to be able to parse options.
 
             options(1).directurl = '';
-            options(1).baseurl = 'https://bitbucket.org/sonnhammergrni/gs-datasets/raw/';
+            options(1).baseurl = 'https://bitbucket.org/api/1.0/repositories/sonnhammergrni/gs-datasets/raw/';
             options(1).version = 'master';
             options(1).N = 10;
             options(1).name = 'Nordling-ID1446937-D20150825-N10-E15-SNR3291-IDY15968';
@@ -554,8 +554,14 @@ classdef Dataset < datastruct.Exchange
             else
                 obj_data = fetch@datastruct.Exchange(options,varargin{:});
             end
-            data = datastruct.Dataset();
-            data.populate(obj_data);
+
+            if isa(obj_data,'cell')
+                varargout{1} = obj_data;
+                return
+            else
+                data = datastruct.Dataset();
+                data.populate(obj_data);
+            end
 
             if nargout == 1
                 varargout{1} = data;
