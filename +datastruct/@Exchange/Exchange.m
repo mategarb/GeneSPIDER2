@@ -237,15 +237,9 @@ classdef Exchange < hgsetget
             if nargin == 2 % assume path is given.
                 [directurl,name,filetype] = fileparts(varargin{1});
 
-                if ~isempty(directurl)
-                    options.directurl = directurl;
-                end
-                if exist(name,'var')
-                    options.name = name;
-                end
-                if exist(filetype,'var')
-                    options.filetype = filetype;
-                end
+                options.directurl = directurl;
+                options.name = name;
+                options.filetype = filetype;
             end
 
             if length(varargin) > 2
@@ -271,19 +265,38 @@ classdef Exchange < hgsetget
                 end
             end
 
-            [junk,name,ext] = fileparts(options.name);
-            if ~isempty(ext)
+            [junk,name,filetype] = fileparts(options.name);
+            if isempty(options.filetype)
                 options.name = name;
-                options.filetype = ext;
+                options.filetype = filetype;
+            else
+                options.name = name;
             end
 
-            webread_options = weboptions('ContentType',options.filetype(2:end));
+            if ~isempty(options.filetype)
+
+                switch options.filetype
+                  case '.json'
+                    webread_options = weboptions('ContentType','json');
+                  case '.xml'
+                    webread_options = weboptions('ContentType','xmldom');
+                  case '.ubj'
+                    webread_options = weboptions('ContentType','binary');
+                  case '.ubjson'
+                    webread_options = weboptions('ContentType','binary');
+                  case '.mat'
+                    webread_options = weboptions('ContentType','binary');
+                end
+            elseif isempty(options.name)
+                webread_options = weboptions('ContentType','text');
+            end
+
 
             % If name or complete path is given
             if nargin == 2
                 if ~isempty(options.directurl) % some part of the path is given
-                    failed = logical(0);
                     try
+                        failed = logical(0);
                         tmpurl1 = fullfile(options.directurl,[options.name,options.filetype]);
                         obj_data =  webread(tmpurl1,webread_options);
                     catch
@@ -291,13 +304,26 @@ classdef Exchange < hgsetget
                     end
 
                     if failed
+                        failed = logical(0);
                         try
                             tmpurl2 = fullfile(options.baseurl,options.directurl,[options.name,options.filetype]);
                             obj_data =  webread(tmpurl2,webread_options);
                         catch
-                            error(' Remote URL does not seem to be correct\n %s or\n %s\n does not work',tmpurl1,tmpurl2)
+                            failed = logical(1);
                         end
                     end
+
+                    if failed
+                        failed = logical(0);
+                        try
+                            tmpurl3 = fullfile(options.baseurl,options.version,options.directurl,[options.name,options.filetype]);
+                            obj_data =  webread(tmpurl3,webread_options);
+                        catch
+                            failed = logical(1);
+                            error(' Remote URL does not seem to be correct\n %s\n %s\n %s\n does not work',tmpurl1,tmpurl2,tmpurl3)
+                        end
+                    end
+
                 else % only name is given, try to parse the name and assume bitbucket GeneSPIDER repo.
                     N = regexp(options.name,'-N\d+','match');
                     optiones.N = str2num(N{1}(3:end));
@@ -315,7 +341,6 @@ classdef Exchange < hgsetget
                     end
                 end
             else % name value pair input args.
-                'hello'
                 try
                     if isfield(options,'type')
                         tmpurl1 = fullfile(options.baseurl,options.version,options.type,['N',num2str(options.N)],[options.name,options.filetype]);
@@ -324,13 +349,22 @@ classdef Exchange < hgsetget
                     end
                     obj_data =  webread(tmpurl1,webread_options);
                 catch
-
                     error(' Could not fetch any data with the options')
                 end
             end
 
             if isfield(obj_data,'obj_data')
                 varargout{1} = obj_data.obj_data;
+            elseif isa(obj_data,'char')
+                output = strread(obj_data, '%s', 'delimiter', sprintf('\n'));
+                if nargout == 0
+                    for j=1:length(output)
+                        fprintf('%d %s\n',j,output{j});
+                    end
+                    return
+                else
+                    varargout{1} = output;
+                end
             else
                 varargout{1} = obj_data;
             end
