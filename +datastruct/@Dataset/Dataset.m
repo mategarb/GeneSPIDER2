@@ -527,16 +527,19 @@ classdef Dataset < datastruct.Exchange
         % method to get GeneSPIDER datasets from https://bitbucket.org/sonnhammergrni/gs-datasets
         % currently only supports json format.
         %
-        % Several different callings are possible
+        % Several different callings are possible, if URL is a path in the repository (ending in '/')
+        % a list of files or directories will be returned.
         %
         % data = datastruct.Dataset.fetch('URL');
-        % where URL is the complete path to the file.
+        % where URL is the complete path to the file or directory
+        % or the extended path beginning with the above URL.
         %
         % data = datastruct.Dataset.fetch('name');
         % where name is the name in the bitbucket repository
         %
         % data = datastruct.Dataset.fetch('option1',value1);
         % set name value pairs to be able to parse options.
+
 
             options(1).directurl = '';
             options(1).baseurl = 'https://bitbucket.org/api/1.0/repositories/sonnhammergrni/gs-datasets/raw/';
@@ -546,11 +549,14 @@ classdef Dataset < datastruct.Exchange
             options(1).filetype = '.json';
 
             if nargin == 0
-                dbout = dbstack();
-                parentFunc = dbout(2).name;
-                optionNames = fieldnames(options);
-                disp(optionNames)
-                error([parentFunc,' needs propertyName/propertyValue pairs with names as above\n or alternatively a full filepath.'])
+                if nargout == 0
+                    default_url = fullfile(options.baseurl,options.version,['N',num2str(options.N)],'/');
+                    fetch@datastruct.Exchange(options,default_url);
+                    return
+                else
+                    default_file = 'Nordling-ID1446937-D20150825-N10-E15-SNR3291-IDY15968.json';
+                    obj_data = fetch@datastruct.Exchange(options,default_file);
+                end
             else
                 obj_data = fetch@datastruct.Exchange(options,varargin{:});
             end

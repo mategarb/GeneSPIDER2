@@ -199,18 +199,18 @@ classdef Network < datastruct.Exchange
         function varargout = fetch(varargin)
         % method to get GeneSPIDER networks from https://bitbucket.org/sonnhammergrni/gs-networks
         %
-        % Several different callings are possible
+        % Several different callings are possible, if URL is a path in the repository (ending in '/')
+        % a list of files or directories will be returned.
         %
         % net = datastruct.Network.fetch('URL');
-        % where URL is the complete path to the file.
+        % where URL is the complete path to the file or directory
+        % or the extended path beginning with the above URL.
         %
         % net = datastruct.Network.fetch('name');
-        % where name is the name in the bitbucket repository
+        % where name is the name in the bitbucket repository.
         %
         % net = datastruct.Network.fetch('option1',value1);
         % set name value pairs to be able to parse options.
-
-            default_file = 'Nordling-D20100302-random-N10-L25-ID1446937.json';
 
             options(1).directurl = '';
             options(1).baseurl = 'https://bitbucket.org/api/1.0/repositories/sonnhammergrni/gs-networks/raw/';
@@ -222,11 +222,14 @@ classdef Network < datastruct.Exchange
             options(1).filetype = '';
 
             if nargin == 0
-                dbout = dbstack();
-                parentFunc = dbout(2).name;
-                optionNames = fieldnames(options);
-                disp(optionNames)
-                error([parentFunc,' needs propertyName/propertyValue pairs with names as above\n or alternatively a full filepath.'])
+                if nargout == 0
+                    default_url = fullfile(options.baseurl,options.version,options.type,['N',num2str(options.N)],'/');
+                    fetch@datastruct.Exchange(options,default_url);
+                    return
+                else
+                    default_file = 'Nordling-D20100302-random-N10-L25-ID1446937.json';
+                    obj_data = fetch@datastruct.Exchange(options,default_file);
+                end
             else
                 if nargout == 0
                     fetch@datastruct.Exchange(options,varargin{:});
