@@ -57,17 +57,17 @@ Supplementary information: online-only supplementary data available at the journ
 * To develop and keep track of changes for each submodule you need to check out the master branch from each submodule with the command `git checkout master`.
 * Dependencies:
 
-    * [MATLAB](https://se.mathworks.com/products/matlab/)
+    * [MATLAB](https://se.mathworks.com/products/matlab/), version including (2015a) and above is preferred.
     * [git](https://git-scm.com/) for easily keeping up to date with the GeneSPIDER toolbox and for fetching sub-module toolboxes.
     * [Glmnet](https://web.stanford.edu/~hastie/glmnet_matlab/) for Matlab (2013) Qian, J., Hastie, T., Friedman, J., Tibshirani, R. and Simon, N. used with the wrapper script `Methods.Glmnet`, `Methods.Bolasso`
     * [JSONlab](http://www.mathworks.com/matlabcentral/fileexchange/33381-jsonlab--a-toolbox-to-encode-decode-json-files-in-matlab-octave) for exporting to storage format .json or .ubj.
     * [xml4mat](https://www.mathworks.com/matlabcentral/fileexchange/6268-xml4mat-v2-0) is nessessary for exporting to storage format xml.
     * [CVX](http://cvxr.com/cvx/): Matlab software for disciplined convex programming for some implemented Methods.
 
-* Datasets are available [here](https://bitbucket.org/sonnhammergrni/gs-datasets)
-* Networks are available [here](https://bitbucket.org/sonnhammergrni/gs-networks)
+* Datasets are available [here](https://bitbucket.org/sonnhammergrni/gs-datasets).
+* Networks are available [here](https://bitbucket.org/sonnhammergrni/gs-networks).
 
-* To test that basic functionality after setup as detailed above open matlab and run the commands:
+* To test that basic functionality after setup as detailed above open matlab and run the commands (require version 2015a at least):
 
         Net = datastruct.Network.fetch()
         Data = datastruct.Dataset.fetch()
