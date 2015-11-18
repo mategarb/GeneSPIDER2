@@ -105,7 +105,7 @@ for j = 1:straps
         temp = find(abs(Als) <= zetavec(i));
         Atmp = Als;
         Atmp(temp) = 0;
-
+        %disp(nnz(Atmp))
         estA(:,:,i) = Atmp;
     end
 
@@ -114,10 +114,15 @@ for j = 1:straps
         Asign=(double(sign(estA))<0);
         tmp = estA > 0;
         Apos = double(tmp);
+        tmp = estA < 0;
+        Aneg = double(tmp);
+        Aneg = abs(Aneg);
     else
         Alogical = Alogical + double(logical(estA));
         tmp = estA > 0;
         Apos = Apos + double(tmp);
+        tmp = estA < 0;
+        Aneg = Aneg + double(tmp);
     end
 
 end
@@ -128,6 +133,12 @@ Alogical(Alogical < 1) = 0;
 Aposs_frac = Apos./(straps*Afrac);
 Asign_frac = 2*Aposs_frac-1;
 
+for i=1:size(Apos,3)
+    tmp=cat(3,Apos,Aneg);
+    Asign_Max(:,:,i)=max(tmp,[],3);
+end
+Asign_Max=(Asign_Max.*Afrac)/straps;
+
 if nargout > 0
     varargout{1} = Alogical;
 end
@@ -137,7 +148,7 @@ if nargout > 1
 end
 
 if nargout > 2 % Agnostic sign support
-    varargout{3} = abs(Asign_frac);
+    varargout{3} = Asign_Max;
 end
 
 if nargout > 3 % Explicit sign support -1 for 100% negative
@@ -145,7 +156,7 @@ if nargout > 3 % Explicit sign support -1 for 100% negative
 end
 
 if nargout > 4 % # positive links
-    varargout{5} = Apos;
+    varargout{5} = cat(3,Apos,Aneg);
 end
 
 return
