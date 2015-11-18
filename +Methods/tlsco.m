@@ -71,6 +71,8 @@ for i=1:length(zetavec)
     Atmp(temp) = 0;
 
     estA(:,:,i) = Atmp;
+    zetaRange(1) = min(abs(estA(estA~=0)))-eps;
+    zetaRange(2) = max(abs(estA(estA~=0)))+10*eps;
 end
 
 varargout{1} = estA;
