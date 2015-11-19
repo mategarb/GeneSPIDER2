@@ -1,7 +1,7 @@
-function A = stabalize(Atilde,varargin)
-% Stabalize weights a static network structure
-% 
-%   Input arguments: stabalize(Atilde [,'iaa', iaa, 'sign', sign])
+function A = stabilize(Atilde,varargin)
+% Stabilize weights a static network structure
+%
+%   Input arguments: stabilize(Atilde [,'iaa', iaa, 'sign', sign])
 %   ================
 %   Atilde:     Network model, with specific desired structure (matrix)
 %
@@ -11,10 +11,10 @@ function A = stabalize(Atilde,varargin)
 %               low  => cond < N/2
 %               high => cond > N*2
 %               N = #nodes
-%               
+%
 %   sign:  if signed structure is to be kept (logical) (false)
 %          may not be solveable for some signed structures.
-%   
+%
 
 %% Parse Input
 iaa = 'low';
@@ -22,7 +22,7 @@ inputopts = struct('iaa',iaa,'sign',logical(0));
 optionNames = fieldnames(inputopts);
 nArgs = length(varargin);
 if round(nArgs/2) ~= nArgs/2
-   error('stabalize needs Name/Value pairs')
+   error('stabilize needs Name/Value pairs')
 end
 for pair = reshape(varargin,2,[]) % pair is {propName;propValue}
     inpName = lower(pair{1}); % make case insensitive
@@ -42,7 +42,7 @@ elseif strcmp(inputopts.iaa,'high')
     Atilde = 10*Atilde;
 end
 
-%% Stabalize matrix
+%% Stabilize matrix
 tol = 1e-4;
 S = abs(Atilde) < tol;
 n = size(Atilde,1);
@@ -79,13 +79,13 @@ elseif inputopts.sign
         Shi <= e <= Epsilon
         D(S) == 0
         Atmp = Atilde + D
-        Atmp(Pos) >= 0 
-        Atmp(Neg) <= 0 
+        Atmp(Pos) >= 0
+        Atmp(Neg) <= 0
         cvx_end
     catch ME
         fprintf('%s\n',ME.message)
     end
 end
 
-D = full(D); 
+D = full(D);
 A = Atilde + full(D);
