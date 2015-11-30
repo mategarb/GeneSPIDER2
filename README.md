@@ -38,11 +38,13 @@ Supplementary information: online-only supplementary data available at the journ
 
 ### How do I get set up? ###
 
-* Fetch this repository with the command
+* *Alternative 1*: Download genespider-v1 from [here](https://bitbucket.org/sonnhammergrni/genespider/downloads)
+  and place in e.g. `~/src/genespider`
+
+* *Alternative 2*: Fetch this repository with the command
 
         git clone git@bitbucket.org:sonnhammergrni/genespider.git ~/src/genespider
 
-    or download from `https://bitbucket.org/sonnhammergrni/genespider` to `~/src/genespider`
     and run `cd ~/src/genespider`.
 
     To fetch the complete toolbox run
@@ -50,11 +52,12 @@ Supplementary information: online-only supplementary data available at the journ
         git submodule init
         git submodule update
 
-    Now you will have the complete toolbox availible by adding the path `~/src/genespider` to your MATLAB path with the command
+* Now you should have the complete toolbox availible by adding the path `~/src/genespider` to your MATLAB path with the command
 
         addpath('~/src/genespider')
 
-* To develop and keep track of changes for each submodule you need to check out the master branch from each submodule with the command `git checkout master`.
+* If fetched through `git` you can develop and keep track of changes for each submodule by checking out the master branch from each submodule with the command `git checkout master`.
+
 * Dependencies:
 
     * [MATLAB](https://se.mathworks.com/products/matlab/), version including (2015a) and above is preferred.
