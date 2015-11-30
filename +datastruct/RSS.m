@@ -13,7 +13,7 @@ if nargin < 4,
 end
 
 P = data.P;
-Y = response(data.Y);
+Y = response(data);
 
 for j = 1:size(Alist,3)
     A = Alist(:,:,j);
