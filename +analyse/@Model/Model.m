@@ -160,6 +160,11 @@ classdef Model < analyse.DataModel
         end
 
         function tauG = time_constant(model)
+        % Calculates minimum time constant of the model G
+        % tauG = time_constant(G)
+        %
+        % G is a datastruct.Network object.
+        %
             G = analyse.Model.give_matrix(model,'inv');
             tauG = min(sort(1./abs(real(eig(G)))));
         end

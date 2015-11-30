@@ -103,8 +103,7 @@ classdef Data < analyse.DataModel
         end
 
         function varargout = irrepresentability(data,net)
-        % Calculates the irrepresentability of the data set for inference with
-        % LASSO
+        % Calculates the irrepresentable condition of the data set for inference with LASSO.
             Y = response(data,net);
             Phi = Y';
             for i = 1:net.N
