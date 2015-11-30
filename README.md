@@ -52,9 +52,11 @@ Supplementary information: online-only supplementary data available at the journ
         git submodule init
         git submodule update
 
+
 * Now you should have the complete toolbox availible by adding the path `~/src/genespider` to your MATLAB path with the command
 
         addpath('~/src/genespider')
+
 
 * If fetched through `git` you can develop and keep track of changes for each submodule by checking out the master branch from each submodule with the command `git checkout master`.
 
