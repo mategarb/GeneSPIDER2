@@ -34,7 +34,7 @@ function export2gnuplot(file,varargin)
     nArgs = length(varargin);
     if ~logical(mod(nArgs,2)) && nArgs == 0
         tmp = dbstack;
-        error([tmp.name,' needs variables (cell array)/data (2d matrix) pairs as input, see: help tools.export2gnuplot'])
+        error([tmp.name,' needs variables (cell array)/data (2d matrix) pairs as input, see: help gsUtilities.export2gnuplot'])
     end
 
 
@@ -65,7 +65,7 @@ function export2gnuplot(file,varargin)
         fprintf(fid,'#');
         if iscell(values)
             fprintf(fid,' %s\t',variables{1,:});
-        else
+        elseif ~isempty(variables)
             fprintf(fid,'\t%s',variables{1,:});
         end
         fprintf(fid,'\n');
