@@ -326,7 +326,7 @@ classdef Exchange < hgsetget
 
                 else % only name is given, try to parse the name and assume bitbucket GeneSPIDER repo.
                     N = regexp(options.name,'-N\d+','match');
-                    optiones.N = str2num(N{1}(3:end));
+                    options.N = str2num(N{1}(3:end));
                     try
                         if isfield(options,'type')
                             type = regexp(options.name,'-[A-Za-z]+-','match');
