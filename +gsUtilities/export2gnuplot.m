@@ -18,11 +18,11 @@ function export2gnuplot(file,varargin)
 %
 %   # Header
 %   # variable{1} variable{2} ... variable{n-1} variable{n}
-%   data(1,1)     data(1,2)   ... data(1,n-1)   data(1,n)
-%       .             .       ...     .             .
-%       .             .       ...     .             .
-%   data(n-1,1)   data(n-1,2) ... data(n-1,n-1) data(n-1,n)
-%   data(n,1)     data(n,2)   ... data(n,n-1)   data(n,n)
+%     data(1,1)   data(1,2)   ... data(1,n-1)   data(1,n)
+%         .           .       ...     .             .
+%         .           .       ...     .             .
+%     data(n-1,1) data(n-1,2) ... data(n-1,n-1) data(n-1,n)
+%     data(n,1)   data(n,2)   ... data(n,n-1)   data(n,n)
 %
 %
 %   # Next block
