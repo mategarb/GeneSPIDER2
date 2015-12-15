@@ -104,7 +104,7 @@ else
         ind1 = find(strcmp(genes,line{1}));
         ind2 = find(strcmp(genes,line{2}));
         for j=1:length(line(3:end))
-            tmpA(ind1,ind2,j) = str2num(line{j+2});
+            tmpA(ind2,ind1,j) = str2num(line{j+2});
         end
 
     end
