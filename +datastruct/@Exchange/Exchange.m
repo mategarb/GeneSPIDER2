@@ -330,6 +330,9 @@ classdef Exchange < hgsetget
                     try
                         if isfield(options,'type')
                             type = regexp(options.name,'-[A-Za-z]+-','match');
+                            if isempty(type)
+                                type = regexp(options.name,'-[A-Za-z]+_[A-Za-z]+-','match');
+                            end
                             options.type = type{1}(2:end-1);
                             tmpurl1 = fullfile(options.baseurl,options.version,options.type,['N',num2str(options.N)],[options.name,options.filetype]);
                         else
