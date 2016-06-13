@@ -112,7 +112,12 @@ for j=1:straps
 
     for i = 1:size(bdata.P,1)
         fit = glmnet(response(bdata,net)',-bdata.P(i,:)','gaussian',glmnetSet(struct('lambda',zetavec,'alpha',alpha)));
-        Afit(i,:,:) = fit.beta(:,:);
+        try
+            Afit(i,:,:) = fit.beta(:,:);
+        catch
+            save(bdata,'../debug/')
+            return
+        end
     end
     Afit(:, :, :) = Afit(:, :, end:-1:1); % Glmnet reverses the order. Need to undo.
     if isempty(Alogical)
