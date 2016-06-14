@@ -11,6 +11,15 @@ function varargout = export2Cytoscape(A,genes,outf,varargin)
 %       existing files
 % altA: alternative weights for the links. (optional)
 %
+% =========================================================================
+% This function can also import networks in the same format as it produces.
+% A = export2Cytoscape('inf.tsv',genes)
+%
+% genes: cell array (n x 1) with gene names
+% inf.tsv: name of input text file "inf.tsv";
+%
+% A: 3d matrix with each value column from the file of the interaction are stored in each layer.
+
 
 importnet = false;
 if isa(A,'datastruct.Network')
@@ -96,7 +105,7 @@ else
     ind1 = find(strcmp(genes,line{1}));
     ind2 = find(strcmp(genes,line{2}));
     for j=1:length(line(3:end))
-        tmpA(ind1,ind2,j) = str2num(line{j+2});
+        tmpA(ind2,ind1,j) = str2num(line{j+2});
     end
     for i=1:nlines-1
         line = Mdata(newlines(i)+1:newlines(i+1)-1);
