@@ -114,10 +114,11 @@ classdef CompareModels
         FN          % # False Negatives
         sen         % Sensitivity TP/(TP+FN)
         spe         % Specificity TN/(TN+FP)
-        comspe      % Complementary specificity 1-Specificity
+        comspe      % Complementary specificity 1-Specificity = False positive rate FP/(FP+TN)
         pre         % Precision TP/(TP+FP)
         TPTN        % Number of links that is present and absent in both networks (TP+TN)
         structsim   % Structural similarity (TP+TN)/#Nodes^2
+        F1          % F-score
         MCC         % Matthews correlation coefficient
 
         %% Directed graph measures
@@ -298,6 +299,13 @@ classdef CompareModels
                 M.pre(length(M.pre)+1) = M.TP(end)/(M.TP(end)+M.FP(end));
                 M.TPTN(length(M.TPTN)+1) = M.TP(end) + M.TN(end);
                 M.structsim(length(M.structsim)+1) = M.TPTN(end)/M.npl;
+
+                n = 2*M.TP(end) + M.FP(end) + M.FN(end);
+                if n == 0
+                    M.F1(length(M.F1)+1) = 0;
+                else
+                    M.F1(length(M.F1)+1) = 2*M.TP(end)/n;
+                end
 
                 n = (M.TP(end) + M.FP(end)) * (M.TP(end) + M.FN(end)) * (M.TN(end)+M.FP(end)) * (M.TN(end)+M.FN(end));
                 if n == 0
@@ -690,6 +698,42 @@ classdef CompareModels
             if n ~= m
                 square = false;
             end
+        end
+
+        function varargout = ROC(M)
+        % Function for plotting roc curve.
+            TPR = M.sen;
+            FPR = M.comspe;
+
+            h = plot(FPR,TPR);
+            hold on
+            plot(xlim,ylim,'k--')
+            xlabel('False positive rate')
+            ylabel('True positive rate')
+            title('ROC curve')
+            grid on
+            if nargout > 0
+                varargout{1} = h;
+            end
+            if nargout > 1
+                varargout{2} = AUROC(M);
+            end
+        end
+
+        function varargout = AUROC(M)
+        % Calculate the area under the TPR/FPR curve
+            TPR = M.sen;
+            FPR = M.comspe;
+            [t1,t2] = stairs(FPR,TPR);
+
+            auroc = 0;
+            for i=1:2:length(t1)-1
+                a1 = abs(t1(i+1)-t1(i))*t2(i);
+                a2 = abs(t1(i+1)-t1(i))*abs(t2(i+1)-t2(i))/2;
+                auroc = auroc + a1+a2;
+            end
+
+            varargout{1} = auroc;
         end
     end
 end
