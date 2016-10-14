@@ -710,9 +710,13 @@ classdef CompareModels
             h = plot(FPR,TPR);
             hold on
             plot([0,1],[0,1],'k--')
+            xlim([0,1])
+            ylim([0,1])
             xlabel('False positive rate')
             ylabel('True positive rate')
             title({'ROC curve',['AUROC = ',sprintf('%0.3f',auroc)]})
+            xlim([0,1.05])
+            ylim([0,1.05])
             grid on
             hold off
             if nargout > 0
@@ -765,6 +769,8 @@ classdef CompareModels
             xlabel('recall')
             ylabel('precision')
             title({'PR curve',['AUPR = ',sprintf('%0.3f',aupr)]})
+            xlim([0,1.05])
+            ylim([0,1.05])
             grid on
             if nargout > 0
                 varargout{1} = aupr;
