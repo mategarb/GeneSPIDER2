@@ -112,7 +112,7 @@ classdef CompareModels
         TN          % # True Negatives
         FP          % # False Positives
         FN          % # False Negatives
-        sen         % Sensitivity TP/(TP+FN)
+        sen         % Sensitivity TP/(TP+FN), recall
         spe         % Specificity TN/(TN+FP)
         comspe      % Complementary specificity 1-Specificity = False positive rate FP/(FP+TN)
         pre         % Precision TP/(TP+FP)
@@ -121,16 +121,16 @@ classdef CompareModels
         F1          % F-score
         MCC         % Matthews correlation coefficient
 
-        %% Directed graph measures
+        %% Signed graph measures
 
         TR          % True Regulation
         TZ          % True Zero
         FI          % False Interaction
         FR          % False Regulation
         FZ          % False Zero
-        dirsen      % Directed sensitivity
-        dirspe      % Directed specificity
-        dirprec     % Directed precision
+        dirsen      % Signed sensitivity
+        dirspe      % Signed specificity
+        dirprec     % Signed precision
         SMCC        % Signed Matthews correlation coefficient
     end
 
@@ -279,7 +279,7 @@ classdef CompareModels
         end
 
         function M = graph_measures(M,Alist)
-        % Calculate only non directional graph measures
+        % Calculate only non signed graph measures
         % graph_measures(M,Alist)
 
             Z = zeros(size(M.A));
@@ -294,9 +294,11 @@ classdef CompareModels
                 M.FP(length(M.FP)+1) = sum(sum(and(~M.DGA,DiGraphT)));
                 M.FN(length(M.FN)+1) = sum(sum(and(M.DGA,~DiGraphT)));
                 M.sen(length(M.sen)+1) = M.TP(end)/(M.TP(end)+M.FN(end));
+                M.sen(isnan(M.sen)) = 1;
                 M.spe(length(M.spe)+1) = M.TN(end)/(M.TN(end)+M.FP(end));
                 M.comspe(length(M.comspe)+1) = M.FP(end)/(M.TN(end)+M.FP(end));
                 M.pre(length(M.pre)+1) = M.TP(end)/(M.TP(end)+M.FP(end));
+                M.pre(isnan(M.pre)) = 1;
                 M.TPTN(length(M.TPTN)+1) = M.TP(end) + M.TN(end);
                 M.structsim(length(M.structsim)+1) = M.TPTN(end)/M.npl;
 
@@ -316,9 +318,9 @@ classdef CompareModels
             end
         end
 
-        function M = dirGraph_measures(M,Alist)
-        % Calculate only directional graph measures
-        % dirGraph_measures(M,Alist)
+        function M = signGraph_measures(M,Alist)
+        % Calculate only signed graph measures
+        % signGraph_measures(M,Alist)
 
             for i=1:size(Alist,3)
                 T = Alist(:,:,i);
@@ -396,12 +398,12 @@ classdef CompareModels
                 M = topology_measures(M,Alist);
                 M = correlation_measures(M,Alist);
                 M = graph_measures(M,Alist);
-                M = dirGraph_measures(M,Alist);
+                M = signGraph_measures(M,Alist);
             else
-                M = topology_measures(M,tools.rmdiag(Alist));
-                M = correlation_measures(M,tools.rmdiag(Alist));
-                M = graph_measures(M,tools.rmdiag(Alist));
-                M = dirGraph_measures(M,tools.rmdiag(Alist));
+                M = topology_measures(M,gsUtilities.rmdiag(Alist));
+                M = correlation_measures(M,gsUtilities.rmdiag(Alist));
+                M = graph_measures(M,gsUtilities.rmdiag(Alist));
+                M = signGraph_measures(M,gsUtilities.rmdiag(Alist));
             end
 
             if nargout == 1 & nargin == 3
@@ -702,16 +704,16 @@ classdef CompareModels
 
         function varargout = ROC(M)
         % Function for plotting roc curve.
-            TPR = M.sen;
-            FPR = M.comspe;
+            [auroc,TPR,FPR] = AUROC(M);
 
             h = plot(FPR,TPR);
             hold on
             plot(xlim,ylim,'k--')
             xlabel('False positive rate')
             ylabel('True positive rate')
-            title('ROC curve')
+            title({'ROC curve',['AUROC = ',sprintf('%0.3f',auroc)]})
             grid on
+            hold off
             if nargout > 0
                 varargout{1} = h;
             end
@@ -724,16 +726,42 @@ classdef CompareModels
         % Calculate the area under the TPR/FPR curve
             TPR = M.sen;
             FPR = M.comspe;
-            [t1,t2] = stairs(FPR,TPR);
+            FPR = fliplr(FPR);
+            TPR = fliplr(TPR);
 
-            auroc = 0;
-            for i=1:2:length(t1)-1
-                a1 = abs(t1(i+1)-t1(i))*t2(i);
-                a2 = abs(t1(i+1)-t1(i))*abs(t2(i+1)-t2(i))/2;
-                auroc = auroc + a1+a2;
-            end
+            auroc = trapz(FPR,TPR);
 
             varargout{1} = auroc;
+            varargout{2} = TPR;
+            varargout{3} = FPR;
+        end
+
+        function varargout = AUPR(M)
+        % Calculate the au precision recall curve.
+            PRE = M.pre;
+            REC = M.sen;
+
+            aupr = trapz(REC,PRE);
+            varargout{1} = aupr;
+            varargout{2} = PRE;
+            varargout{3} = REC;
+        end
+
+        function varargout = PR(M)
+        % Plot the precision recall curve.
+            [aupr,PRE,REC] = AUPR(M);
+
+            h = plot(REC,PRE);
+            xlabel('recall')
+            ylabel('precision')
+            title({'PR curve',['AUPR = ',sprintf('%0.3f',aupr)]})
+            grid on
+            if nargout > 0
+                varargout{1} = h;
+            end
+            if nargout > 1
+                varargout{2} = aupr;
+            end
         end
     end
 end
