@@ -706,19 +706,20 @@ classdef CompareModels
         % Function for plotting roc curve.
             [auroc,TPR,FPR] = AUROC(M);
 
+            figure()
             h = plot(FPR,TPR);
             hold on
-            plot(xlim,ylim,'k--')
+            plot([0,1],[0,1],'k--')
             xlabel('False positive rate')
             ylabel('True positive rate')
             title({'ROC curve',['AUROC = ',sprintf('%0.3f',auroc)]})
             grid on
             hold off
             if nargout > 0
-                varargout{1} = h;
+                varargout{1} = AUROC(M);
             end
             if nargout > 1
-                varargout{2} = AUROC(M);
+                varargout{2} = h;
             end
         end
 
@@ -726,8 +727,11 @@ classdef CompareModels
         % Calculate the area under the TPR/FPR curve
             TPR = M.sen;
             FPR = M.comspe;
-            FPR = fliplr(FPR);
-            TPR = fliplr(TPR);
+            [junk,ord] = sort(M.nlinks);
+            TPR = TPR(ord);
+            FPR = FPR(ord);
+            % FPR = fliplr(FPR);
+            % TPR = fliplr(TPR);
 
             auroc = trapz(FPR,TPR);
 
@@ -740,6 +744,11 @@ classdef CompareModels
         % Calculate the au precision recall curve.
             PRE = M.pre;
             REC = M.sen;
+            [junk,ord] = sort(M.nlinks);
+            PRE = PRE(ord);
+            REC = REC(ord);
+            % PRE = fliplr(PRE);
+            % REC = fliplr(REC);
 
             aupr = trapz(REC,PRE);
             varargout{1} = aupr;
@@ -751,16 +760,17 @@ classdef CompareModels
         % Plot the precision recall curve.
             [aupr,PRE,REC] = AUPR(M);
 
+            figure()
             h = plot(REC,PRE);
             xlabel('recall')
             ylabel('precision')
             title({'PR curve',['AUPR = ',sprintf('%0.3f',aupr)]})
             grid on
             if nargout > 0
-                varargout{1} = h;
+                varargout{1} = aupr;
             end
             if nargout > 1
-                varargout{2} = aupr;
+                varargout{2} = h;
             end
         end
     end
