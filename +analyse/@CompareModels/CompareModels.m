@@ -169,7 +169,7 @@ classdef CompareModels
         % Calculate network properties
             M.A = net;
             [UA SA VA] = svd(M.A);
-            if issquare(M.A)
+            if issquare(M)
                 [QA LA] = eig(M.A);
                 LA = diag(LA);
                 [crap index] = sort(abs(LA),1,'descend');
@@ -393,7 +393,7 @@ classdef CompareModels
             end
 
             % Eigenvalues can not be calculated for a non square matrix
-            if issquare(M.A)
+            if issquare(M)
                 M = system_measures(M,Alist);
                 M = topology_measures(M,Alist);
                 M = correlation_measures(M,Alist);
@@ -692,10 +692,10 @@ classdef CompareModels
             end
         end
 
-        function square = issquare(M,A)
+        function square = issquare(M)
         % helper function if issquare
             square = true;
-            [n,m] = size(A);
+            [n,m] = size(M.A);
 
             if n ~= m
                 square = false;
