@@ -58,6 +58,7 @@ classdef CompareModels
 
     properties (SetAccess = public, AbortSet = true)
         A           % Gold standard network
+        zetavec     % peanalty parameter related to the specific observation
     end
 
     properties (Hidden = true, SetAccess = private)
@@ -777,6 +778,115 @@ classdef CompareModels
             end
             if nargout > 1
                 varargout{2} = h;
+            end
+        end
+
+        function save(M,savepath,varargin)
+        % Function for saving the performance measures in a nice format.
+        % Requires single row vector as measurments in object structure.
+        % Empty measures will be discarded.
+        %
+        % save(M, savefile, <format>)
+        %
+        %
+        % default format is tab separated values (.tsv). options are .json/.ubj/.tsv
+
+            supported = {'.json','.ubj','.tsv','.txt'};
+
+            fending = '.tsv';
+
+            [p,f,ext] = fileparts(savepath);
+
+            if isempty(p)
+                p = './';
+            end
+
+            if ~exist(p,'dir')
+                error('save path does not exist')
+            end
+            savepath = fullfile(p,[f,ext]);
+
+            if length(varargin) > 0
+                if ~isa(varargin{1},'char')
+                    error('File format arguments must be a string')
+                end
+                fending = varargin{1};
+                if ~strcmp(fending(1),'.')
+                    fending = ['.',fending];
+                end
+            end
+
+
+            if isempty(ext)
+                savepath = fullfile([p,f,fending]);
+            elseif ~isempty(ext) && length(varargin) == 0
+                fending = ext;
+                if strcmp(ext(end-2:end),'txt')
+                    fending = '.tsv';
+                end
+            end
+
+            if ~any(ismember(supported,fending))
+                error('File extension or format not supported')
+            end
+
+
+            if strcmp(fending,'.tsv')
+                save_tsv(M,savepath,varargin{:});
+            elseif strcmp(fending,'.json')
+                if exist('savejson') ~= 2
+                    error('Save method for json files does not seem to exist')
+                end
+                save_json(M,savepath,fending,varargin{2:end})
+            elseif strncmp(fending,'.ubj',4)
+                if exist('saveubjson') ~= 2
+                    error('Save method for universal binary json files does not seem to exist')
+                end
+                save_json(M,savepath,fending,varargin{2:end})
+            end
+
+        end
+
+        function varargout = save_tsv(M,savepath,varargin)
+        % save performance meansures as tsv
+            measures = show(M);
+
+            s = struct(M);
+            f = fieldnames(s);
+            toRemove = f(~ismember(f,measures));
+
+            s = rmfield(s,[toRemove]);
+
+            for i=1:length(measures)
+                if length(s.(measures{i})) == 0
+                    s = rmfield(s,[measures{i}]);
+                else
+                    s.(measures{i}) = s.(measures{i})';
+                end
+            end
+            st = struct2table(s);
+
+            writetable(st, savepath,'Delimiter','\t','WriteRowNames',true,'FileType','text')
+
+            if nargout > 0
+                varargout{1} = st;
+            end
+        end
+
+        function save_json(M,savepath,fending,varargin)
+        % save performance meansures as json or ubj
+
+            obj_M = struct(M);
+            method = 'obj_M';
+
+            if length(varargin) > 0
+               method = varargin{1};
+            end
+
+            if strcmp(fending,'.json')
+                savejson(method,obj_M,savepath,varargin{:});
+            elseif strncmp(fending,'.ubj',4)
+                saveubjson(method,obj_M,savepath,varargin{:});
             end
         end
     end
