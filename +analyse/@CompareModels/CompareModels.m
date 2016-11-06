@@ -789,9 +789,13 @@ classdef CompareModels
         % save(M, savefile, <format>)
         %
         %
-        % default format is tab separated values (.tsv). options are .json/.ubj/.tsv
+        % default format is tab separated values (.tsv). options are .json/.ubj if savejson or saveubjson is availbile
+        %                                                or .txt/.csv/.dat/.tsv/.xls/xlsm/.xlsx/.xlsb for table output,
+        %                                                where excel formats needs microsoft office excel.
 
-            supported = {'.json','.ubj','.tsv','.txt'};
+            supported_json = {'.json','.ubj'};
+            supported_table = {'.txt','.csv','.dat','.tsv','.xls','xlsm','.xlsx','.xlsb'};
+            supported_table_f = {'text','text','text','text','spreadsheet','spreadsheet','spreadsheet','spreadsheet'};
 
             fending = '.tsv';
 
@@ -821,34 +825,24 @@ classdef CompareModels
                 savepath = fullfile([p,f,fending]);
             elseif ~isempty(ext) && length(varargin) == 0
                 fending = ext;
-                if strcmp(ext(end-2:end),'txt')
-                    fending = '.tsv';
-                end
             end
 
-            if ~any(ismember(supported,fending))
+            if ~(any(ismember(supported_json,fending)) || any(ismember(supported_table,fending)))
                 error('File extension or format not supported')
             end
 
 
-            if strcmp(fending,'.tsv')
-                save_tsv(M,savepath,varargin{:});
-            elseif strcmp(fending,'.json')
-                if exist('savejson') ~= 2
-                    error('Save method for json files does not seem to exist')
-                end
-                save_json(M,savepath,fending,varargin{2:end})
-            elseif strncmp(fending,'.ubj',4)
-                if exist('saveubjson') ~= 2
-                    error('Save method for universal binary json files does not seem to exist')
-                end
+            if any(ismember(supported_table,fending))
+                save_tsv(M,savepath,supported_table,supported_table_f,varargin{:});
+            elseif any(ismember(supported_json,fending))
                 save_json(M,savepath,fending,varargin{2:end})
             end
 
         end
 
-        function varargout = save_tsv(M,savepath,varargin)
+        function varargout = save_tsv(M,savepath,supported_table,supported_table_f,varargin)
         % save performance meansures as tsv
+
             measures = show(M);
 
             s = struct(M);
@@ -866,9 +860,17 @@ classdef CompareModels
             end
             st = struct2table(s);
 
-            writetable(st, savepath,'Delimiter','\t','WriteRowNames',true,'FileType','text')
+            [junk,junk,ext] = fileparts(savepath);
 
-            if nargout > 0
+
+            if nargout == 0
+                if strcmpi('.tsv',ext)
+                    writetable(st, savepath,'Delimiter','\t','WriteRowNames',true,'FileType','text')
+                else
+                    % ftype = supported_table_f(find(ismember(supported_table,ext)));
+                    writetable(st, savepath,'WriteRowNames',true)
+                end
+            else
                 varargout{1} = st;
             end
         end
@@ -884,8 +886,14 @@ classdef CompareModels
             end
 
             if strcmp(fending,'.json')
+                if exist('savejson') ~= 2
+                    error('Save method for json files does not seem to exist')
+                end
                 savejson(method,obj_M,savepath,varargin{:});
             elseif strncmp(fending,'.ubj',4)
+                if exist('saveubjson') ~= 2
+                    error('Save method for universal binary json files does not seem to exist')
+                end
                 saveubjson(method,obj_M,savepath,varargin{:});
             end
         end
