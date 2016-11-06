@@ -58,6 +58,7 @@ classdef CompareModels
 
     properties (SetAccess = public, AbortSet = true)
         A           % Gold standard network
+        method      % for inference given results, needs to be same size as zetavec for save table to work.
         zetavec     % peanalty parameter related to the specific observation
     end
 
@@ -845,17 +846,17 @@ classdef CompareModels
 
             if any(ismember(supported_table,fending))
                 if nargout > 0
-                    varargout{1} = save_tsv(M,savepath,supported_table,supported_table_f,varargin{:});
+                    varargout{1} = save_table(M,savepath,supported_table,supported_table_f,varargin{:});
                 else
-                    save_tsv(M,savepath,supported_table,supported_table_f,varargin{:});
+                    save_table(M,savepath,supported_table,supported_table_f,varargin{:});
                 end
             elseif any(ismember(supported_json,fending))
                 save_json(M,savepath,fending,varargin{2:end})
             end
 
         end
-
-        function varargout = save_tsv(M,savepath,supported_table,supported_table_f,varargin)
+        
+        function varargout = save_table(M,savepath,supported_table,supported_table_f,varargin)
         % save performance meansures as tsv
 
             measures = show(M);
