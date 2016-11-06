@@ -781,13 +781,20 @@ classdef CompareModels
             end
         end
 
-        function save(M,savepath,varargin)
+        function varargout = save(M,savepath,varargin)
         % Function for saving the performance measures in a nice format.
         % Requires single row vector as measurments in object structure.
         % Empty measures will be discarded.
         %
         % save(M, savefile, <format>)
+        % if file format can be derived from savefile, no format needs to be supplied.
         %
+        % This function also makes it possible to convert a compare object to a table.
+        % This also makes it possible to have multi row measures in the return.
+        % Each row in the comapre object will be converted to a column in the returned table.
+        % No file will be saved when an output variable is supplied.
+        %
+        % table = save(M, savefile)
         %
         % default format is tab separated values (.tsv). options are .json/.ubj if savejson or saveubjson is availbile
         %                                                or .txt/.csv/.dat/.tsv/.xls/xlsm/.xlsx/.xlsb for table output,
@@ -797,6 +804,10 @@ classdef CompareModels
             supported_table = {'.txt','.csv','.dat','.tsv','.xls','xlsm','.xlsx','.xlsb'};
             supported_table_f = {'text','text','text','text','spreadsheet','spreadsheet','spreadsheet','spreadsheet'};
 
+            if ~exist('savepath','var')
+                savepath = 'dummy.tsv';
+            end
+            
             fending = '.tsv';
 
             [p,f,ext] = fileparts(savepath);
@@ -833,7 +844,11 @@ classdef CompareModels
 
 
             if any(ismember(supported_table,fending))
-                save_tsv(M,savepath,supported_table,supported_table_f,varargin{:});
+                if nargout > 0
+                    varargout{1} = save_tsv(M,savepath,supported_table,supported_table_f,varargin{:});
+                else
+                    save_tsv(M,savepath,supported_table,supported_table_f,varargin{:});
+                end
             elseif any(ismember(supported_json,fending))
                 save_json(M,savepath,fending,varargin{2:end})
             end
