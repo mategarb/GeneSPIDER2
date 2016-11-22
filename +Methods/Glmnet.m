@@ -15,12 +15,15 @@ function varargout = Glmnet(varargin)
 %            supply your own zeta sequence. zeta needs to be set first
 %   rawZeta: logical to determine if the zeta values should be
 %            converted.  default = false
+%   regpath  {'input','full'}  string to determine if we should try to create a zetavec
+%            for the complete regularization path dependant on method, default 'input'.
+%            Where 'input' is a zetavec determined by the user
+%            and 'full' gives the best estimate of the complete regularization path
 %
 %   Output Arguments: estA
 %   =================
 %   estA: the estimated networks as a 3d array.
-%   fit: The glmnet algorithm output data, outputs the last fit if
-%        a range of sparsity penalties are supplied.
+%   zetavec: the complete regularization path
 %   zetaRange: the sparsity range used when a scaled zeta are used (default).
 %
 %
@@ -32,6 +35,7 @@ rawZeta = 0;
 zetavec = [];
 net = [];
 alpha = 1;
+regpath = 'input';
 for i=1:nargin
     if isa(varargin{i},'datastruct.Dataset')
         data = varargin{i};
@@ -39,6 +43,8 @@ for i=1:nargin
         net = varargin{i};
     elseif isa(varargin{i},'logical')
         rawZeta = varargin{i};
+    elseif isa(varargin{i},'char')
+        regpath = varargin{i};
     else
         if isempty(zetavec)
             zetavec = varargin{i};
@@ -54,14 +60,18 @@ end
 
 %% Determine how to handle zeta %%
 
-if ~rawZeta
+if isempty(zetavec)
+    regpath = 'full';
+end
+
+if ~rawZeta & strcmpi(regpath,'input')
     zetaRange = [];
     tol = 1e-6;
     zmax = 1;
     zmin = 0;
     % find zero network
     estA = Methods.Glmnet(data,net,zmax,logical(1));
-    while nnz(estA) > 0 
+    while nnz(estA) > 0
         tmp = zmax;
         zmax = zmax*2;
         estA = Methods.Glmnet(data,net,zmax,logical(1));
@@ -76,7 +86,7 @@ if ~rawZeta
             zmin = i;
         end
     end
-    
+
     zetaRange(1) = 0;
     zetaRange(2) = zmax;
     varargout{3} = zetaRange;
@@ -85,22 +95,48 @@ if ~rawZeta
     zetavec = zetavec*delta + zetaRange(1);
 end
 
+if strcmpi(regpath,'full')
+    zetavec = [];
+    for i = 1:size(data.P,1)
+        fit = glmnet(response(data,net)',-data.P(i,:)','gaussian',glmnetSet(struct('nlambda',size(data.P,1),'alpha',alpha)));
+        zetavec = [zetavec,fit.lambda'];
+    end
+    zetavec = unique(sort(zetavec));
+
+    if ~rawZeta
+        zetaRange(2) = max(zetavec);
+        zetaRange(1) = min(zetavec);
+        delta = zetaRange(2)-zetaRange(1);
+    else
+        zetaRange(2) = 1;
+        zetaRange(1) = 0;
+        delta = 1;
+    end
+end
+
 %% Run
+% for i = 1:size(data.P,1)
+%     % fit = glmnet(nY',-P(i,:)','gaussian',glmnetSet(struct('lambda',zetavec,'standardize',false)));
+%     fit = glmnet(response(data,net)',-data.P(i,:)','gaussian',glmnetSet(struct('lambda',zetavec,'alpha',alpha)));
+%     Afit(i,:,:) = fit.beta(:,:);
+% end
+% Afit(:, :, :) = Afit(:, :, end:-1:1); % Glmnet reverses the order. Need to undo.
+
+
 for i = 1:size(data.P,1)
-    % fit = glmnet(nY',-P(i,:)','gaussian',glmnetSet(struct('lambda',zetavec,'standardize',false)));
     fit = glmnet(response(data,net)',-data.P(i,:)','gaussian',glmnetSet(struct('lambda',zetavec,'alpha',alpha)));
     Afit(i,:,:) = fit.beta(:,:);
 end
 Afit(:, :, :) = Afit(:, :, end:-1:1); % Glmnet reverses the order. Need to undo.
 
-% for i=1:size(Afit,3)
-%     Afit(:,:,i);
-% end
 
 varargout{1} = Afit;
 
-varargout{2} = fit;
-
-if ~rawZeta
+if strcmpi(regpath,'full')
+    zetavec = (zetavec-zetaRange(1))/delta;
+    varargout{2} = zetavec;
+    varargout{3} = zetaRange;
+else strcmpi(regpath,'input')
+    varargout{2} = zetavec;
     varargout{3} = zetaRange;
 end
