@@ -12,7 +12,7 @@ function varargout = aracne(varargin)
 %            for the complete regularization path dependant on method, default 'input'.
 %            Where 'input' is a zetavec determined by the user
 %            and 'full' gives the best estimate of the complete regularization path
-%  aracnedir if the PATH to aracne is not specified beforehand a PATH to the
+%  aracnedir {Not implemented yet} if the PATH to aracne is not specified beforehand a PATH to the
 %            binarary can be supplied here, must be a valid path
 %
 %   Output Arguments: confA, zetavec
@@ -21,7 +21,8 @@ function varargout = aracne(varargin)
 %   zetavec: the complete regularization path
 %   zetaRange: will return the raw zeta range scale factors
 %
-% For this function to work, aracne homed direcotry has to be set. This is where executables and config files can be found.
+% For this function to work, aracne home directory has to be set beforehand in the PATH variable.
+% This is where executables and config files for aracne2 can be found.
 %
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -71,32 +72,23 @@ if ~isempty(aracnedir)
 end
 nY = response(data);
 
-save 'in.txt' -ascii -tabs nY;
-if system('aracnify.py in.txt > in.tab') ~= 0,
-    error('aracnify.py could not be used')
-    return
-end;
+f1='./in.tab';
+t{1} = 'gene';
+for i=2:data.M+1, t{i} = strcat('S',num2str(i-1)); end
+delete(f1);
+gsUtilities.export2gnuplot(f1,t,{data.names,nY});
 
-% find_aracnedir = ['ARACNEDIR=$(dirname `which aracne2`)'];
-% system('export LD_LIBRARY_PATH=/usr/lib/')
-% system('which aracne2 > bla.txt')
-% system('aracne2')
-% system(find_aracnedir)
-return
-% cmd = ['export LD_LIBRARY_PATH=/usr/lib/;cd ',ARACNEdir,[';./aracne2 ' ...
-%                     '-i $OLDPWD/in.tab -e '] num2str(alpha) ' -o ' ...
-%        '$OLDPWD/out.adj;cd -'];
-cmd = ['export LD_LIBRARY_PATH=/usr/lib/; aracne2 -H dirname `which aracne2`  -i in.tab -e ' num2str(alpha) ' -o out.adj;'];
+system(['sed -i -e "s/# //" -e "s/\t$//" ', f1]);
+cmd = ['export LD_LIBRARY_PATH=/usr/lib/; aracne2 -H $(dirname `which aracne2`)  -i in.tab -e ' num2str(alpha) ' -o out.adj;'];
 
 if system(cmd) ~= 0,
     return,
 end;
-if system('dearacnify.py out.adj > out.mat.txt') ~= 0, return, end;
-return
+
+Aest = fix_aracne_output('./out.adj',data.names);
 
 % cleanup
-% if system('rm out.adj in.txt in.tab') ~= 0, return, end;
-Aest = load('out.mat.txt');
+if system('rm out.adj in.tab') ~= 0, return, end;
 
 
 if strcmpi(regpath,'full')
@@ -148,3 +140,24 @@ elseif nargout > 1 & strcmpi(regpath,'full')
 end
 
 return
+
+function adj = fix_aracne_output(filename,genes)
+
+rawtxt = fileread(filename);
+
+txtsplit = strsplit(rawtxt,'\n');
+
+header = strncmpi('>',txtsplit,1);
+txtsplit = txtsplit(~header);
+
+adj = zeros(length(genes),length(genes));
+for l=1:length(txtsplit)
+    linesplit = strsplit(txtsplit{l},'\t');
+    ind1 = find(strcmp(genes,linesplit{1}));
+    for j=2:2:length(linesplit)
+        ind2 = find(strcmp(genes,linesplit{j}));
+        val = linesplit{j+1};
+        adj(ind1,ind2) = str2num(val);
+    end
+
+end
