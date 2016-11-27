@@ -1,19 +1,19 @@
 function varargout = aracne(varargin)
-% function estA = aracne(data <,net,alpha,regpath>)
+% function estA = aracne(data <,net,DPI,regpath>)
 %
 %   Input Arguments: aracne(data <,net,alpha,zetavec,regpath>)
 %   ================
 %   data:    datastruct.Dataset
 %   net:     datastruct.Network <optional>
-%   alpha:   confidense level of inference, can only be a single digit \in [0,1[. default 0.01
-%   zetavec: should the confidence values be truncated at some specified values.
+%   DPI:     DPI tolerance, default: 1, range \in [0,1[.
+%   zetavec: should the MI values be truncated at some specified values.
 %            Will be ignored if regpath = 'full'
 %   regpath  {'input','full'}  string to determine if we should try to create a zetavec
 %            for the complete regularization path dependant on method, default 'input'.
 %            Where 'input' is a zetavec determined by the user
 %            and 'full' gives the best estimate of the complete regularization path
 %  aracnedir {Not implemented yet} if the PATH to aracne is not specified beforehand a PATH to the
-%            binarary can be supplied here, must be a valid path
+%            binary can be supplied here, must be a valid path.
 %
 %   Output Arguments: confA, zetavec
 %   =================
