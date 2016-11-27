@@ -73,13 +73,21 @@ function export2gnuplot(file,varargin)
             continue
         end
 
-        if iscell(values) % assume labels are in the first column and values in the second column
-            for j=1:size(values,1)
-                for k=1:size(values,2)-1
-                    fprintf(fid,'%s',values{j,k});
+        if iscell(values)
+            if size(size(values,1)) == 1 % assume each index corresponds to a row and the cell array has length 2
+                for k=1:length(values{1})
+                    fprintf(fid,'%s',values{1}{k});
+                    fprintf(fid,'\t%g',values{2}(k,:));
+                    fprintf(fid,'\n');
                 end
-                fprintf(fid,'\t%g',values{j,end}(1,:));
-                fprintf(fid,'\n');
+            else  % assume labels are in the first column and values in the second column
+                for j=1:size(values,1)
+                    for k=1:size(values,2)-1
+                        fprintf(fid,'%s',values{j,k});
+                    end
+                    fprintf(fid,'\t%g',values{j,end}(1,:));
+                    fprintf(fid,'\n');
+                end
             end
         else
             for j=1:size(values,1)
