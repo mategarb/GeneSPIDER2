@@ -76,7 +76,7 @@ f1='./in.tab';
 t{1} = 'gene';
 for i=2:data.M+1, t{i} = strcat('S',num2str(i-1)); end
 delete(f1);
-fix_aracne_input(f1],data);
+fix_aracne_input(f1,data);
 
 system(['sed -i -e "s/# //" -e "s/\t$//" ', f1]);
 cmd = ['export LD_LIBRARY_PATH=/usr/lib/; aracne2 -H $(dirname `which aracne2`)  -i in.tab -e ' num2str(alpha) ' -o out.adj;'];
