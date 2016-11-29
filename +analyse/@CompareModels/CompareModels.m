@@ -59,6 +59,8 @@ classdef CompareModels
     properties (SetAccess = public, AbortSet = true)
         A           % Gold standard network
         method      % for inference given results, needs to be same size as zetavec for save table to work.
+        network     % what network/model was used as gold standard
+        dataset     % what dataset was used to generate the data point
         zetavec     % peanalty parameter related to the specific observation
     end
 
