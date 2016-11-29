@@ -1,4 +1,4 @@
-# Methods is a tool for managing regulatory networks and datasets
+# Methods is a toolbox for running methods for inferring gene regulatory networks (GRNs)
 
 clone the repository
 ```
