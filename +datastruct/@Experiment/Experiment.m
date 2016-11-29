@@ -108,7 +108,7 @@ classdef Experiment  < hgsetget
 
         function set.alpha(data,SignificanceLevel)
             if SignificanceLevel > 1 || SignificanceLevel < 0
-                error('SignificanceLevel must be in the range [0,1]')
+                error('Significance level must be in the range [0,1]')
             end
             data.alpha = SignificanceLevel;
         end
