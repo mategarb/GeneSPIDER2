@@ -1,8 +1,8 @@
-# analyse is a tool for managing regulatory networks and datasets
+# analyse is a tool for analysing networks and datasets as well as GRN inference methods performances
 
 clone the repository
 ```
-git clone git@bitbucket.org:sonnhammergrni/analyse.git +analys
+git clone git@bitbucket.org:sonnhammergrni/analyse.git +analyse
 ```
 or
 ```
