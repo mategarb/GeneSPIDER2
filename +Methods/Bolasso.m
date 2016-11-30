@@ -154,7 +154,7 @@ Aposs_frac = Aposs./(straps*Afrac);
 Asign_frac = 2*Aposs_frac-1;
 
 if nargout > 0
-    varargout{1} = nlinksBo;
+    varargout{1} = Alogical;
 end
 
 if nargout > 1 % Link support [0,1]
