@@ -5,7 +5,7 @@
     | |__| |  __/ | | |  __/ ____) | |    _| |_| |__| | |____| | \ \
      \_____|\___|_| |_|\___||_____/|_|   |_____|_____/|______|_|  \_\
 
-# Generation and Simulation Package for Informative Data ExploRation #
+# Gene regulatory network inference benchmarking with controlled network and data properties #
 
 This is the collection repository for the GeneSPIDER toolbox.
 This toolbox is comprised of five submodules:
@@ -25,9 +25,9 @@ Independent control of these properties in simulations is key to drawing conclus
 ### Results: ###
 We here present the Matlab toolbox GeneSPIDER for generation and analysis of networks and data in a dynamical systems framework with focus on the ability to vary properties on data to mimic plausible real world settings.
 It supplies essential components that have been missing to existing network inference methods in common use and wrappers for a selected number of inference methods.
-\gs contains tools for controlling and evaluating network topology (random, small-world, scale-free), stability of linear time-invariant systems, signal to noise ratio (SNR), and network Interampatteness, properties that has been shown to play a major role in the ability to infer a good network that can explain the data.
+GeneSPIDER contains tools for controlling and evaluating network topology (random, small-world, scale-free), stability of linear time-invariant systems, signal to noise ratio (SNR), and network Interampatteness, properties that has been shown to play a major role in the ability to infer a good network that can explain the data.
 Procedures for design of perturbation experiments, bootstrapping, analysis of linear dependence, sample selection, scaling of SNR, and performance evaluation are included.
-The ability of \gs to independently control network and data properties in simulations, together with its tools to analyse these properties and the quality of inferred GRNs enables much more informative analysis of GRN inference performance than was previously possible.
+The ability of GeneSPIDER to independently control network and data properties in simulations, together with its tools to analyse these properties and the quality of inferred GRNs enables much more informative analysis of GRN inference performance than was previously possible.
 
 Availability and Implementation: Source code freely available for download at https://bitbucket.org/sonnhammergrni/genespider, implemented in Matlab.
 
@@ -37,7 +37,7 @@ Supplementary information: online-only supplementary data available at the journ
 
 ### How do I get set up? ###
 
-* *Alternative 1*: Download genespider-v1 from [here](https://bitbucket.org/sonnhammergrni/genespider/downloads)
+* *Alternative 1*: Download genespider-v1.10 from [here](https://bitbucket.org/sonnhammergrni/genespider/downloads)
   and place in e.g. `~/src/genespider`
 
 * *Alternative 2*: Fetch this repository with the command
@@ -377,5 +377,5 @@ truncated along the second dimension.
 * For questions contact [Torbjörn](https://bitbucket.org/temn/)
 * How to cite:
 
-    GeneSPIDER -- generation and simulation package for informative data exploration.
+    GeneSPIDER -- Gene regulatory network inference benchmarking with controlled network and data properties.
     Tjärnberg *et. al.*, *manuscript.*, (2017).
