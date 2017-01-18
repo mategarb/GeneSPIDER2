@@ -97,7 +97,7 @@ classdef Dataset < datastruct.Exchange
 
         function SNR = get.SNR_L(data)
             alpha = 0.01;
-            sigma = min(svd(data.Y-data.E));
+            sigma = min(svd(true_response(data)));
             SNR = sigma/sqrt(chi2inv(1-alpha,prod(size(data.P)))*data.lambda(1));
         end
 
@@ -193,7 +193,7 @@ classdef Dataset < datastruct.Exchange
         % newdata = scaleSNR(data,net,SNR)
         %
             newdata = datastruct.Dataset(data,net);
-            sY = svd(newdata.Y);
+            sY = svd(true_response(newdata));
             sE = svd(newdata.E);
             scale = 1/SNR*min(sY)/max(sE);
             newdata.lambda = scale^2*newdata.lambda;
