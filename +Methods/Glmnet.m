@@ -18,7 +18,9 @@ function varargout = Glmnet(varargin)
 %   regpath  {'input','full'}  string to determine if we should try to create a zetavec
 %            for the complete regularization path dependant on method, default 'input'.
 %            Where 'input' is a zetavec determined by the user
-%            and 'full' gives the best estimate of the complete regularization path
+%            and 'full' lets the glmnet algorithm determine the relevant regularization penalties.
+%            If the SNR is high this might lead to few peanalty steps as the first small peanalty
+%            removes a majority of the interactions.
 %
 %   Output Arguments: estA
 %   =================
