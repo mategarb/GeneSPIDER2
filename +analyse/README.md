@@ -31,6 +31,9 @@ This should return a brief overview of the network and data and the methods resu
 The measure results, `MR` can be saved by specifying an output file, but we also want to fill in some data specific parameters that would help with analysing the result further in the future
 
     MR.zetavec = z;
+    mes.addprop('method');
+    mes.addprop('dataset');
+    mes.addprop('network');
     MR.method = repmat({'lsco'},size(z));
     MR.dataset = repmat({Data.dataset},size(z));
     MR.network = repmat({Net.network},size(z));
