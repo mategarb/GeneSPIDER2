@@ -167,7 +167,7 @@ function fix_aracne_input(filename,data)
 
 nY = response(data);
 outs = struct();
-outs(1).gene = data.names;
+outs(1).gene = data.names';
 for i=1:data.M
     outs(1).(['S' num2str(i)]) = nY(:,i);
 end
