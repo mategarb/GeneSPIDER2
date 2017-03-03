@@ -101,8 +101,8 @@ Any named network or data set in the repositories can be input to the fetch func
 
 ### Network generation
 
-We start by generating a stable random network with $10$ nodes and
-sparsity $0.25$. The following code snippet demonstrate how to create a
+We start by generating a stable random network with \(10\) nodes and
+sparsity \(0.25\). The following code snippet demonstrate how to create a
 `datastruct.Network` object with the above specifications.
 
     N = 10; S=0.25;
@@ -165,9 +165,9 @@ network. The Network class can handle sparse matrices.
 ### Data generation
 
 We now use the generated network to simulate perturbation experiments to
-obtain an expression dataset. The following code snippet simulates $N$
+obtain an expression dataset. The following code snippet simulates \(N\)
 single gene perturbation experiments where each gene is perturbed one by
-one followed by $N/2$ experiments in which genes are perturbed randomly.
+one followed by \(N/2\) experiments in which genes are perturbed randomly.
 
     SNR = 7;
     P = double([eye(N),full(logical(sprandn(N,round(N/2),0.2)))]);
@@ -317,7 +317,7 @@ It will result in the following output:
        SNR_phi_true: 10.991
       SNR_phi_gauss: 10.341
 
-The SNRs reported here correspond the definitions in equations in Tjärnberg *et. al.*, *manuscript.* 2017 by default. However, the SNR is calculated for all $i$ with the following two functions:
+The SNRs reported here correspond the definitions in equations in Tjärnberg *et. al.*, *manuscript.* 2017 by default. However, the SNR is calculated for all \(i\) with the following two functions:
 
     disp('SNR estimate based on actual noise matrix E for each variable')
     SNRe = analyse.Data.calc_SNR_phi_true(Data);
@@ -339,7 +339,7 @@ itself. To run the Glmnet implementation we execute:
 The variable `zetavec` is the returned regularisation parameters that
 was used within the algorithm. The option “full” will instruct the
 method to try to generate the complete regularization path from full to
-empty network with the $\zeta$ values scaled between 0 and 1. It should
+empty network with the \(\zeta\) values scaled between 0 and 1. It should
 be noted that not all methods can reliably do this. For those cases a
 zetavec can be specified and supplied to the method. `zetaRange` gives
 the scaling factors used for the parameters.
