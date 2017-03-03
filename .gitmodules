@@ -6,7 +6,7 @@
 	url = git@bitbucket.org:sonnhammergrni/gsutilities.git
 [submodule "+Methods"]
 	path = +Methods
-	url = git@bitbucket.org:sonnhammergrni/Methods.git
+	url = git@bitbucket.org:sonnhammergrni/methods.git
 [submodule "+illustrate"]
 	path = +illustrate
 	url = git@bitbucket.org:sonnhammergrni/illustrate.git
