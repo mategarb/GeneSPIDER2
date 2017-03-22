@@ -25,6 +25,8 @@ for i=1:nargin
         data = varargin{i};
     elseif isa(varargin{i},'datastruct.Network')
         net = varargin{i};
+    elseif isa(varargin{i},'char')
+        regpath = varargin{i};
     elseif isa(varargin{i},'logical')
         rawZeta = varargin{i};
     else
@@ -37,27 +39,42 @@ if ~exist('data')
 end
 
 %% Run
-if ~exist('zetavec','var')
+if ~exist('zetavec','var') & strcmpi(regpath,'input')
     hatTheta = Methods.tls(response(data,net)',data.P');
     estA = hatTheta';
     varargout{1} = estA;
-    return
+else
+    Atls = Methods.tls(response(data,net)',data.P');
 end
 
+if strcmpi(regpath,'full')
+    zetavec = abs(Atls(:)');
+    zetavec = unique(zetavec);
+    % zetavec = zetavec(zetavec~=0)
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Determine how to handle zeta %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-if ~rawZeta
+if ~rawZeta & strcmpi(regpath,'input')
     zetaRange = [];
     hatTheta = Methods.tls(response(data,net)',-data.P');
-    estA = hatTheta';
+    % Atls = hatTheta';
+    estA = hatTheta'; %Atls
     zetaRange(1) = min(abs(estA(estA~=0)))-eps;
     zetaRange(2) = max(abs(estA(estA~=0)))+10*eps;
     
     % Convert to interval.
     delta = zetaRange(2)-zetaRange(1);
     zetavec = zetavec*delta + zetaRange(1);
+elseif ~rawZeta & strcmpi(regpath,'full')
+    zetaRange(2) = max(zetavec);
+    zetaRange(1) = min(zetavec);
+    delta = zetaRange(2)-zetaRange(1);
+elseif rawZeta & strcmpi(regpath,'full')
+    zetaRange(2) = 1;
+    zetaRange(1) = 0;
+    delta = 1;
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -73,6 +90,7 @@ for i=1:length(zetavec)
     estA(:,:,i) = Atmp;
     zetaRange(1) = min(abs(estA(estA~=0)))-eps;
     zetaRange(2) = max(abs(estA(estA~=0)))+10*eps;
+
 end
 
 varargout{1} = estA;
