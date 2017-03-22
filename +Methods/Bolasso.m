@@ -36,6 +36,8 @@ for i=1:nargin
         net = varargin{i};
     elseif isa(varargin{i},'logical')
         rawZeta = varargin{i};
+    elseif isa(varargin{i},'char')
+        regpath = varargin{i};
     elseif varargin{i}==floor(varargin{i}) & length(varargin{i}) == 1 & varargin{i} ~= 1 % is integer of length 1 and is not 1
         tmpstraps = varargin{i};
     else
@@ -76,7 +78,11 @@ for j=1:straps
 
     %% Determine how to handle zeta %%
 
-    if ~rawZeta
+    if isempty(zetavec)
+        regpath = 'full';
+    end
+
+    if ~rawZeta & strcmpi(regpath,'input')
         zetaRange = [];
         tol = 1e-6;
         zmax = 1;
@@ -107,7 +113,25 @@ for j=1:straps
         delta = zetaRange(2)-zetaRange(1);
         zetavec = zetavec*delta + zetaRange(1);
     end
+        
+    if strcmpi(regpath,'full')
+        zetavec = [];
+        for i = 1:size(data.P,1)
+            fit = glmnet(response(data,net)',-data.P(i,:)','gaussian',glmnetSet(struct('nlambda',size(data.P,1),'alpha',alpha)));
+            zetavec = [zetavec,fit.lambda'];
+        end
+        zetavec = unique(sort(zetavec));
 
+        if ~rawZeta
+            zetaRange(2) = max(zetavec);
+            zetaRange(1) = min(zetavec);
+            delta = zetaRange(2)-zetaRange(1);
+        else
+            zetaRange(2) = 1;
+            zetaRange(1) = 0;
+            delta = 1;
+        end
+    end
     %% Run
 
     for i = 1:size(bdata.P,1)
