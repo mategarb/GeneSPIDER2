@@ -23,7 +23,7 @@ function varargout = Bolsco(varargin)
 %%  Parse input arguments  %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 rawZeta = 0;
-tmpzetas = [];
+zetavec = [];
 net = [];
 alpha = 1;
 tmpstraps = 1;
@@ -34,11 +34,13 @@ for i=1:nargin
         net = varargin{i};
     elseif isa(varargin{i},'logical')
         rawZeta = varargin{i};
+    elseif isa(varargin{i},'char')
+        regpath = varargin{i};
     elseif varargin{i}==floor(varargin{i}) & length(varargin{i}) == 1 & varargin{i} ~= 1 % is integer of length 1 and is not 1
         tmpstraps = varargin{i};
     else
-        if isempty(tmpzetas)
-            tmpzetas = varargin{i};
+        if isempty(zetavec)
+            zetavec = varargin{i};
         else
             alpha = varargin{i};
         end
@@ -56,17 +58,25 @@ else
 end
 
 %% Run
-if ~exist('tmpzetas','var')
+if ~exist('zetavec','var') & strcmpi(regpath,'input')
     estA = -data.P*pinv(response(data,net));
     varargout{1} = estA;
     return
+else
+    Als = -data.P*pinv(response(data,net));
+end
+
+if strcmpi(regpath,'full')
+    zetavec = abs(Als(:)');
+    zetavec = unique(zetavec);
+    % zetavec = zetavec(zetavec~=0)
 end
 
 zR = []; % zeta range for all bootstraps
 Apos = zeros(data.N,data.N,straps);
 Alogical = [];
 for j = 1:straps
-    zetavec = tmpzetas;
+    zetavec = zetavec;
     bdata = bootstrap(data);
 
     reps = 1;
@@ -84,7 +94,7 @@ for j = 1:straps
     %% Determine how to handle zeta %%
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    if ~rawZeta
+if ~rawZeta & strcmpi(regpath,'input')
         zetaRange = [];
         estA = -data.P*pinv(response(data,net));
         zetaRange(1) = min(abs(estA(estA~=0)))-eps;
@@ -95,7 +105,15 @@ for j = 1:straps
         % Convert to interval.
         delta = zetaRange(2)-zetaRange(1);
         zetavec = zetavec*delta + zetaRange(1);
-    end
+elseif ~rawZeta & strcmpi(regpath,'full')
+    zetaRange(2) = max(zetavec);
+    zetaRange(1) = min(zetavec);
+    delta = zetaRange(2)-zetaRange(1);
+elseif rawZeta & strcmpi(regpath,'full')
+    zetaRange(2) = 1;
+    zetaRange(1) = 0;
+    delta = 1;
+end
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
