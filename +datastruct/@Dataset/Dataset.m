@@ -208,10 +208,12 @@ classdef Dataset < datastruct.Exchange
         % newdata = variable_std_normalization(data)
         %
             newdata = datastruct.Dataset(data);
-            if sum(newdata.E(:)) ~= 0
+            if nnz(newdata.E(:)) ~= 0
                 SNR = min(svd(true_response(newdata)))/max(svd(newdata.E));
             else
-                SNR = 1;
+                alpha = 0.01;
+                sigma = min(svd(true_response(newdata)));
+                SNR = sigma/sqrt(chi2inv(1-alpha,prod(size(newdata.P)))*newdata.lambda(1));
             end
             Y = true_response(newdata);
             m = size(Y, 2);
@@ -223,13 +225,15 @@ classdef Dataset < datastruct.Exchange
             Yhat = (Y - Mu) ./ Sigma;
 
             sY = svd(Yhat);
-            if sum(newdata.E(:)) ~= 0
+            if nnz(newdata.E(:)) ~= 0
                 sE = svd(newdata.E);
                 scale = 1/SNR*min(sY)/max(sE);
+                newdata.lambda = scale^2*newdata.lambda;
             else
-                scale = 1;
+                sigma = min(svd(Yhat));
+                lambda = sigma/sqrt(chi2inv(1-alpha,prod(size(newdata.P)))*SNR);
+                newdata.lambda = lambda;
             end
-            newdata.lambda = scale^2*newdata.lambda;
             newdata.E = scale*newdata.E;
             newdata.Y = Yhat + newdata.E;
             newdata.cvP = [];
@@ -246,10 +250,12 @@ classdef Dataset < datastruct.Exchange
         % newdata = variable_std_normalization(data)
         %
             newdata = datastruct.Dataset(data);
-            if sum(newdata.E(:)) ~= 0
+            if nnz(newdata.E(:)) ~= 0
                 SNR = min(svd(true_response(newdata)))/max(svd(newdata.E));
             else
-                SNR = 1;
+                alpha = 0.01;
+                sigma = min(svd(true_response(data)));
+                SNR = sigma/sqrt(chi2inv(1-alpha,prod(size(newdata.P)))*newdata.lambda(1));
             end
             Y = true_response(newdata);
             n = size(Y, 1);
@@ -261,11 +267,13 @@ classdef Dataset < datastruct.Exchange
             Yhat = (Y - Mu) ./ Sigma;
 
             sY = svd(Yhat);
-            if sum(newdata.E(:)) ~= 0
+            if nnz(newdata.E(:)) ~= 0
                 sE = svd(newdata.E);
                 scale = 1/SNR*min(sY)/max(sE);
             else
-                scale = 1;
+                sigma = min(svd(Yhat));
+                lambda = sigma/sqrt(chi2inv(1-alpha,prod(size(newdata.P)))*SNR);
+                newdata.lambda = lambda;
             end
             newdata.lambda = scale^2*newdata.lambda;
             newdata.E = scale*newdata.E;
