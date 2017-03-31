@@ -177,11 +177,12 @@ classdef Dataset < datastruct.Exchange
                 sdY = sqrt(data.lambda(1:data.N))'*ones(1,size(data.P,2));
                 sdP = sqrt(data.lambda(data.N+1:end))'*ones(1,size(data.P,2));
             end
+
             if nargout == 1
-               varargout{1} = sdY;
+                varargout{1} = sdY;
             elseif nargout == 2
-               varargout{1} = sdY;
-               varargout{2} = sdP;
+                varargout{1} = sdY;
+                varargout{2} = sdP;
             end
         end
 
@@ -198,6 +199,36 @@ classdef Dataset < datastruct.Exchange
             scale = 1/SNR*min(sY)/max(sE);
             newdata.lambda = scale^2*newdata.lambda;
             newdata.E = scale*newdata.E;
+        end
+
+        function newdata = normalize(data)
+        % Standard normalize data expression matrix.
+        %
+        % == Usage ==
+        % newdata = normalize(data)
+        %
+            newdata = datastruct.Dataset(data);
+            SNR = min(svd(true_response(newdata)))/max(svd(newdata.E));
+            Y = true_response(newdata);
+            m = size(Y, 2);
+
+            mu = mean(Y, 2);
+            sigma = std(Y, 1, 2); % population standard deviation
+            Mu = repmat(mu, 1, m);
+            Sigma = repmat(sigma, 1, m);
+            Yhat = (Y - Mu) ./ Sigma;
+
+            sY = svd(Yhat);
+            sE = svd(newdata.E);
+            scale = 1/SNR*min(sY)/max(sE);
+            newdata.lambda = scale^2*newdata.lambda;
+            newdata.E = scale*newdata.E;
+            newdata.Y = Yhat + newdata.E;
+            newdata.cvP = [];
+            newdata.cvY = [];
+            [sdY,sdP] = newdata.std();
+            newdata.setsdY(sdY);
+            newdata.setsdP(sdP);
         end
 
         function [E,F] = gaussian(data)
