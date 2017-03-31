@@ -201,14 +201,18 @@ classdef Dataset < datastruct.Exchange
             newdata.E = scale*newdata.E;
         end
 
-        function newdata = normalize(data)
-        % Standard normalize data expression matrix.
+        function newdata = variable_std_normalization(data)
+        % Standard normalize dataset expression matrix over variables (rows).
         %
         % == Usage ==
-        % newdata = normalize(data)
+        % newdata = variable_std_normalization(data)
         %
             newdata = datastruct.Dataset(data);
-            SNR = min(svd(true_response(newdata)))/max(svd(newdata.E));
+            if sum(newdata.E(:)) ~= 0
+                SNR = min(svd(true_response(newdata)))/max(svd(newdata.E));
+            else
+                SNR = 1;
+            end
             Y = true_response(newdata);
             m = size(Y, 2);
 
@@ -219,8 +223,12 @@ classdef Dataset < datastruct.Exchange
             Yhat = (Y - Mu) ./ Sigma;
 
             sY = svd(Yhat);
-            sE = svd(newdata.E);
-            scale = 1/SNR*min(sY)/max(sE);
+            if sum(newdata.E(:)) ~= 0
+                sE = svd(newdata.E);
+                scale = 1/SNR*min(sY)/max(sE);
+            else
+                scale = 1;
+            end
             newdata.lambda = scale^2*newdata.lambda;
             newdata.E = scale*newdata.E;
             newdata.Y = Yhat + newdata.E;
@@ -230,6 +238,45 @@ classdef Dataset < datastruct.Exchange
             newdata.setsdY(sdY);
             newdata.setsdP(sdP);
         end
+
+        function newdata = sample_std_normalization(data)
+        % Standard normalize dataset expression matrix over samples (columns).
+        %
+        % == Usage ==
+        % newdata = variable_std_normalization(data)
+        %
+            newdata = datastruct.Dataset(data);
+            if sum(newdata.E(:)) ~= 0
+                SNR = min(svd(true_response(newdata)))/max(svd(newdata.E));
+            else
+                SNR = 1;
+            end
+            Y = true_response(newdata);
+            n = size(Y, 1);
+
+            mu = mean(Y, 1);
+            sigma = std(Y, 1, 1); % sample standard deviation
+            Mu = repmat(mu, n, 1);
+            Sigma = repmat(sigma, n, 1);
+            Yhat = (Y - Mu) ./ Sigma;
+
+            sY = svd(Yhat);
+            if sum(newdata.E(:)) ~= 0
+                sE = svd(newdata.E);
+                scale = 1/SNR*min(sY)/max(sE);
+            else
+                scale = 1;
+            end
+            newdata.lambda = scale^2*newdata.lambda;
+            newdata.E = scale*newdata.E;
+            newdata.Y = Yhat + newdata.E;
+            newdata.cvP = [];
+            newdata.cvY = [];
+            [sdY,sdP] = newdata.std();
+            newdata.setsdY(sdY);
+            newdata.setsdP(sdP);
+        end
+
 
         function [E,F] = gaussian(data)
         % Generate new gaussian noise matrices E and F with variance lambda for
