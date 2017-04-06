@@ -201,98 +201,172 @@ classdef Dataset < datastruct.Exchange
             newdata.E = scale*newdata.E;
         end
 
-        function newdata = variable_std_normalization(data)
-        % Standard normalize dataset expression matrix over variables (rows).
+        function newdata = noise_normalization_scaling(data,varargin)
+        % Attempt to rescale the noise and variance information after a given normalization procedure.
+        % Currently this function can not handle the noise matrix E, correctly.
+        %
+        % dim: 1 or 2, default (2)
+        % procedure: sring name of method, {'std_normalize' (default), 'range_scaling', 'unit_length_scaling'}
         %
         % == Usage ==
-        % newdata = variable_std_normalization(data)
+        % newdata = noise_std_normalization(data,<dim>,<procedure>)
         %
-            newdata = datastruct.Dataset(data);
-            sYo = svd(response(newdata));
-            if nnz(newdata.E) ~= 0
-                sEo = svd(newdata.E);
+            Warning('This function is not fully reliable and should be used without caution.')
+
+            dim = 2;
+            if len(varargin) > 0
+                dim = varargin{1};
+            end
+
+            norm_fun = 'std_normalize'
+
+            if len(varargin) > 1
+                 norm_fun = sort(varargin{2});
+            end
+
+            newdata = data.(norm_fun)(dim);
+
+            sYo = svd(response(data));
+            if nnz(data.E) ~= 0
+                sEo = svd(data.E);
                 SNR = min(sYo)/max(sEo);
             else
                 alpha = 0.01;
                 sigma = min(sYo);
-                SNR = sigma/sqrt(chi2inv(1-alpha,prod(size(newdata.P)))*newdata.lambda(1));
+                SNR = sigma/sqrt(chi2inv(1-alpha,prod(size(data.P)))*data.lambda(1));
             end
-            Y = response(newdata);
-            m = size(Y, 2);
 
-            mu = mean(Y, 2);
-            sigma = std(Y, 1, 2); % population standard deviation
-            Mu = repmat(mu, 1, m);
-            Sigma = repmat(sigma, 1, m);
-            Yhat = (Y - Mu) ./ Sigma;
-
-            sY = svd(Yhat);
-            if nnz(newdata.E) ~= 0
-                E = newdata.E * min(sY)/min(sYo);
-                % scale = 1/SNR*min(sY)/max(svd(E));
+            sY = svd(response(data));
+            if nnz(data.E) ~= 0
+                E = data.E * min(sY)/min(sYo);
                 scale = max(svd(E))/max(sEo);
-                newdata.lambda = scale^2*newdata.lambda;
+                newdata.lambda = scale^2*data.lambda;
                 newdata.E = E;
             else
                 sigma = min(svd(Yhat));
                 lambda = sigma/sqrt(chi2inv(1-alpha,prod(size(newdata.P)))*SNR);
                 newdata.lambda = lambda;
             end
+            newdata.cvP = [];
+            newdata.cvY = [];
+            [sdY,sdP] = newdata.std();
+            newdata.setsdY(sdY);
+            newdata.setsdP(sdP);
+        end
+
+        function newdata = std_normalize(data,varargin)
+        % Standard normalize dataset expression matrix over rows (default).
+        %
+        % == Usage ==
+        % newdata = std_normalize(data,<dim>)
+        %
+            if len(varargin) == 0
+                dim = 2;
+            else
+                dim = varargin{1};
+            end
+            newdata = datastruct.Dataset(data);
+
+            s = size(Y);
+            if dim == 2
+                s(1) = 1;
+            elseif dim == 1;
+                s(2) = 1;
+            end
+
+            mu = mean(Y, dim);
+            sigma = std(Y, 1, dim); % population standard deviation
+            Mu = repmat(mu, s);
+            Sigma = repmat(sigma, s);
+            Yhat = (Y - Mu) ./ Sigma;
+
             newdata.Y = Yhat;
+            newdata.E = zeros(size(Yhat));
             newdata.cvP = [];
             newdata.cvY = [];
-            [sdY,sdP] = newdata.std();
-            newdata.setsdY(sdY);
-            newdata.setsdP(sdP);
         end
 
-        function newdata = sample_std_normalization(data)
-        % Standard normalize dataset expression matrix over samples (columns).
+        function newdata = range_scaling(data,varargin)
+        % Do range scaling over rows (default) of the expression matrix.
+        % The range is min and max over the row/column.
+        %
+        % dim: 1 or 2
         %
         % == Usage ==
-        % newdata = variable_std_normalization(data)
+        % newdata = feature_scaling(data,<dim>)
         %
+
+            dim = 2;
+            if len(varargin) > 0
+                dim = varargin{1};
+            end
+
+            if len(varargin) > 1
+                range = sort(varargin{2});
+            end
+
             newdata = datastruct.Dataset(data);
-            sYo = svd(response(newdata));
-            if nnz(newdata.E) ~= 0
-                sEo = svd(newdata.E);
-                SNR = min(sYo)/max(sEo);
-            else
-                alpha = 0.01;
-                sigma = min(sYo);
-                SNR = sigma/sqrt(chi2inv(1-alpha,prod(size(newdata.P)))*newdata.lambda(1));
+            Y = response(data);
+            s = size(Y);
+            if dim == 2
+                s(1) = 1;
+            elseif dim == 1;
+                s(2) = 1;
             end
-            Y = response(newdata);
-            n = size(Y, 1);
 
-            mu = mean(Y, 1);
-            sigma = std(Y, 1, 1); % sample standard deviation
-            Mu = repmat(mu, n, 1);
-            Sigma = repmat(sigma, n, 1);
-            Yhat = (Y - Mu) ./ Sigma;
+            mx = max(Y,[],dim);
+            mn = min(Y,[],dim);
 
-            sY = svd(Yhat);
-            if nnz(newdata.E) ~= 0
-                E = newdata.E * min(sY)/min(sYo);
-                % scale = 1/SNR*min(sY)/max(svd(E));
-                scale = max(svd(E))/max(sEo);
-                newdata.lambda = scale^2*newdata.lambda;
-                newdata.E = E;
-            else
-                sigma = min(svd(Yhat));
-                lambda = sigma/sqrt(chi2inv(1-alpha,prod(size(newdata.P)))*SNR);
-                newdata.lambda = lambda;
-            end
-            newdata.lambda = scale^2*newdata.lambda;
-            newdata.E = scale*newdata.E;
-            newdata.Y = Yhat + newdata.E;
+            max_mat = repmat(mx,s);
+            min_mat = repmat(mn,s);
+
+            Yhat = (Y-min_mat)./(max_mat-min_mat);
+
+            newdata.Y = Yhat;
+            newdata.E = zeros(size(Yhat));
             newdata.cvP = [];
             newdata.cvY = [];
-            [sdY,sdP] = newdata.std();
-            newdata.setsdY(sdY);
-            newdata.setsdP(sdP);
         end
 
+        function newdata = unit_length_scaling(data,varargin)
+        % Do range scaling over rows (default) of the expression matrix.
+        % The range is min and max over the row/column.
+        %
+        % dim: 1 or 2
+        %
+        % == Usage ==
+        % newdata = feature_scaling(data,<dim>)
+        %
+
+            dim = 2;
+            if len(varargin) > 0
+                dim = varargin{1};
+            end
+
+            if len(varargin) > 1
+                range = sort(varargin{2});
+            end
+
+            newdata = datastruct.Dataset(data);
+            Y = response(data);
+            s = size(Y);
+            if dim == 2
+                s(1) = 1;
+            elseif dim == 1;
+                s(2) = 1;
+            end
+
+            len = sqrt(sum(A.^2,dim))
+
+            norm_mat = repmat(len,s);
+
+            Yhat = Y./norm_mat;
+
+            newdata.Y = Yhat;
+            newdata.E = zeros(size(Yhat));
+            newdata.cvP = [];
+            newdata.cvY = [];
+        end
 
         function [E,F] = gaussian(data)
         % Generate new gaussian noise matrices E and F with variance lambda for
