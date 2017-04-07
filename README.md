@@ -237,6 +237,33 @@ It is important to be able to connect a dataset to a specific network if
 the data was generated , hence the network name is reported in the
 `Data` object.
 
+We also provide normalisation procedures for the `Data` object that will normalise the expression matrix `Y`. Three different normalisation procedures are available, standard normalisation, min max range scaling and unit scaling. All methods works over rows or columns, depending on input, *e.g.*
+
+For standard normalisation
+
+    NewData = Data.std_normalize(2);
+    sum(response(NewData),2)
+    sum(response(NewData).^2,2)
+
+should return zeros as sum over rows and the squared values should be 1 for each sample so the sum over rows should be = M.
+
+
+For unit scaling
+
+    NewData = Data.unit_length_scaling(2);
+    sum(response(NewData).^2,2)
+
+the squared values should sum to 1.
+
+For range scaling
+
+    NewData = Data.range_scaling(2);
+    max(response(NewData),[],2)
+    min(response(NewData),[],2)
+    
+the max and min of each row should be 1 and 0 respectively.
+
+It should be noted that the noise estimates are currently not scaled according to the new data and should therefore not be used *as is* in subsequent calculations.
 
 ### Analysis
 
@@ -374,8 +401,8 @@ truncated along the second dimension.
 
 ### Who do I talk to? ###
 
-* For questions contact [Torbjörn](https://bitbucket.org/temn/)
+* For questions contact [Nordling](mailto:torbjorn.nordling@nordlinglab.org)
 * How to cite:
 
     GeneSPIDER -- Gene regulatory network inference benchmarking with controlled network and data properties.
-    Tjärnberg *et. al.*, *manuscript.*, (2017).
+    Tjärnberg *et. al.*, *Molecular BioSystems*, (2017).
