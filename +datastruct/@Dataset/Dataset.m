@@ -214,13 +214,13 @@ classdef Dataset < datastruct.Exchange
             Warning('This function is not fully reliable and should be used without caution.')
 
             dim = 2;
-            if len(varargin) > 0
+            if length(varargin) > 0
                 dim = varargin{1};
             end
 
             norm_fun = 'std_normalize'
 
-            if len(varargin) > 1
+            if length(varargin) > 1
                  norm_fun = sort(varargin{2});
             end
 
@@ -260,13 +260,13 @@ classdef Dataset < datastruct.Exchange
         % == Usage ==
         % newdata = std_normalize(data,<dim>)
         %
-            if len(varargin) == 0
+            if length(varargin) == 0
                 dim = 2;
             else
                 dim = varargin{1};
             end
             newdata = datastruct.Dataset(data);
-
+            Y = response(newdata);
             s = size(Y);
             if dim == 2
                 s(1) = 1;
@@ -297,11 +297,11 @@ classdef Dataset < datastruct.Exchange
         %
 
             dim = 2;
-            if len(varargin) > 0
+            if length(varargin) > 0
                 dim = varargin{1};
             end
 
-            if len(varargin) > 1
+            if length(varargin) > 1
                 range = sort(varargin{2});
             end
 
@@ -339,11 +339,11 @@ classdef Dataset < datastruct.Exchange
         %
 
             dim = 2;
-            if len(varargin) > 0
+            if length(varargin) > 0
                 dim = varargin{1};
             end
 
-            if len(varargin) > 1
+            if length(varargin) > 1
                 range = sort(varargin{2});
             end
 
@@ -356,7 +356,7 @@ classdef Dataset < datastruct.Exchange
                 s(2) = 1;
             end
 
-            len = sqrt(sum(A.^2,dim))
+            len = sqrt(sum(Y.^2,dim))
 
             norm_mat = repmat(len,s);
 
