@@ -37,7 +37,7 @@ Supplementary information: online-only supplementary data available at the journ
 
 ### How do I get set up? ###
 
-* *Alternative 1*: Download genespider-v1.10 from [here](https://bitbucket.org/sonnhammergrni/genespider/downloads)
+* *Alternative 1*: Download genespider-v1.11 from [here](https://bitbucket.org/sonnhammergrni/genespider/downloads)
   and place in e.g. `~/src/genespider`
 
 * *Alternative 2*: Fetch this repository with the command
