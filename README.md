@@ -31,7 +31,7 @@ The ability of GeneSPIDER to independently control network and data properties i
 
 Availability and Implementation: Source code freely available for download at https://bitbucket.org/sonnhammergrni/genespider, implemented in Matlab.
 
-Contact: tn@kth.se
+Contact: [Nordling](mailto:torbjorn.nordling@nordlinglab.org)
 
 Supplementary information: online-only supplementary data available at the journal's web site.
 
@@ -82,7 +82,7 @@ Supplementary information: online-only supplementary data available at the journ
 Generating example data as used in results section
 --------------------------------------------------
 
-provides four toolboxes: `datastruct`, `analyse`, `Methods`, and
+GeneSPIDER provides four toolboxes: `datastruct`, `analyse`, `Methods`, and
 `gsUtilities`. Each toolbox is aimed at a specific function and their
 usage is exemplified here. The data used in the examples below can be
 downloaded from the online repository at
@@ -404,5 +404,14 @@ truncated along the second dimension.
 * For questions contact [Nordling](mailto:torbjorn.nordling@nordlinglab.org)
 * How to cite:
 
-    GeneSPIDER -- Gene regulatory network inference benchmarking with controlled network and data properties.
-    Tjärnberg *et. al.*, *Molecular BioSystems*, (2017).
+    @article{Tjarnberg2017-GeneSPIDER,
+    author ="Tj\"arnberg, Andreas and Morgan, Daniel C. and Studham, Matthew  and Nordling, T\"orbjorn E. M. and Sonnhammer, Erik L. L.",
+    title  ="GeneSPIDER - gene regulatory network inference benchmarking with controlled network and data properties",
+    journal  ="Mol. BioSyst.",
+    year  ="2017",
+    pages  ="-",
+    publisher  ="The Royal Society of Chemistry",
+    doi  ="10.1039/C7MB00058H",
+    url  ="http://dx.doi.org/10.1039/C7MB00058H",
+    }
+
