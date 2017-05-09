@@ -402,16 +402,16 @@ truncated along the second dimension.
 ### Who do I talk to? ###
 
 * For questions contact [Nordling](mailto:torbjorn.nordling@nordlinglab.org)
-* How to cite:
+* How to cite [bibtex]:
 
-    @article{Tjarnberg2017-GeneSPIDER,
-    author ="Tj\"arnberg, Andreas and Morgan, Daniel C. and Studham, Matthew  and Nordling, T\"orbjorn E. M. and Sonnhammer, Erik L. L.",
-    title  ="GeneSPIDER - gene regulatory network inference benchmarking with controlled network and data properties",
-    journal  ="Mol. BioSyst.",
-    year  ="2017",
-    pages  ="-",
-    publisher  ="The Royal Society of Chemistry",
-    doi  ="10.1039/C7MB00058H",
-    url  ="http://dx.doi.org/10.1039/C7MB00058H",
-    }
+        @article{Tjarnberg2017-GeneSPIDER,
+        author ="Tj\"arnberg, Andreas and Morgan, Daniel C. and Studham, Matthew  and Nordling, T\"orbjorn E. M. and Sonnhammer, Erik L. L.",
+        title  ="GeneSPIDER - gene regulatory network inference benchmarking with controlled network and data properties",
+        journal  ="Mol. BioSyst.",
+        year  ="2017",
+        pages  ="-",
+        publisher  ="The Royal Society of Chemistry",
+        doi  ="10.1039/C7MB00058H",
+        url  ="http://dx.doi.org/10.1039/C7MB00058H",
+        }
 
