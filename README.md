@@ -8,13 +8,13 @@
 # Gene regulatory network inference benchmarking with controlled network and data properties #
 
 This is the collection repository for the GeneSPIDER toolbox.
-This toolbox is comprised of five submodules:
+This toolbox is comprised of five modules:
 
-* [datastruct](https://bitbucket.org/sonnhammergrni/datastruct) repository containing functionality which is used for handling relevant data structure formats.
-* [Methods](https://bitbucket.org/sonnhammergrni/methods) repository containing original scripts and wrappers for various inference methods accepting special `datastruct` objects for analysis.
-* [analyse](https://bitbucket.org/sonnhammergrni/analyse), for analysing data and inference methods.
-* [gsUtilities](https://bitbucket.org/sonnhammergrni/gsutilities), include helper functions.
-* [illustrate](https://bitbucket.org/sonnhammergrni/illustrate) toolbox for help with data visualization and exporting to other graphical tools/formats.
+* [datastruct](https://bitbucket.org/sonnhammergrni/genespider/+datastruct) containing functionality which is used for handling relevant data structure formats.
+* [Methods](https://bitbucket.org/sonnhammergrni/genespider/+Methods) containing original scripts and wrappers for various inference methods accepting special `datastruct` objects for analysis.
+* [analyse](https://bitbucket.org/sonnhammergrni/genespider/+analyse), for analysing data and inference methods.
+* [gsUtilities](https://bitbucket.org/sonnhammergrni/genespider/+gsUtilities), include helper functions.
+* [illustrate](https://bitbucket.org/sonnhammergrni/genespider/+illustrate) toolbox for help with data visualization and exporting to other graphical tools/formats.
 
 ## Why GeneSPIDER? ##
 Inference of gene regulatory networks (GRNs) is a central goal in systems biology.
@@ -46,18 +46,9 @@ Supplementary information: online-only supplementary data available at the journ
 
     and run `cd ~/src/genespider`.
 
-    To fetch the complete toolbox run
-
-        git submodule init
-        git submodule update
-
-
 * Now you should have the complete toolbox availible by adding the path `~/src/genespider` to your MATLAB path with the command
 
         addpath('~/src/genespider')
-
-
-* If fetched through `git` you can develop and keep track of changes for each submodule by checking out the master branch from each submodule with the command `git checkout master`.
 
 * Dependencies:
 

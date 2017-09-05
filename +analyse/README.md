@@ -1,16 +1,5 @@
 # analyse is a tool for analysing networks and datasets as well as GRN inference methods performances
 
-clone the repository
-```
-git clone git@bitbucket.org:sonnhammergrni/analyse.git +analyse
-```
-or
-```
-git clone https://$USER@bitbucket.org/sonnhammergrni/analyse.git +analyse
-```
-
-where `$USER` is your bitbucket user account name.
-
 Add the parent directory to the path in MATLAB. This makes `+analyse` a MATLAB toolbox and ready for use.
 
 To test in MATLAB >(2015a) (requaires the [+datastruct](https://bitbucket.org/sonnhammergrni/datastruct) and [+Methods](https://bitbucket.org/sonnhammergrni/methods) toolbox) run:
