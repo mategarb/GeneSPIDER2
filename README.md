@@ -10,11 +10,11 @@
 This is the collection repository for the GeneSPIDER toolbox.
 This toolbox is comprised of five modules:
 
-* [datastruct](https://bitbucket.org/sonnhammergrni/genespider/+datastruct) containing functionality which is used for handling relevant data structure formats.
-* [Methods](https://bitbucket.org/sonnhammergrni/genespider/+Methods) containing original scripts and wrappers for various inference methods accepting special `datastruct` objects for analysis.
-* [analyse](https://bitbucket.org/sonnhammergrni/genespider/+analyse), for analysing data and inference methods.
-* [gsUtilities](https://bitbucket.org/sonnhammergrni/genespider/+gsUtilities), include helper functions.
-* [illustrate](https://bitbucket.org/sonnhammergrni/genespider/+illustrate) toolbox for help with data visualization and exporting to other graphical tools/formats.
+* [datastruct](https://bitbucket.org/sonnhammergrni/genespider/src/master/+datastruct) containing functionality which is used for handling relevant data structure formats.
+* [Methods](https://bitbucket.org/sonnhammergrni/genespider/src/master/+Methods) containing original scripts and wrappers for various inference methods accepting special `datastruct` objects for analysis.
+* [analyse](https://bitbucket.org/sonnhammergrni/genespider/src/master/+analyse), for analysing data and inference methods.
+* [gsUtilities](https://bitbucket.org/sonnhammergrni/genespider/src/master/+gsUtilities), include helper functions.
+* [illustrate](https://bitbucket.org/sonnhammergrni/genespider/src/master/+illustrate) toolbox for help with data visualization and exporting to other graphical tools/formats.
 
 ## Why GeneSPIDER? ##
 Inference of gene regulatory networks (GRNs) is a central goal in systems biology.
