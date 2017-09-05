@@ -10,6 +10,3 @@
 [submodule "+illustrate"]
 	path = +illustrate
 	url = git@bitbucket.org:sonnhammergrni/illustrate.git
-[submodule "+analyse"]
-	path = +analyse
-	url = git@bitbucket.org:sonnhammergrni/analyse.git
