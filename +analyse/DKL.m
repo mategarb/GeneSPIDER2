@@ -12,6 +12,13 @@ function varargout = DKL(p,q)
 % check if the probability p and q are probability distributions, i.e. sum to 1
 if (abs(sum(p)) == 0) || (abs(sum(q)) == 0)
     error('p or q are not a probability distribution or contain no values.')
+elseif length(p) != length(q)
+    error('need to be pared values for p and q, i.e. equal length vectors')
+end
+
+% add pseudo distribution
+if any(q == 0)
+    q = q + eps;
 end
 
 if (abs(sum(p) - 1) > 1e-10)
@@ -22,7 +29,9 @@ if (abs(sum(q) - 1) > 1e-10)
     q = q/sum(q);
 end
 
+
 kla = p .* log2(p./q);
+kla(isnan(kla)) = 0; % defined as zero if p is 0
 kldiv = sum(kla);
 
 
