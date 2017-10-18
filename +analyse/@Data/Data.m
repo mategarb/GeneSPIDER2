@@ -7,6 +7,7 @@ classdef Data < analyse.DataModel
         dataset = '';     % identifier for dataset used
         SNR_Phi_true      % Signal to noise ratio, \sigma_N(Y)/\sigma_1(E)
         SNR_Phi_gauss     % Signal to noise ratio,
+        SNR_L             % Signal to noise ratio, true expression to variance relationship
         SNR_phi_true      % Signal to noise ratio, \argmin_i min(norm(\Fi_i)/norm(\nu_i))
         SNR_phi_gauss     % Signal to noise ratio,
     end
@@ -32,6 +33,7 @@ classdef Data < analyse.DataModel
             analysis.dataset       = analyse.Data.identifier(data);
             analysis.SNR_Phi_true  = analyse.Data.calc_SNR_Phi_true(data);
             analysis.SNR_Phi_gauss = analyse.Data.calc_SNR_Phi_gauss(data);
+            analysis.SNR_L         = analyse.Data.calc_SNR_L(data);
             analysis.SNR_phi_true  = min(analyse.Data.calc_SNR_phi_true(data));
             analysis.SNR_phi_gauss = min(analyse.Data.calc_SNR_phi_gauss(data));
         end
@@ -79,6 +81,12 @@ classdef Data < analyse.DataModel
             SNR = sigma/sqrt(chi2inv(1-alpha,prod(size(data.P)))*data.lambda(1));
         end
 
+        function SNR = calc_SNR_L(data)
+            alpha = analyse.Data.alpha;
+            sigma = min(svd(true_response(data)));
+            SNR = sigma/sqrt(chi2inv(1-alpha,prod(size(data.P)))*data.lambda(1));
+        end
+
         function SNR = calc_SNR_phi_gauss(data)
             alpha = analyse.Data.alpha;
             Y = response(data);
@@ -94,6 +102,15 @@ classdef Data < analyse.DataModel
             s = min(svd(true_response(data)));
             lambda = s^2/(chi2inv(1-alpha,prod(size(data.P)))*SNR_L^2);
             % data.E = sqrt(lambda/preLambda).*data.E;
+        end
+
+        function lambda = scale_lambda_SNR_E(data,SNR_t)
+        % scale the noise variance by looking at the true noise and expression realisations singular values.
+            alpha = analyse.Data.alpha;
+            s = min(svd(true_response(data)));
+            e = max(svd(data.E));
+            e2 = s/SNR_t;
+            lambda = var(data.E(:)*e2/e);
         end
 
         function lambda = scale_lambda_SNRv(data,SNRv)

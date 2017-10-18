@@ -211,7 +211,7 @@ classdef Dataset < datastruct.Exchange
         % == Usage ==
         % newdata = noise_std_normalization(data,<dim>,<procedure>)
         %
-            Warning('This function is not fully reliable and should be used without caution.')
+            Warning('This function is not fully reliable and should not be used without caution.')
 
             dim = 2;
             if length(varargin) > 0
@@ -644,6 +644,26 @@ classdef Dataset < datastruct.Exchange
             varargout{1} = tmpdata;
             if nargout == 2
                varargout{2} = boots;
+            end
+        end
+
+        function varargout = shuffle(data,varargin)
+        % shuffle the expression data variable in each sample.
+
+            tmpdata = struct(data);
+            for i=1:data.M
+                shuf = randperm(data.N);
+                tmpdata(1).Y(:,i) = tmpdata.Y(shuf,i);
+                tmpdata(1).E(:,i) = tmpdata.E(shuf,i);
+                tmpdata(1).sdY(:,i) = tmpdata.sdY(shuf,i);
+            end
+
+            outdata = datastruct.Dataset();
+            outdata.populate(tmpdata);
+
+            varargout{1} = outdata;
+            if nargout == 2
+                varargout{2} = shuf
             end
         end
 
