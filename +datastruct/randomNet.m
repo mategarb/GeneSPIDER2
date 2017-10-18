@@ -4,11 +4,15 @@ function A = randomNet(N,n)
 % A = datastruct.randomNet(N,n)
 %
 % N: number of nodes
-% n: wished average number of links per node.
+% n: whished average number of links per node if n>=1, else relative sparsity of total possible links.
 %
 % A: undirected random network matrix
 
-sparsity = n/N;
+if n<1
+    sparsity = n;
+else
+    sparsity = n/N;
+end
 
 A = zeros(N);
 tspar = round(N^2*sparsity*N^2/(N*(N-1)))/N^2;
