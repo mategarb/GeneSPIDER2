@@ -1,11 +1,14 @@
-function A = randomNet(N,sparsity)
+function A = randomNet(N,n)
 % creates a random network with N nodes and specific sparseness with no self loops.
 %
-% A = datastruct.randomNet(N,sparsity)
+% A = datastruct.randomNet(N,n)
+%
+% N: number of nodes
+% n: wished average number of links per node.
 %
 % A: undirected random network matrix
-% N: number of nodes
-% sparsity: sparsity degree [0,1]
+
+sparsity = n/N;
 
 A = zeros(N);
 tspar = round(N^2*sparsity*N^2/(N*(N-1)))/N^2;

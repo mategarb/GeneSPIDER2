@@ -6,11 +6,11 @@ function [A,s] = smallworld(N,k,p,undirected,varargin)
 % A: undirected or directed adjacency matrix
 % s: random number generator state
 %
-% N: number of nodes
-% k: inital connections for each node, assumed even
-% p: probability of rewiring
+% N:          number of nodes
+% k:          inital connections for each node, assumed even
+% p:          probability of rewiring
 % undirected: logical if undirected or directed
-% d: probability of rewiring direction
+% d:          probability of rewiring direction
 %
 
 if isempty(varargin)

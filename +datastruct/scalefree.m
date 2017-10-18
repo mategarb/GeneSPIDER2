@@ -1,13 +1,13 @@
-function A = scalefree(N,sparsity,varargin)
+function A = scalefree(N,n,varargin)
 % Create a scalefree network with N nodes and specific sparseness
 % with preferential attachment
 %
-% A = datastruct.scalefree(N,sparsity[, seed])
+% A = datastruct.scalefree(N,n[, seed])
 %
-% A:         undirected scalefree network matrix
-% N:         number of nodes
-% sparsity:  sparsity degree [0,1]
-% seed:      matrix to work as a seed, assumed to have size < N
+% A:    undirected scalefree network matrix
+% N:    number of nodes
+% n:    whished number of links per node
+% seed: matrix to work as a seed, assumed to have size < N
 
 rank_check = true;
 if length(varargin) > 0
@@ -19,6 +19,8 @@ if length(varargin) > 0
         end
     end
 end
+
+sparsity = n/N
 
 m0 = round(sparsity*N);
 
