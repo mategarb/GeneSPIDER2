@@ -5,7 +5,7 @@ function varargout = Bolasso(varargin)
 %
 % function estA = Bolasso(data,net,zetavec[,alpha,rawZeta,straps])
 %
-%   Input Arguments: Bolasso(data,net,zetavec[,alpha,rawZeta,straps])
+%   Input Arguments: Bolasso(data,[zetavec,alpha,rawZeta,straps,regpath])
 %   ================
 %   data:    datastruct.Dataset
 %   net:     datastruct.Network
@@ -16,6 +16,12 @@ function varargout = Bolasso(varargin)
 %   rawZeta: logical to determine if the zeta values should be
 %            converted.  default = false
 %   straps:  integer, number of bootstrap runs. must be > 1, default = 100
+%   regpath  {'input','full'}  string to determine if we should try to create a zetavec
+%            for the complete regularization path dependant on method, default 'input'.
+%            Where 'input' is a zetavec determined by the user
+%            and 'full' lets the glmnet algorithm determine the relevant regularization penalties.
+%            If the SNR is high this might lead to few peanalty steps as the first small peanalty
+%            removes a majority of the interactions.
 %
 %   Output Arguments: estA
 %   =================
@@ -29,6 +35,7 @@ tmpzetas = [];
 net = [];
 alpha = 1;
 tmpstraps = 1;
+regpath = 'input';
 for i=1:nargin
     if isa(varargin{i},'datastruct.Dataset')
         data = varargin{i};
@@ -132,8 +139,8 @@ for j=1:straps
             delta = 1;
         end
     end
-    %% Run
 
+    %% Run
     for i = 1:size(bdata.P,1)
         fit = glmnet(response(bdata,net)',-bdata.P(i,:)','gaussian',glmnetSet(struct('lambda',zetavec,'alpha',alpha)));
         try

@@ -1,7 +1,7 @@
 function varargout = Bolsco(varargin)
 % Bootstrap sampling applied for least squares with cut off
 %
-% function [estA,Asupport] = Bolsco(data,bootstraps,zetavec[,net,rawZeta,straps])
+% function [estA,Asupport] = Bolsco(data,[bootstraps,zetavec,net,rawZeta,straps,regpath])
 %
 %   Input Arguments:
 %   ================
@@ -13,6 +13,12 @@ function varargout = Bolsco(varargin)
 %   rawZeta: logical to determine if the zeta values should be
 %            converted.  default 0
 %   straps:  integer, number of bootstrap runs. must be > 1, default = 100
+%   regpath  {'input','full'}  string to determine if we should try to create a zetavec
+%            for the complete regularization path dependant on method, default 'input'.
+%            Where 'input' is a zetavec determined by the user
+%            and 'full' lets the glmnet algorithm determine the relevant regularization penalties.
+%            If the SNR is high this might lead to few peanalty steps as the first small peanalty
+%            removes a majority of the interactions.
 %
 %   Output Arguments: estA
 %   =================
@@ -27,6 +33,7 @@ zetavec = [];
 net = [];
 alpha = 1;
 tmpstraps = 1;
+regpath = 'input';
 for i=1:nargin
     if isa(varargin{i},'datastruct.Dataset')
         data = varargin{i};
