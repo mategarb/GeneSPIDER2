@@ -113,7 +113,7 @@ sparsity `0.25`. The following code snippet demonstrate how to create a
         'The coefficients of the network have not been tuned to explain'...
         'any of the data sets in the mentioned articles.'];
 
-`datastruct.stabalize` takes the random network and the desired IAA as
+`datastruct.stabilize` takes the random network and the desired IAA as
 input parameters and stabilises the network by making the real part of
 all eigenvalues negative while adjusting the IAA level. The `setname`
 method is used to specify the fields of the `Network` object. The name
