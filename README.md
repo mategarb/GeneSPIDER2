@@ -98,7 +98,7 @@ sparsity `0.25`. The following code snippet demonstrate how to create a
 
     N = 10; S=0.25;
     A = datastruct.randomNet(N,S)-eye(N);
-    A = datastruct.stabalize(A,'iaa','high');
+    A = datastruct.stabilize(A,'iaa','high');
     Net = datastruct.Network(A,'random');
     setname(Net,struct('creator','Nordling'));
     Net.description = ['This is a sparse network with 10 nodes,'...
@@ -268,7 +268,7 @@ the online repository:
     if str2num(v(1:end-1)) >= 2015
         disp('Fetching example data online')
         Net = datastruct.Network.fetch('Nordling-D20100302-random-N10-L25-ID1446937.json')
-        Data = datastruct.Dataset.fetch('Nordling-ID1446937-D20150825-E15-SNR3291-IDY15968.json')
+        Data = datastruct.Dataset.fetch('Nordling-ID1446937-D20150825-N10-E15-SNR3291-IDY15968.json')
     else
         disp('Older versions of MATLAB does not support fetching datasets online.')
     end
