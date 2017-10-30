@@ -297,7 +297,7 @@ classdef Exchange < hgsetget
                 if ~isempty(options.directurl) % some part of the path is given
                     try
                         failed = logical(0);
-                        tmpurl1 = fullfile(options.directurl,[options.name,options.filetype]);
+                        tmpurl1 = strrep(fullfile(options.directurl,[options.name,options.filetype]),'\','/');
                         obj_data =  webread(tmpurl1,webread_options);
                     catch
                         failed = logical(1);
@@ -306,7 +306,7 @@ classdef Exchange < hgsetget
                     if failed
                         failed = logical(0);
                         try
-                            tmpurl2 = fullfile(options.baseurl,options.directurl,[options.name,options.filetype]);
+                            tmpurl2 = strrep(fullfile(options.baseurl,options.directurl,[options.name,options.filetype]),'\','/');
                             obj_data =  webread(tmpurl2,webread_options);
                         catch
                             failed = logical(1);
@@ -316,7 +316,7 @@ classdef Exchange < hgsetget
                     if failed
                         failed = logical(0);
                         try
-                            tmpurl3 = fullfile(options.baseurl,options.version,options.directurl,[options.name,options.filetype]);
+                            tmpurl3 = strrep(fullfile(options.baseurl,options.version,options.directurl,[options.name,options.filetype]),'\','/');
                             obj_data =  webread(tmpurl3,webread_options);
                         catch
                             failed = logical(1);
@@ -338,7 +338,7 @@ classdef Exchange < hgsetget
                         else
                             tmpurl1 = fullfile(options.baseurl,options.version,['N',num2str(options.N)],[options.name,options.filetype]);
                         end
-                        obj_data =  webread(tmpurl1,webread_options);
+                        obj_data =  webread(strrep(tmpurl1,'\','/'),webread_options);
                     catch
                         error(' File with name %s does not seem to exist\ at the locations %s',options.name,tmpurl1)
                     end
@@ -350,7 +350,7 @@ classdef Exchange < hgsetget
                     else
                         tmpurl1 = fullfile(options.baseurl,options.version,['N',num2str(options.N)],[options.name,options.filetype]);
                     end
-                    obj_data =  webread(tmpurl1,webread_options);
+                    obj_data =  webread(strrep(tmpurl1,'\','/'),webread_options);
                 catch
                     error(' Could not fetch any data with the options')
                 end
