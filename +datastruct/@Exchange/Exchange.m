@@ -34,8 +34,8 @@ classdef Exchange < hgsetget
         %
         % Support for writing xml formats can be found here:
         %     https://www.mathworks.com/matlabcentral/fileexchange/6268-xml4mat-v2-0
-        % a slightly optimized version is contained here:
-        %    <my-repo>
+        % a slightly optimized version is available here:
+        %    https://bitbucket.org/sonnhammergrni/xml4mat
 
             warning('off','MATLAB:structOnObject')
             if ~exist('fending','var')
