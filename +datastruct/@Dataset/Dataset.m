@@ -78,6 +78,14 @@ classdef Dataset < datastruct.Exchange
             N = size(data.P,1);
         end
 
+        function sA = size(data,varargin)
+            if length(varargin) > 0
+                sA = size(data.Y,varargin{1});
+            else
+                sA = size(data.Y);
+            end
+        end
+
         function set.lambda(data,lambda)
             if ~isrow(lambda)
                 lambda = lambda';

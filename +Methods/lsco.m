@@ -1,5 +1,5 @@
 function varargout = lsco(varargin)
-% function estA = lsco(data,require,zetavec,rawZeta,regpath)
+% function estA = lsco(data,net,zetavec,rawZeta,regpath)
 %
 %   Input Arguments: lsco(data,net,zetavec,rawZeta,regpath)
 %   ================
