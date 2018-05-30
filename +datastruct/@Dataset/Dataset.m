@@ -13,7 +13,7 @@ classdef Dataset < datastruct.Exchange
 %   ================ functionality
 %
 
-    properties (SetAccess = private)
+    properties (SetAccess = public)
         dataset ='';  % Name of the data set
         network ='';  % Name of complementary network
         P         % Observed/assumed perturbations
@@ -76,14 +76,6 @@ classdef Dataset < datastruct.Exchange
 
         function N = get.N(data)
             N = size(data.P,1);
-        end
-
-        function sA = size(data,varargin)
-            if length(varargin) > 0
-                sA = size(data.Y,varargin{1});
-            else
-                sA = size(data.Y);
-            end
         end
 
         function set.lambda(data,lambda)
@@ -625,7 +617,13 @@ classdef Dataset < datastruct.Exchange
             if length(varargin) == 1
                 boots = varargin{1};
             else
-                boots = randi([1 data.M],1,data.M);
+                bb=[];jj=cumsum(sum(data.P,2));jj=cat(1,jj,jj(end)+1);
+                bb(1)=  randi([1 jj(1)],1,1);
+                for dd=1:(length(jj)-1)
+                    bb(dd+1) = randi([jj(dd)+1 jj(dd+1)],1,1);
+                end
+                boots(:,1:size(data.P,1)) = bb(1:dd);
+                boots(:,(size(data.P,1)+1:size(data.P,2))) = randi([1 size(data.P,2)],1,(size(data.P,2)-size(data.P,1)));
             end
 
             tmpdata = datastruct.Dataset();
