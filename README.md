@@ -7,7 +7,7 @@
 
 # Gene regulatory network inference benchmarking with controlled network and data properties #
 
-This is the collection repository for the GeneSPIDER toolbox.
+This is the collection repository for the GeneSPIDER toolbox (Generation and Simulation Package for Informative Data ExploRation).
 This toolbox is comprised of five modules:
 
 * [datastruct](https://bitbucket.org/sonnhammergrni/genespider/src/master/+datastruct) containing functionality which is used for handling relevant data structure formats.
