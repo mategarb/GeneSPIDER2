@@ -31,7 +31,7 @@ The ability of GeneSPIDER to independently control network and data properties i
 
 Availability and Implementation: Source code freely available for download at https://bitbucket.org/sonnhammergrni/genespider, implemented in Matlab.
 
-Contact: [Nordling](mailto:torbjorn.nordling@nordlinglab.org)
+Contact: [Torbjörn Nordling](mailto:torbjorn.nordling@nordlinglab.org), [Erik sonnhammer](mailto:erik.sonnhammer@scilifelab.se)
 
 Supplementary information: online-only supplementary data available at the journal's web site.
 
