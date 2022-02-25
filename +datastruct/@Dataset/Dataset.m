@@ -736,7 +736,7 @@ classdef Dataset < datastruct.Exchange
 
 
             options(1).directurl = '';
-            options(1).baseurl = 'https://bitbucket.org/api/1.0/repositories/sonnhammergrni/gs-datasets/raw/';
+            options(1).baseurl = 'https://bitbucket.org/sonnhammergrni/gs-datasets/raw/';
             options(1).version = 'master';
             options(1).N = 10;
             options(1).name = 'Nordling-ID1446937-D20150825-N10-E15-SNR3291-IDY15968';
