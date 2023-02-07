@@ -5,13 +5,18 @@ function A = scalefree(N,n,varargin)
 % A = datastruct.scalefree(N,n[, seed])
 %
 % N:    number of nodes
-% n:    whished average number of links per node if n>=1, else relative sparsity of total possible links.
+% n:    requested average number of links per node if n>=1, else relative sparsity of total possible links.
 % seed: matrix to work as a seed, assumed to have size < N
 %
 % A:    undirected scalefree network matrix
 
+% rng('shuffle');
+
+pin=0.5;
+pout=0.3;
+
 rank_check = true;
-if length(varargin) > 0
+if ~isempty(varargin)
     for i=1:length(varargin)
         if isa(varargin{i},'logical')
             rank_check = varargin{i};
@@ -51,7 +56,7 @@ if ~exist('seed','var')
     for i=2:size(seed,1)
         tmp(i,1:i-1) = seed(i,1:i-1);
     end
-    seed = logical(tmp+tmp');
+    seed = logical(tmp);
 end
 
 A = zeros(N);
@@ -69,17 +74,38 @@ for i=(m0*2+1):N
 
     k = 0;
     while k < m
+        %c = 0;
         ps = 0;
         r = rand;
         for inode = 1:i-1
-            pl = sum(A(inode,1:i-1))/nnz(A(1:i-1,1:i-1));
+            pl = sum(abs(A(inode,1:i-1)))/nnz(A(1:i-1,1:i-1));
             ps = ps + pl;
+            
             if r < ps
-                A(i,inode) = 1;
-                A(inode,i) = 1;
+                
+                r2 = rand();
+
+                randC = rand();
+
+                if randC <= 0.5 
+                    val = -1;
+                else
+                    val = 1;
+                end
+                
+                if r2 < pin
+                    A(i,inode) = val;
+                elseif r2 < pin+pout
+                    A(inode,i) = val;
+                end
+                
                 k = k + 1;
                 break
             end
         end
     end
 end
+
+A = A.*rand(N,N);
+A(eye(N)==1) = -max(max(A));
+return 

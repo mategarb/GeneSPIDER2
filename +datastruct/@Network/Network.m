@@ -100,7 +100,7 @@ classdef Network < datastruct.Exchange
             networkProperties = {
                 'Name'                 net.network;
                 'Description'          net.description;
-                'Sparseness'           nnz(net)/prod(size(net))
+                'Sparseness'           nnz(net)/numel(net)
                 '# Nodes'              size(net.A,1)
                 '# links'              nnz(net)};
 
@@ -114,9 +114,9 @@ classdef Network < datastruct.Exchange
 
         function varargout = view(net)
         % make a rough graphical network plot with biograph
-            A = net.A;
-            A(logical(eye(net.N))) = 0;
-            h = view(biograph(A,net.names,'ShowWeights','on'));
+            Ap = net.A;
+            Ap(logical(eye(net.N))) = 0;
+            h = view(biograph(Ap,net.names,'ShowWeights','on'));
 
             if nargout == 1
                 varargout{1} = h;
@@ -132,7 +132,7 @@ classdef Network < datastruct.Exchange
         end
 
         function sA = size(net,varargin)
-            if length(varargin) > 0
+            if ~isempty(varargin)
                 sA = size(net.A,varargin{1});
             else
                 sA = size(net.A);
@@ -168,9 +168,9 @@ classdef Network < datastruct.Exchange
                 error('Needs to be a struct or datastruct.Network object')
             end
             inputnames = fieldnames(input);
-            names = fieldnames(net);
+            allnames = fieldnames(net);
             for name = inputnames'
-                if any(strmatch(name,names,'exact'))
+                if any(find(strcmp(name,allnames)))
                     net.(name{1}) = input.(name{1});
                 end
             end
@@ -213,12 +213,12 @@ classdef Network < datastruct.Exchange
         % set name value pairs to be able to parse options.
 
             options(1).directurl = '';
-            options(1).baseurl = 'https://bitbucket.org/api/1.0/repositories/sonnhammergrni/gs-networks/raw/';
+            options(1).baseurl = 'https://bitbucket.org/sonnhammergrni/gs-networks/raw/';
             options(1).version = 'master';
             options(1).type = 'random';
             options(1).N = 10;
             options(1).name = '';
-            options(1).filelist = logical(0);
+            options(1).filelist = false;
             options(1).filetype = '';
 
             if nargin == 0
