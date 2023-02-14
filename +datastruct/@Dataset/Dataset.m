@@ -26,6 +26,9 @@ classdef Dataset < datastruct.Exchange
         sdY = []; % measurement point variation of Y
         lambda    % Noise variance, lambda
         SNR_L     % Signal to noise ratio,
+        SNR_Wiki  % Wikipedia Signal to noise ratio (ADDED BY DENIZ)
+        A         % network
+        G         % Static gain model
     end
 
     properties (SetAccess = public)
@@ -100,6 +103,34 @@ classdef Dataset < datastruct.Exchange
             sigma = min(svd(true_response(data)));
             SNR = sigma/sqrt(chi2inv(1-alpha,prod(size(data.P)))*data.lambda(1));
         end
+%{
+        function SNR_Wiki = get.SNR_Wiki(data)
+            P = data.P; reps = sum(P~=0,2); cs = cumsum(reps);
+            sd = zeros(1,size(P,1)); m = zeros(1,size(P,1)); y = data.Y(:, 1:cs(1));
+            sd(1, 1) = abs(std(y(:))); m(1, 1) = abs(mean(y(:)));
+            for j = 1:(size(data.Y,1)-1)
+                clear y
+                y = data.Y(:, (cs(j)+1):cs(j+1));
+                sd(1, j+1) = abs(std(y(:)));
+                m(1, j+1) = abs(mean(y(:)));
+            end
+            SNR_Wiki = median(m)/median(sd);
+        end
+%}
+
+        function SNR_Wiki = get.SNR_Wiki(data)
+            P = data.P; reps = sum(P~=0,2); cs = cumsum(reps);
+            sd = zeros(1,size(P,1)); m = zeros(1,size(P,1)); y = data.Y(:, 1:cs(1));
+            sd(1, 1) = abs(std(y(:))); m(1, 1) = abs(mean(y(:)));
+            for j = 1:(size(data.Y,1)-1)
+                clear y
+                y = data.Y(:, (cs(j)+1):cs(j+1));
+                sd(1, j+1) = abs(std(y(:)));
+                m(1, j+1) = abs(mean(y(:)));
+            end
+            SNR_Wiki = median(m)/median(sd);
+        end
+
 
         function p = Phi(data)
         % Y'
@@ -152,10 +183,12 @@ classdef Dataset < datastruct.Exchange
             end
             if isempty(data.lambda)
                 SNR_L = '0';
+                SNR_Wiki = '0';
             else
                 SNR_L = num2str(round(data.SNR_L*1000));
+                SNR_Wiki = num2str(data.SNR_Wiki);
             end
-            data.dataset = [namer.creator,'-ID',data.network(regexpi(data.network,'-ID')+3:end),'-D',datestr(namer.time,'yyyymmdd'),'-N',num2str(size(data.P,1)),'-E',num2str(size(data.P,2)),'-SNR',SNR_L,'-IDY',namer.id];
+            data.dataset = [namer.creator,'-ID',data.network(regexpi(data.network,'-ID')+3:end),'-D',datestr(namer.time,'yyyymmdd'),'-N',num2str(size(data.P,1)),'-E',num2str(size(data.P,2)),'-SNR',SNR_L, '-SNR_Wiki',SNR_Wiki, '-IDY',namer.id];
         end
 
         function names = get.names(data)
@@ -201,6 +234,29 @@ classdef Dataset < datastruct.Exchange
             newdata.E = scale*newdata.E;
         end
 
+%{
+        function newdata = scaleSNR_Wiki(data,net,SNR_Wiki)
+        % == Usage ==
+        % newdata = scaleSNR_Wiki(data,net,SNR_Wiki)
+        %
+            newdata = datastruct.Dataset(data,net);
+            P = data.P; reps = sum(P~=0,2); cs = cumsum(reps);
+            sd = zeros(1,size(P,1)); m = zeros(1,size(P,1)); y = data.Y(:, 1:cs(1));
+            sd(1, 1) = abs(std(y(:))); m(1, 1) = abs(mean(y(:)));
+            for j = 1:(size(data.Y,1)-1)
+                clear y
+                y = data.Y(:, (cs(j)+1):cs(j+1));
+                sd(1, j+1) = abs(std(y(:)));
+                m(1, j+1) = abs(mean(y(:)));
+            end
+           % SNR_Wiki = median(m)/median(sd);
+
+            scale = 1/SNR_Wiki*median(m)/median(sd);
+            newdata.lambda = scale^2*newdata.lambda;
+            newdata.E = scale*newdata.E;
+        end
+
+%}
         function newdata = noise_normalization_scaling(data,varargin)
         % Attempt to rescale the noise and variance information after a given normalization procedure.
         % Currently this function can not handle the noise matrix E, correctly.
@@ -612,17 +668,19 @@ classdef Dataset < datastruct.Exchange
             end
         end
 
-        function varargout = bootstrap(data,varargin)
+        function varargout = FullCondBoot(data,varargin)
         % Bootstraps a new data set from the old data set.
             if length(varargin) == 1
                 boots = varargin{1};
             else
-                bb=[];jj=cumsum(sum(data.P,2));jj=cat(1,jj,jj(end)+1);
-                bb(1)=  randi([1 jj(1)],1,1);
-                for dd=1:(length(jj)-1)
+                bb=[];
+                jj = abs(cumsum(sum(data.P,2))); % calculates how many replicates is between genes
+                jj = cat(1,jj,jj(end)+1); % add first and last interval
+                bb(1) =  randi([1 jj(1)],1,1);
+                for dd = 1:(length(jj)-1)
                     bb(dd+1) = randi([jj(dd)+1 jj(dd+1)],1,1);
                 end
-                boots(:,1:size(data.P,1)) = bb(1:dd);
+                boots(:,1:size(data.P,1)) = bb(1:dd); %first N (based on P) genes
                 boots(:,(size(data.P,1)+1:size(data.P,2))) = randi([1 size(data.P,2)],1,(size(data.P,2)-size(data.P,1)));
             end
 
@@ -633,6 +691,51 @@ classdef Dataset < datastruct.Exchange
 
             tmp(1).P = data.P(:,boots);
             tmp(1).Y = data.Y(:,boots);
+            % if ~isempty(data.sdY)
+            %     tmp(1).sdY = data.sdY(:,boots);
+            % end
+            % if ~isempty(data.sdP)
+            %     tmp(1).sdP = data.sdP(:,boots);
+            % end
+            if ~isempty(data.E)
+                tmp(1).E = data.E(:,boots);
+            end
+            if ~isempty(data.F)
+                tmp(1).F = data.F(:,boots);
+            end
+
+            tmpdata.populate(tmp);
+            varargout{1} = tmpdata;
+            % if nargout == 2
+            %    varargout{2} = boots;
+            % end
+        end
+
+        function varargout = bootstrap(data,varargin)
+        % Bootstraps a new data set from the old data set.
+            if length(varargin) == 1
+                boots = varargin{1};
+            else
+                boot_seed = zeros(1,size(data.P,1));
+                for i = 1:size(data.P,1)
+                    ind = find(data.P(i,:)~=0);
+                    drawn = datasample(ind,1);
+                    boot_seed(i) = drawn;
+                end
+                
+                boots(1:size(data.P,1)) = boot_seed;
+                boots((size(data.P,1)+1:size(data.P,2))) = randi([1,size(data.P,2)],1,(size(data.P,2)-size(data.P,1)));
+                
+            end
+
+            tmpdata = datastruct.Dataset();
+            tmpdata.populate(data);
+
+            tmp = struct([]);
+
+            tmp(1).P = data.P(:,boots);
+            tmp(1).Y = data.Y(:,boots);
+
             if ~isempty(data.sdY)
                 tmp(1).sdY = data.sdY(:,boots);
             end
@@ -653,6 +756,48 @@ classdef Dataset < datastruct.Exchange
             end
         end
 
+
+        function varargout = bootstrap2(data,varargin)
+        % Bootstraps a new data set from the old data set.
+            if length(varargin) == 1
+                boots = varargin{1};
+            else
+                ind = cell(size(data.P,1),1);
+                for i = 1:size(data.P,1)
+                    ind{i,1} = find(data.P(i,:)~=0);
+                end
+                
+                boots = cell2mat(datasample(ind,size(data.P,1)));
+                boots = reshape(boots, 1,[]);
+            end
+
+            tmpdata = datastruct.Dataset();
+            tmpdata.populate(data);
+
+            tmp = struct([]);
+            tmp(1).P = data.P(boots(1:size(data.P,1)),boots);
+            tmp(1).Y = data.Y(boots(1:size(data.P,1)),boots);
+
+            if ~isempty(data.sdY)
+                tmp(1).sdY = data.sdY(:,boots);
+            end
+            if ~isempty(data.sdP)
+                tmp(1).sdP = data.sdP(:,boots);
+            end
+            if ~isempty(data.E)
+                tmp(1).E = data.E(:,boots);
+            end
+            if ~isempty(data.F)
+                tmp(1).F = data.F(:,boots);
+            end
+
+            tmpdata.populate(tmp);
+            varargout{1} = tmpdata;
+            if nargout == 2
+               varargout{2} = boots;
+            end
+        end
+        
         function varargout = shuffle(data,varargin)
         % shuffle the expression data variable in each sample.
 
@@ -669,7 +814,7 @@ classdef Dataset < datastruct.Exchange
 
             varargout{1} = outdata;
             if nargout == 2
-                varargout{2} = shuf
+                varargout{2} = shuf;
             end
         end
 
@@ -734,15 +879,20 @@ classdef Dataset < datastruct.Exchange
         % data = datastruct.Dataset.fetch('option1',value1);
         % set name value pairs to be able to parse options.
 
-
-            options(1).directurl = '';
-            options(1).baseurl = 'https://bitbucket.org/sonnhammergrni/gs-datasets/raw/';
-            options(1).version = 'master';
-            options(1).N = 10;
-            options(1).name = 'Nordling-ID1446937-D20150825-N10-E15-SNR3291-IDY15968';
-            options(1).filetype = '.json';
+            options.directurl = '';
+            options.baseurl = 'https://bitbucket.org/sonnhammergrni/gs-datasets/raw/';
+            options.version = 'master';
+            options.N = 10;
+            options.name = 'Nordling-ID1446937-D20150825-N10-E15-SNR3291-IDY15968';
+            options.filetype = '.json';
 
             if nargin == 0
+                error("No file given for fetching. To find avalible files go to https://bitbucket.org/sonnhammergrni/gs-datasets")
+
+                % removed default file and the somewhat odd
+                % function for writting a whole bitbucket html site
+                % to matlab window
+                %{
                 if nargout == 0
                     default_url = fullfile(options.baseurl,options.version,['N',num2str(options.N)],'/');
                     fetch@datastruct.Exchange(options,default_url);
@@ -751,10 +901,13 @@ classdef Dataset < datastruct.Exchange
                     default_file = 'Nordling-ID1446937-D20150825-N10-E15-SNR3291-IDY15968.json';
                     obj_data = fetch@datastruct.Exchange(options,default_file);
                 end
+                %}
+            elseif nargout == 0
+                error('No object to fetch data to given, to use fetch make sure to use: Data = datastruct.Dataset.fecth(file)')
             else
                 obj_data = fetch@datastruct.Exchange(options,varargin{:});
             end
-
+            
             if isa(obj_data,'cell')
                 varargout{1} = obj_data;
                 return
