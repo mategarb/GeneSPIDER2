@@ -29,36 +29,38 @@ classdef NestBoot
         %	data        GS dataset structure
         %	net         GS network structure
         %	method      any GS method staring with "Bo" prefix, character
+        %	nest        outer runs (R), integer
         %	boot        inner bootstrap iterations (Q), integer
-        %	init        outer runs (R), integer
         %	zetavec     a vector of zetas defining network sparsity
-        %	FDR         False Discovery Rate threshold, integer [%]
+        %	FDR         False Discovery Rate threshold, decimal
         %	par         run NestBoot as a parallel version, true or false
         %	cpus        number of CPUs in parallel version, integer
         %
         % Output arguments:
-        %	XNET        bootstrapped intersection at a given support cutoff
-        %	Ssum        sum of signum function support to be sign
-        %	minAb       minimum absolute value of sign support
-        %	sXNET       signed network
-        %	orig_index  crossing of shufled and plain data
-        %	ACC         accumulated structure support
-        %	FREQ        frequency of bins
-        %	FP          frequency rate for crossing
-        %	supp        support for crossing, i.e. (orig_index-1)/init
+        %	binnary_networks            bootstrapped intersection at a given support cutoff
+        %	summed_networks             sum of signum function support to be sign
+        %	minab_networks              minimum absolute value of sign support
+        %	signed_networks             signed network
+        %	bin_cutoff                  crossing of shufled and plain data
+        %	accumulated_frequency       accumulated structure support
+        %	binned_frequency            frequency of bins
+        %	FP_rate_cross               frequency rate for crossing
+        %	support_at_FP_cross         support for crossing, i.e. (orig_index-1)/init
+        %	area_shuffled               area under bins from trapeozid for s
+        %	area_measured               area under bins from trapeozid for m
         %
         % Sample code:
         %	data = datastruct.Dataset.fetch('Tjarnberg-ID1005621-D20151111-N10-E30-SNR10-IDY1005621.json');
         %	net = datastruct.Network.fetch([data.network,'.json']);
-        %	method = 'Bolsco';
-        %	boot = 10;
-        %	init = 10;
+        %	method = 'lsco';
+        %	boot = 100;
+        %	init = 100;
         %	zetavec = logspace(-6,0,30);
-        %	FDR = 5;
-        %	par = false;
+        %	FDR = 0.05;
+        %	par = true;
         %	cpus = 2;
-        %	[XNET,Ssum,minAb,sXNET,orig_index,ACC,FREQ,FP,supp] = Methods.NestBoot(data,method,boot,init,zetavec,FDR,'~/',par,cpus);
-        %	m = analyse.CompareModels(net,XNET);
+        %	nbout = Methods.NestBoot(data,method,boot,init,zetavec,FDR,'~/',par,cpus);
+        %	m = analyse.CompareModels(net,nbout.binary_networks);
         %
         % Reference:
         %   Morgan, Daniel, et al. "A generalized framework for controlling FDR in
@@ -68,6 +70,7 @@ classdef NestBoot
         %   Methods, analyse, datastruct
         %
         init = nest;
+        FDR = FDR*100; % to allow decimal FDR in input
         %%%%%%%%%%ROLL-BACK CODE%%%%%%%%%%
         esta = cell(1,init);
         Afrac = cell(1,init);
