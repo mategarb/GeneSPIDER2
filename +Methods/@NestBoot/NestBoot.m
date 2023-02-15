@@ -14,9 +14,9 @@ classdef NestBoot
       area_shuffled
       area_measured
     end
-    
+
     methods
-      function nbout = NestBoot(data,method,boot,init,zetavec,FDR,datadir,par,cpus)
+        function nbout = NestBoot(data,method,nest,boot,zetavec,FDR,datadir,par,cpus)
     
         % Description:
         %	data must be GeneSPIDER (GS) compiled dataset with Y and P matrices, for example synthetic sets included in GS
@@ -67,7 +67,7 @@ classdef NestBoot
         % See also:
         %   Methods, analyse, datastruct
         %
-        
+        init = nest;
         %%%%%%%%%%ROLL-BACK CODE%%%%%%%%%%
         esta = cell(1,init);
         Afrac = cell(1,init);
@@ -201,7 +201,7 @@ classdef NestBoot
         end %close opening function call
     end
 
-    methods (Static)
+    methods (Static, Hidden)
         % all the nestboot methods (functions) loaded here
         varargout = lsco(varargin);
         varargout = lscon(varargin);
