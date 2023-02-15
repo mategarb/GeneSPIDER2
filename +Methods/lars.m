@@ -68,7 +68,7 @@ for j=1:length(zetavec)
     for i = 1:size(data.P,1)
         % y = center(-data.P(i,:)')
         y = -data.P(i,:)';
-        [beta, info] = lar(X,y,zetavec(j),false);
+        [beta, info] = lars(X,y,zetavec(j),false);
         Afit(i,:,j) = beta';
     end
 end

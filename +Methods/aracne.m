@@ -83,7 +83,7 @@ cmd = ['export LD_LIBRARY_PATH=/usr/lib/; aracne2 -H $(dirname `which aracne2`) 
 
 if system(cmd) ~= 0,
     return,
-end;
+end
 
 Aest = fix_aracne_output('./out.adj',data.names);
 
