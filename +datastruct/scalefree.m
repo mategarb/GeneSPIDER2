@@ -5,25 +5,44 @@ function A = scalefree(N,n,varargin)
 % A = datastruct.scalefree(N,n[, seed])
 %
 % N:    number of nodes
-% n:    requested average number of links per node if n>=1, else relative sparsity of total possible links.
+% n:    whished average number of links per node if n>=1, else relative sparsity of total possible links.
+% pin:  The probability of adding an incoming edge to a node
+% pout: pin+pout is the probabiltiy to add an ougouing edge to a given gene
+%       pin and pout togheter controls the in/outgoing edges degree
+%       in the powerlaw trying to ensure that the powerlaw is
+%       primarily on outgoing edges. 
 % seed: matrix to work as a seed, assumed to have size < N
 %
 % A:    undirected scalefree network matrix
 
 % rng('shuffle');
 
-pin=0.5;
-pout=0.3;
 
 rank_check = true;
+pin=NaN;
+pout=NaN;
+
 if ~isempty(varargin)
     for i=1:length(varargin)
-        if isa(varargin{i},'logical')
+        if isa(varargin{i},'double')
+            if isnan(pin)
+                pin = varargin{i};
+            elseif isnan(pout)
+                pout = varargin{i};
+            end
+        elseif isa(varargin{i},'logical')
             rank_check = varargin{i};
         else
             seed = varargin{i};
         end
     end
+end
+% check that pin and pout is actually set as it will crash without this
+if isnan(pin) 
+    pin=0.5;
+end
+if isnan(pout)
+    pout=0.3;
 end
 
 if n<1
@@ -74,7 +93,6 @@ for i=(m0*2+1):N
 
     k = 0;
     while k < m
-        %c = 0;
         ps = 0;
         r = rand;
         for inode = 1:i-1
@@ -92,7 +110,7 @@ for i=(m0*2+1):N
                 else
                     val = 1;
                 end
-                
+
                 if r2 < pin
                     A(i,inode) = val;
                 elseif r2 < pin+pout
@@ -106,6 +124,10 @@ for i=(m0*2+1):N
     end
 end
 
+% this part is added to reduce the extreme diagonalization that
+% occurs when using +/-1 as the only values in the system. 
 A = A.*rand(N,N);
-A(eye(N)==1) = -max(max(A));
+% this is added to ensure the stabelize script don't crash every
+% other time it is used. 
+A(eye(N)) = -max(max(A));
 return 
