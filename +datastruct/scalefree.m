@@ -129,5 +129,5 @@ end
 A = A.*rand(N,N);
 % this is added to ensure the stabelize script don't crash every
 % other time it is used. 
-A(eye(N)) = -max(max(A));
+A(eye(N)==1) = -max(max(A));
 return 
