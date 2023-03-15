@@ -42,7 +42,7 @@ Supplementary information: online-only supplementary data available at the journ
 
 * *Alternative 2*: Fetch this repository with the command
 
-        git clone git@bitbucket.org:sonnhammergrni/genespider.git ~/src/genespider
+        git clone https://bitbucket.org/sonnhammergrni/genespider.git ~/src/genespider
 
     and run `cd ~/src/genespider`.
 
