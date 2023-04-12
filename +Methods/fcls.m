@@ -17,7 +17,7 @@ function varargout = fcls(varargin)
 
     net = [];
     verbose = false;
-    for i=1:nargin
+    for i = 1:nargin
         if isa(varargin{i},'datastruct.Dataset')
             data = varargin{i};
         elseif isa(varargin{i},'datastruct.Network')
@@ -34,8 +34,8 @@ function varargout = fcls(varargin)
     end
 
     %% Parse data to use
-    P = data.P;
-    Y = response(data,net);
+    %P = data.P;
+    %Y = response(data,net);
 
     [cvY,cvP] = cov(data);
 
@@ -49,12 +49,12 @@ function varargout = fcls(varargin)
     
     e = 1e-6;
 
-    for j=1:size(Ainit,3)
+    for j = 1:size(Ainit,3)
         A = Ainit(:,:,j);
-        [H, D, H] = svd(A * cvY * A' + cvP + e*eye(size(A)));
+        [~, D, H] = svd(A * cvY * A' + cvP + e*eye(size(A)));
         dD = diag(D);
         R = H * sqrt(diag( 1 ./dD ));
-        results = Methods.matcls(A,response(data,net),data.P,R,verbose);
+        results = Methods.matcls(A,data.Y,data.P,R,verbose);
 
         Aest(:,:,j) = results.A;
     end

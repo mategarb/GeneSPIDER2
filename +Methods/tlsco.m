@@ -18,7 +18,7 @@ function varargout = tlsco(varargin)
 %%  Parse input arguments %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 rawZeta = 0;
-
+regpath = 'input';
 net = [];
 for i=1:nargin
     if isa(varargin{i},'datastruct.Dataset')

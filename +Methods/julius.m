@@ -19,11 +19,11 @@ function varargout = julius(varargin)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%  Parse input arguments %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-rawZeta = 0;
+rawZeta = 1;
 zetavec = [];
 net = [];
 
-for i=1:nargin
+for i = 1:nargin
     if isa(varargin{i},'datastruct.Dataset')
         data = varargin{i};
     elseif isa(varargin{i},'datastruct.Network')
@@ -53,16 +53,16 @@ if ~rawZeta
     zmax = 1;
     zmin = 0;
     % find zero network
-    estA = Methods.julius(data,net,zmax,logical(1));
+    estA = Methods.julius(data,net,zmax,true);
     while nnz(estA) > 0
         tmp = zmax;
         zmax = zmin*2;
-        estA = Methods.julius(data,net,zmax,logical(1));
+        estA = Methods.julius(data,net,zmax,true);
     end
     % refine upper bound
     while zmax-zmin > tol
         i = (zmax + zmin) * 0.5;
-        estA = Methods.julius(data,net,i,logical(1));
+        estA = Methods.julius(data,net,i,true);
         if nnz(estA) == 0
             zmax = i;
         else
@@ -70,6 +70,8 @@ if ~rawZeta
         end
     end
 
+    zetaRange(1) = 0;
+    zetaRange(2) = zmax;
     % Convert to interval.
     delta = zetaRange(2)-zetaRange(1);
     zetavec = zetavec*delta + zetaRange(1);
@@ -102,7 +104,7 @@ if ~exist('initA','var')
     initA = -eye(nGenes);
 end
 
-for i=1:length(zetavec)
+for i = 1:length(zetavec)
     if size(initA,3) == length(zetavec)
         Ai = initA(:,:,i);
     else % we use one
@@ -127,6 +129,10 @@ for i=1:length(zetavec)
     Aest(:,:,i) = full(double(Ahat));
 end
 
-
-
 varargout{1} = Aest;
+
+if ~rawZeta
+    varargout{2} = zetaRange;
+else
+    varargout{2} = zetavec;
+end

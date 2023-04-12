@@ -81,14 +81,14 @@ fix_aracne_input(f1,data);
 system(['sed -i -e "s/# //" -e "s/\t$//" ', f1]);
 cmd = ['export LD_LIBRARY_PATH=/usr/lib/; aracne2 -H $(dirname `which aracne2`)  -i in.tab -e ' num2str(alpha) ' -o out.adj;'];
 
-if system(cmd) ~= 0,
+if system(cmd) ~= 0
     return,
 end
 
 Aest = fix_aracne_output('./out.adj',data.names);
 
 % cleanup
-if system('rm out.adj in.tab') ~= 0, return, end;
+if system('rm out.adj in.tab') ~= 0, return, end
 
 
 if strcmpi(regpath,'full')

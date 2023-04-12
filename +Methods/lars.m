@@ -18,7 +18,7 @@ function varargout = lars(varargin)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 rawZeta = 0;
 zetavec = [];
-for i=1:nargin
+for i = 1:nargin
     if isa(varargin{i},'datastruct.Dataset')
         data = varargin{i};
     elseif isa(varargin{i},'datastruct.Network')
@@ -36,17 +36,17 @@ end
 if ~exist('net')
     X = (data.Y+data.E)';
 else
-    X = responce(data,net)';
+    X = response(data,net)';
 end
 
 %% Determine how to handle zeta %%
-% X = normalize(responce(data,net)')
+
 if ~rawZeta
     zmax = 0;
     for i = 1:size(data.P,1)
         % y = center(-data.P(i,:)');
         y = -data.P(i,:)';
-        [beta, info] = lar(X,y,0,true); % calculates leaste squares solution
+        [beta, info] = lars(X,y,0,true); % calculates least squares solution
         if sum(abs(beta(:,end))) > zmax
             zmax = sum(abs(beta(:,end)));
         end
