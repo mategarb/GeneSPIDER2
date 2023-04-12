@@ -23,7 +23,7 @@ function varargout = elnet(varargin)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%  Parse input arguments  %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-rawZeta = 1;
+rawZeta = 0;
 zetavec = [];
 net = [];
 

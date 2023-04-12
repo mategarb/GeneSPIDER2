@@ -43,16 +43,16 @@ if ~rawZeta
     zmax = 1;
     zmin = 0;
     % find zero network
-    estA = Methods.GLasso(data,net,zmax,logical(1));
+    estA = Methods.GLasso(data,net,zmax,true);
     while nnz(estA) > 0 
         tmp = zmax;
         zmax = zmin*2;
-        estA = Methods.GLasso(data,net,zmax,logical(1));
+        estA = Methods.GLasso(data,net,zmax,true);
     end
     % refine
     while zmax-zmin > tol
         i = (zmax + zmin) * 0.5;
-        estA = Methods.GLasso(data,net,i,logical(1));
+        estA = Methods.GLasso(data,net,i,true);
         if nnz(estA) == 0
             zmax = i;
         else
@@ -77,7 +77,7 @@ nY = response(data,net);
 %% Run method with input paramters
 Y = nY';
 
-for i=1:length(zetavec)
+for i = 1:length(zetavec)
     estA(:,:,i) = GraphicalLasso(Y, zetavec(i));
 end
 

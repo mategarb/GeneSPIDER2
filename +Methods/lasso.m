@@ -23,7 +23,7 @@ function varargout = lasso(varargin)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%  Parse input arguments  %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-rawZeta = 1;
+rawZeta = 0;
 zetavec = [];
 net = [];
 %alpha = 1;

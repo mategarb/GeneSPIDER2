@@ -26,7 +26,7 @@ function varargout = lassolog(varargin)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%  Parse input arguments  %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-rawZeta = 1;
+rawZeta = 0;
 zetavec = [];
 net = [];
 %alpha = 1;
@@ -58,16 +58,16 @@ if ~rawZeta
     zmax = 1;
     zmin = 0;
     % find zero network
-    estA = Methods.lassosvm(data,net,zmax,true);
+    estA = Methods.lassolog(data,net,zmax,true);
     while nnz(estA) > 0
         %tmp = zmax;
         zmax = zmax*2;
-        estA = Methods.lassosvm(data,net,zmax,true);
+        estA = Methods.lassolog(data,net,zmax,true);
     end
     % refine
     while zmax-zmin > tol
         i = (zmax + zmin) * 0.5;
-        estA = Methods.lassosvm(data,net,i,true);
+        estA = Methods.lassologcccc(data,net,i,true);
         if nnz(estA) == 0
             zmax = i;
         else
