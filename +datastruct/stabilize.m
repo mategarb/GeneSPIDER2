@@ -18,7 +18,7 @@ function A = stabilize(Atilde,varargin)
 
 %% Parse Input
 iaa = 'low';
-inputopts = struct('iaa',iaa,'sign',logical(0));
+inputopts = struct('iaa',iaa,'sign',false);
 optionNames = fieldnames(inputopts);
 nArgs = length(varargin);
 if round(nArgs/2) ~= nArgs/2
