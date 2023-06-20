@@ -5,7 +5,7 @@
     | |__| |  __/ | | |  __/ ____) | |    _| |_| |__| | |____| | \ \
      \_____|\___|_| |_|\___||_____/|_|   |_____|_____/|______|_|  \_\
      
-![logo genespider](sonnhammer-tutorials.bitbucket.io/images/gs_logo.png)
+![logo genespider](sonnhammer-tutorials.bitbucket.io/images/gs_logo.png?raw=true "logo")
 # Gene regulatory network inference benchmarking with controlled network and data properties #
 
 This is the collection repository for the GeneSPIDER toolbox (Generation and Simulation Package for Informative Data ExploRation).
