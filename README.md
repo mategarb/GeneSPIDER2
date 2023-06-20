@@ -5,7 +5,7 @@
     | |__| |  __/ | | |  __/ ____) | |    _| |_| |__| | |____| | \ \
      \_____|\___|_| |_|\___||_____/|_|   |_____|_____/|______|_|  \_\
      
-![genespider](https://sonnhammer-tutorials.bitbucket.io/images/gs_logo.png){width=30%}
+![genespider](https://sonnhammer-tutorials.bitbucket.io/images/gs_logo.png){width=10%}
 
 # Gene regulatory network inference benchmarking with controlled network and data properties #
 
