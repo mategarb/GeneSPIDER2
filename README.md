@@ -9,7 +9,7 @@
 img{width: 50%;}
 </style>
 ![genespider](https://sonnhammer-tutorials.bitbucket.io/images/gs_logo.png)
-<img src="https://sonnhammer-tutorials.bitbucket.io/images/gs_logo.png" width=50% height=50%>
+<img src="https://sonnhammer-tutorials.bitbucket.io/images/gs_logo.png" alt="drawing" width="50%" height="50%"/>
 # Gene regulatory network inference benchmarking with controlled network and data properties #
 
 This is the collection repository for the GeneSPIDER toolbox (Generation and Simulation Package for Informative Data ExploRation).
