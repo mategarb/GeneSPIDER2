@@ -27,11 +27,49 @@ Independent control of these properties in simulations is key to drawing conclus
 
 The official GeneSPIDER website includes updated and extended tutorials: https://sonnhammer-tutorials.bitbucket.io/gene-spider.html
 
-<details>
-    <summary>Summary</summary>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html/js; charset=utf-8" />
 
-    <p>Detailed content goes here …</p>
-</details>
+<title>Untitled Document</title>
+    
+<style>
+
+.page-header {
+  color: #000;
+}
+
+#click {
+  border-radius: 2%;
+  height: 30px;
+  color: green;
+}
+     
+</style>
+
+</head>
+
+<body class="test">
+    <header class="page-header">SIMPLE EXAmPLE</header>      
+<div class="row">
+  <div class="element">
+      <div class="start" id="testdiv"></div>
+      <button id="click">click to color background</button>
+  </div>
+</div>   
+</body>
+    
+<script type="text/javascript">
+    var clickAlert = document.getElementById('click');
+    var rainbow = ["red", "blue", "green", "yellow"];
+
+    function change() {
+      document.body.style.background = rainbow[Math.floor(4*Math.random())];
+    }
+
+    clickAlert.addEventListener("click", change);  
+</script>  
+</html>
 
 ### Results ###
 We here present the Matlab toolbox GeneSPIDER for generation and analysis of networks and data in a dynamical systems framework with focus on the ability to vary properties on data to mimic plausible real world settings.
