@@ -27,13 +27,10 @@ Independent control of these properties in simulations is key to drawing conclus
 
 The official GeneSPIDER website includes updated and extended tutorials: https://sonnhammer-tutorials.bitbucket.io/gene-spider.html
 
-<details open>
-<summary>Shopping list</summary>
+<details>
+    <summary>Summary</summary>
 
-* Vegetables
-* Fruits
-* Fish
-
+    <p>Detailed content goes here …</p>
 </details>
 
 ### Results ###
