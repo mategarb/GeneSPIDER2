@@ -23,13 +23,13 @@ It is therefore important to evaluate the accuracy of GRN inference methods in t
 Although several packages are available for modelling, simulate, and analyse GRN inference, they offer limited control of network topology together with system dynamics, experimental design, data properties, and noise characteristics.
 Independent control of these properties in simulations is key to drawing conclusions about which inference method to use in a given condition and what performance to expect from it, as well as to obtain properties representative of real biological systems.
 
-## GeneSPIDER tutorial ##
+## GeneSPIDER website ##
 
-The official GeneSPIDER website includes updated and extended tutorials: https://sonnhammer-tutorials.bitbucket.io/gene-spider.html
+The official GeneSPIDER website includes updated and extended tutorials under [this link.](https://sonnhammer-tutorials.bitbucket.io/gene-spider.html)
 
-### Previous tutorials ###
+### Earlier tutorials ###
 
-Original tutorials for GeneSPIDER are stored under https://bitbucket.org/sonnhammergrni/genespider/src/master/ARCHIVE.md
+Initial tutorials for GeneSPIDER are archived under [this link.](https://bitbucket.org/sonnhammergrni/genespider/src/master/ARCHIVE.md)
 
 ## Who do I talk to? ##
 
