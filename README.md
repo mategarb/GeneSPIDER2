@@ -27,9 +27,8 @@ Independent control of these properties in simulations is key to drawing conclus
 
 The official GeneSPIDER website includes updated and extended tutorials: https://sonnhammer-tutorials.bitbucket.io/gene-spider.html
 
-<button onclick="myFunction()" id="myBtn">Read more</button>
-
-<script type="text/javascript" src="https://bitbucket.org/sonnhammergrni/genespider/src/master/readme.js"></script>
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
 
 ### Results ###
 We here present the Matlab toolbox GeneSPIDER for generation and analysis of networks and data in a dynamical systems framework with focus on the ability to vary properties on data to mimic plausible real world settings.
