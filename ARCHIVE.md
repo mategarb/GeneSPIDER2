@@ -1,5 +1,5 @@
 
-### Results ###
+## GeneSPIDER ##
 We here present the Matlab toolbox GeneSPIDER for generation and analysis of networks and data in a dynamical systems framework with focus on the ability to vary properties on data to mimic plausible real world settings.
 It supplies essential components that have been missing to existing network inference methods in common use and wrappers for a selected number of inference methods.
 GeneSPIDER contains tools for controlling and evaluating network topology (random, small-world, scale-free), stability of linear time-invariant systems, signal to noise ratio (SNR), and network Interampatteness, properties that has been shown to play a major role in the ability to infer a good network that can explain the data.
@@ -11,8 +11,6 @@ Availability and Implementation: Source code freely available for download at ht
 Contact: [Torbjörn Nordling](mailto:torbjorn.nordling@nordlinglab.org), [Erik Sonnhammer](mailto:erik.sonnhammer@scilifelab.se)
 
 Supplementary information: online-only supplementary data available at the journal's web site.
-
-Official website and extended tutorials: https://sonnhammer-tutorials.bitbucket.io/gene-spider.html
 
 ### How do I get set up? ###
 
