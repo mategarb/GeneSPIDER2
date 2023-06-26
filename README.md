@@ -23,7 +23,11 @@ It is therefore important to evaluate the accuracy of GRN inference methods in t
 Although several packages are available for modelling, simulate, and analyse GRN inference, they offer limited control of network topology together with system dynamics, experimental design, data properties, and noise characteristics.
 Independent control of these properties in simulations is key to drawing conclusions about which inference method to use in a given condition and what performance to expect from it, as well as to obtain properties representative of real biological systems.
 
-### Results: ###
+## GeneSPIDER tutorial ##
+
+The official GeneSPIDER website includes updated and extended tutorials: https://sonnhammer-tutorials.bitbucket.io/gene-spider.html
+
+### Results ###
 We here present the Matlab toolbox GeneSPIDER for generation and analysis of networks and data in a dynamical systems framework with focus on the ability to vary properties on data to mimic plausible real world settings.
 It supplies essential components that have been missing to existing network inference methods in common use and wrappers for a selected number of inference methods.
 GeneSPIDER contains tools for controlling and evaluating network topology (random, small-world, scale-free), stability of linear time-invariant systems, signal to noise ratio (SNR), and network Interampatteness, properties that has been shown to play a major role in the ability to infer a good network that can explain the data.
