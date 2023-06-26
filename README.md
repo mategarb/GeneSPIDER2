@@ -29,6 +29,23 @@ The official GeneSPIDER website includes updated and extended tutorials: https:/
 
 <button onclick="myFunction()" id="myBtn">Read more</button>
 
+```javascript
+function myFunction() {
+  var dots = document.getElementById("dots");
+  var moreText = document.getElementById("more");
+  var btnText = document.getElementById("myBtn");
+
+  if (dots.style.display === "none") {
+    dots.style.display = "inline";
+    btnText.innerHTML = "Read more";
+    moreText.style.display = "none";
+  } else {
+    dots.style.display = "none";
+    btnText.innerHTML = "Read less";
+    moreText.style.display = "inline";
+  }
+}
+```
 
 ### Results ###
 We here present the Matlab toolbox GeneSPIDER for generation and analysis of networks and data in a dynamical systems framework with focus on the ability to vary properties on data to mimic plausible real world settings.
