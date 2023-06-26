@@ -27,38 +27,7 @@ Independent control of these properties in simulations is key to drawing conclus
 
 The official GeneSPIDER website includes updated and extended tutorials: https://sonnhammer-tutorials.bitbucket.io/gene-spider.html
 
-body { margin: 5px; }
-
-.box {
-  display: inline-block;
-  height: 50px;
-  width: 50px;
-  margin: 5px 0 0 5px;
-  background-color: red;
-}
-
-label {
-  margin: 5px;
-  cursor: pointer;
-  width: 5em;
-}
-
-
-<div class="box"></div>
-<div class="box"></div>
-<div class="box"></div>
-<div class="box"></div>
-
-<input type="checkbox" id="view-more" class="view-more"/>
-<label for="view-more" tabindex=0>View more!</label>
-
-<div class="hidden">
-  <div class="box"></div>
-  <div class="box"></div>
-  <div class="box"></div>
-  <div class="box"></div>
-</div>
-
+<button onclick="myFunction()" id="myBtn">Read more</button>
 
 
 ### Results ###
