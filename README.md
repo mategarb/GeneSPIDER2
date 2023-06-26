@@ -36,6 +36,8 @@ Contact: [Torbjörn Nordling](mailto:torbjorn.nordling@nordlinglab.org), [Erik S
 
 Supplementary information: online-only supplementary data available at the journal's web site.
 
+Official website and extended tutorials: https://sonnhammer-tutorials.bitbucket.io/gene-spider.html
+
 ### How do I get set up? ###
 
 * *Alternative 1*: Download genespider-v1.11 from [here](https://bitbucket.org/sonnhammergrni/genespider/downloads)
