@@ -27,49 +27,39 @@ Independent control of these properties in simulations is key to drawing conclus
 
 The official GeneSPIDER website includes updated and extended tutorials: https://sonnhammer-tutorials.bitbucket.io/gene-spider.html
 
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html/js; charset=utf-8" />
+body { margin: 5px; }
 
-<title>Untitled Document</title>
-    
-<style>
-
-.page-header {
-  color: #000;
+.box {
+  display: inline-block;
+  height: 50px;
+  width: 50px;
+  margin: 5px 0 0 5px;
+  background-color: red;
 }
 
-#click {
-  border-radius: 2%;
-  height: 30px;
-  color: green;
+label {
+  margin: 5px;
+  cursor: pointer;
+  width: 5em;
 }
-     
-</style>
 
-</head>
 
-<body class="test">
-    <header class="page-header">SIMPLE EXAmPLE</header>      
-<div class="row">
-  <div class="element">
-      <div class="start" id="testdiv"></div>
-      <button id="click">click to color background</button>
-  </div>
-</div>   
-</body>
-    
-<script type="text/javascript">
-    var clickAlert = document.getElementById('click');
-    var rainbow = ["red", "blue", "green", "yellow"];
+<div class="box"></div>
+<div class="box"></div>
+<div class="box"></div>
+<div class="box"></div>
 
-    function change() {
-      document.body.style.background = rainbow[Math.floor(4*Math.random())];
-    }
+<input type="checkbox" id="view-more" class="view-more"/>
+<label for="view-more" tabindex=0>View more!</label>
 
-    clickAlert.addEventListener("click", change);  
-</script>  
-</html>
+<div class="hidden">
+  <div class="box"></div>
+  <div class="box"></div>
+  <div class="box"></div>
+  <div class="box"></div>
+</div>
+
+
 
 ### Results ###
 We here present the Matlab toolbox GeneSPIDER for generation and analysis of networks and data in a dynamical systems framework with focus on the ability to vary properties on data to mimic plausible real world settings.
