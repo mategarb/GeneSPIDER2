@@ -67,7 +67,7 @@ if ~rawZeta
     % refine
     while zmax-zmin > tol
         i = (zmax + zmin) * 0.5;
-        estA = Methods.lassologcccc(data,net,i,true);
+        estA = Methods.lassolog(data,net,i,true);
         if nnz(estA) == 0
             zmax = i;
         else

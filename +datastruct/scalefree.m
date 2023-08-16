@@ -19,8 +19,8 @@ function A = scalefree(N,n,varargin)
 
 
 rank_check = true;
-pin=NaN;
-pout=NaN;
+pin = NaN;
+pout = NaN;
 
 if ~isempty(varargin)
     for i=1:length(varargin)
