@@ -15,6 +15,10 @@ function A = stabilize(Atilde,varargin)
 %   sign:  if signed structure is to be kept (logical) (false)
 %          may not be solveable for some signed structures.
 %
+%   Note: low iaa guarantees a GRN with low iaa, but setting high iaa 
+%   does not guarantee a GRN with high iaa, hence this must be checked
+%   for externally.
+%   This function was designed for ~10-50 gene GRNs.
 
 %% Parse Input
 iaa = 'low';
