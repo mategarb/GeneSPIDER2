@@ -17,6 +17,7 @@ function A = stabilize(Atilde,varargin)
 %
 
 %% Parse Input
+
 iaa = 'low';
 inputopts = struct('iaa',iaa,'sign',false);
 optionNames = fieldnames(inputopts);
@@ -24,6 +25,7 @@ nArgs = length(varargin);
 if round(nArgs/2) ~= nArgs/2
    error('stabilize needs Name/Value pairs')
 end
+
 for pair = reshape(varargin,2,[]) % pair is {propName;propValue}
     inpName = lower(pair{1}); % make case insensitive
     if any(strmatch(inpName,optionNames))
@@ -33,10 +35,10 @@ for pair = reshape(varargin,2,[]) % pair is {propName;propValue}
     end
 end
 
-if strcmp(inputopts.iaa,'low')
+if strcmp(inputopts.iaa,'low') % always low
     Epsilon = -0.01;
     Gamma = -10;
-elseif strcmp(inputopts.iaa,'high')
+elseif strcmp(inputopts.iaa,'high') % mix of high and low (no guarantee to have all high)
     Epsilon = -0.01;
     Gamma = -100;
     Atilde = 10*Atilde;

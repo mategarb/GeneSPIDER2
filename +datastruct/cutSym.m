@@ -15,7 +15,7 @@ N = size(A,1);
 
 for i=1:N-1
     for j=i+1:N
-        if A(i,j) ~= 0 & A(j,i) ~= 0
+        if A(i,j) ~= 0 && A(j,i) ~= 0
             r = rand;
             if r <= pupper
                 A(i,j) = 0;
