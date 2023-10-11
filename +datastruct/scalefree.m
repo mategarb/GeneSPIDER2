@@ -136,8 +136,7 @@ for i = (m0*2+1):N
                     val = 1;
                 end
 
-                r2 = rand;
-                if r2 < 0.5 % equal chance to be on upper and lower part, i.e. symetrical
+                if rand < 0.5 % equal chance to be on upper and lower part, i.e. symetrical
                     A(i,inode) = val;
                 else
                     A(inode,i) = val;

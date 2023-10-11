@@ -1,4 +1,4 @@
-function A = large_scalefree(m, grn_degree, min_sub_grn, max_sub_grn)
+function A = large_scalefree(m, grn_degree, min_sub_grn, max_sub_grn, min_alpha, max_alpha)
 % BULKYNET - create large (bulky) network to simulate big gene expression
 % data sets like single cell
 % m - final size of M, i.e. number of genes 
@@ -6,9 +6,12 @@ function A = large_scalefree(m, grn_degree, min_sub_grn, max_sub_grn)
 % min_sub_grn - minimum number of nodes for sub grn
 % max_sub_grn - maximum number of nodes for sub grn
 
-
-min_sub_grn=10; % min. number of genes for subnetwork
-max_sub_grn=30; % max. number of genes for subnetwork
+%min_sub_grn=10; % min. number of genes for subnetwork
+%max_sub_grn=30; % max. number of genes for subnetwork
+%min_alpha=2; % min. number of genes for subnetwork
+%max_alpha=2.5; % max. number of genes for subnetwork
+min_ov=1; % min. number of overlapping genes
+max_ov=2; % max. number of overlapping genes
 Ni0 = 1;
 Eout = [];
 
@@ -16,10 +19,10 @@ while Ni0 < m
 
     if Ni0 == 1
     % generate initial sub GRN
-    s = randi([1,3],1,1); % number of overlapping genes between subnetworks, here 1-3 genes overlap
+    s = randi([min_ov,max_ov],1,1); % number of overlapping genes between subnetworks, here 1-3 genes overlap
     N = randi([min_sub_grn,max_sub_grn],1,1); % randomize number of nodes (genes)
     S = grn_degree; % calculate sparsity degree
-    A = datastruct.scalefree2(N, S, 1.5 + 0.5*rand); % create scale-free network
+    A = datastruct.scalefree2(N, S, min_alpha + (max_alpha-min_alpha)*rand); % create scale-free network
     %A = datastruct.cutSym(A, 0.6, 0.398); %(A, pin, pout) in order to remove selfloops
     A = datastruct.stabilize(A,'iaa','low'); % run stabilize
     A(eye(N)==1) = 0;
@@ -35,7 +38,7 @@ while Ni0 < m
     % select the highest regulators
     gns = [string(E0.Var1); string(E0.Var2)];
     [gc, grps] = groupcounts(gns); % count connectivity of genes (gc) and coresponding names (grps)
-    gns0 = analyse.rand_common_genes(s, gc, grps); % select overlapping genes with probability based on their degree
+    gns0 = analyse.rand_common_genes(s, gc, grps, min_alpha + (max_alpha-min_alpha)*rand); % select overlapping genes with probability based on their degree
     Ni0 = Ni0 + N;
     Nin = Ni0;
 
@@ -47,7 +50,7 @@ while Ni0 < m
     % generate next sub GRN that will be merged with previous
     N = randi([min_sub_grn,max_sub_grn],1,1); % randomize number of nodes (genes)
     S = grn_degree; % calculate sparsity degree
-    A = datastruct.scalefree2(N, S, 1.5 + 0.5*rand); % create scale-free network
+    A = datastruct.scalefree2(N, S, min_alpha + (max_alpha-min_alpha)*rand); % create scale-free network
     %A = datastruct.cutSym(A, 0.6, 0.398); %(A, pin, pout) in order to remove selfloops
     A = datastruct.stabilize(A,'iaa','low'); % run stabilize
     A(eye(N)==1) = 0;
@@ -59,7 +62,7 @@ while Ni0 < m
      % select the highest regulators
     gns = [string(En.Var1); string(En.Var2)];
     [gc, grps] = groupcounts(gns); % count connectivity of genes (gc) and coresponding names (grps)
-    gnsi = analyse.rand_common_genes(s, gc, grps); % select overlapping genes with probability based on their degree
+    gnsi = analyse.rand_common_genes(s, gc, grps, min_alpha + (max_alpha-min_alpha)*rand); % select overlapping genes with probability based on their degree
     
     % now make overlapping genes common
     for j = 1:length(gnsi)
@@ -72,10 +75,10 @@ while Ni0 < m
     % according to the whole GRN, not just the last step
     En = [Eout; En];
     gnsn = [string(En.Var1); string(En.Var2)]; % all possible genes in current network
-    s = randi([1,3],1,1); % new number of overlapping genes
+    s = randi([min_ov,max_ov],1,1); % new number of overlapping genes
     gnsn(erase(string(gnsn), string(gnsi)) == "") = []; % remove those that were already selected
     [gc, grps] = groupcounts(gnsn); % count connectivity of genes (gc) and coresponding names (grps)
-    gnsi = analyse.rand_common_genes(s, gc, grps); % select overlapping genes with probability based on their degree
+    gnsi = analyse.rand_common_genes(s, gc, grps, min_alpha + (max_alpha-min_alpha)*rand); % select overlapping genes with probability based on their degree
     gns0 = gnsi; % set the initial overlapping genes that will be used in next loop
     %pN = N; % previous N, keep for the position of next sub GRN
     Eout = En;
@@ -85,7 +88,7 @@ while Ni0 < m
     elseif (Ni0 >= (m - max_sub_grn))
     N = m-Ni0+s; % how many genes remain to fulfuill m number of total genes
     S = grn_degree; % calculate sparsity degree
-    A = datastruct.scalefree2(N, S, 1.5 + 0.5*rand); % create scale-free network
+    A = datastruct.scalefree2(N, S, min_alpha + (max_alpha-min_alpha)*rand); % create scale-free network
     %A = datastruct.cutSym(A, 0.6, 0.398); %(A, pin, pout) in order to remove selfloops
     A = datastruct.stabilize(A,'iaa','low'); % run stabilize
     A(eye(N)==1) = 0;
@@ -96,7 +99,7 @@ while Ni0 < m
     
     gns = [string(En.Var1); string(En.Var2)];
     [gc, grps] = groupcounts(gns); % count connectivity of genes (gc) and coresponding names (grps)
-    gnsi = analyse.rand_common_genes(s, gc, grps); % select overlapping genes with probability based on their degree
+    gnsi = analyse.rand_common_genes(s, gc, grps, min_alpha + (max_alpha-min_alpha)*rand); % select overlapping genes with probability based on their degree
     
     % now make overlapping genes common
     for j = 1:length(gnsi)
@@ -131,10 +134,10 @@ inds2 = double(erase(ind2, 'G'));
 
 Mfull = zeros(m); % go back back to adjacency
 for i = 1:length(inds1)
-    Mfull(inds1(i), inds2(i)) = 1;
+    Mfull(inds1(i), inds2(i)) = -1;
 end
 A = Mfull;
-A(eye(m)==1) = -betarnd(5,1,1,m); % A, here 5, is the parameters of skewness towards one, i.e. higher the value, hihger the chance of having value clos to 1
+A(eye(m)==1) = -1;%betarnd(5,1,1,m); % A, here 5, is the parameters of skewness towards one, i.e. higher the value, hihger the chance of having value clos to 1
 
 end
 

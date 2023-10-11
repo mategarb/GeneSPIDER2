@@ -57,20 +57,21 @@ dgr = 0;
 i = 1;
 
 while dgr < spar
- 
+
 % draw the "rich" gene where the next will attach
 nds = [net0.from; net0.to];
-[gt, gu] = groupcounts(nds);
-%gu = unique(nds);
-probs = (gt/size(gt, 2)).^pow;
-probs = probs/sum(probs); % make sure probabilites sum to 1
-cp = [0; cumsum(probs)];
+[gt, gu] = groupcounts(nds); %degree, gene name
+Pd = (gt/sum(gt)).^(pow);
+C = 1/sum(Pd); %scaling factor so it sums up to 1
+Pd = C*Pd;
+cp = [0; cumsum(Pd)];
+
 ind = find(rand > cp, 1, 'last');
 grich = gu(ind);
 
 
 % check how many genes left that are not attached anywhere
-% to ensure that all genes have at least single link
+% to ensure that all genes have at least a single link
 gdif = setdiff(gns, unique(nds));
 if length(gdif) ~= 0
     probs2 = repelem(1, length(gdif))/length(gdif);
@@ -91,7 +92,11 @@ allpl = unique([net0.from+net0.to; net0.to+net0.from]);
 crpl = string(grich) + string(gnext);
 if(length(find(allpl == crpl)) == 0)
     i = i + 1;
-    net0(i,:) = {grich, gnext}; % add first link to the network
+    if rand < 0.8 % controling in and out degree
+    net0(i,:) = {grich, gnext}; % add next link to the network
+    else
+    net0(i,:) = {gnext, grich}; % add next link to the network
+    end
 end
 
 nds0 = [net0.from; net0.to];
@@ -103,12 +108,19 @@ end
 A = zeros(N);
 nr = double(erase(net0.from, 'G')');
 nc = double(erase(net0.to, 'G')');
+
 for j = 1:length(nr)
-    A(nr(j), nc(j)) = -1;
+
+    if rand <= 0.38 % randomize the sign of edge based on frequency from TRRUST
+        val = -1;
+    else % 0.62
+        val = 1;
+    end
+    A(nr(j), nc(j)) = val; % outdegree
+
 end
+%A(eye(N)==1) = -betarnd(5,1,1,N); % A, here 5, is the parameters of skewness towards one, i.e. higher the value, hihger the chance of having value clos to 1
+A(eye(N)==1) = -1;
 
-%A(eye(N)==1) = -1;
-
-A(eye(N)==1) = -betarnd(5,1,1,N); % A, here 5, is the parameters of skewness towards one, i.e. higher the value, hihger the chance of having value clos to 1
-
+%disp(length(find(real(eig(A)) > 0)))
 return
