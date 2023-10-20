@@ -25,7 +25,7 @@ Independent control of these properties in simulations is key to drawing conclus
 
 ## GeneSPIDER website ##
 
-[The official GeneSPIDER website with updated and extended tutorials.](https://sonnhammer-tutorials.bitbucket.io/gene-spider.html)
+[The official GeneSPIDER website with updated and extended tutorials.](https://sonnhammer-tutorials.bitbucket.io/genespider.html)
 
 ### Earlier tutorials ###
 
