@@ -18,7 +18,7 @@ function [Y, E] = scnoise(X, P, options)
         options.prob_dev {mustBeInRange(options.prob_dev,0,1)} = 0.9 % probability of gene being deviated from Pk=0  
     end  
 
-psc = nbinrnd(1,options.negbin_mean,[1, size(P,1)]); % pseduocontrol mean from negative binomial
+psc = nbinrnd(1,options.negbin_mean,[1, size(P,1)]);  % pseduocontrol mean from negative binomial
 psc = psc + rand(1, length(psc)); % add some 0-1 rand that will make it behave as non-discrete mean
 psc = sort(psc,'ascend');
 psc = psc.^options.right_tail; % to make the tail greater and leave 0s and 1s as 0s and 1s
