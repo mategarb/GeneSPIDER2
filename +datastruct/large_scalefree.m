@@ -25,6 +25,7 @@ while Ni0 < m
     A = datastruct.scalefree2(N, S, min_alpha + (max_alpha-min_alpha)*rand); % create scale-free network
     %A = datastruct.cutSym(A, 0.6, 0.398); %(A, pin, pout) in order to remove selfloops
     A = datastruct.stabilize(A,'iaa','low'); % run stabilize
+    dgnl = A(eye(N)==1);
     A(eye(N)==1) = 0;
     %pN = N; % previous N, keep for the position of next sub GRN
 
@@ -53,6 +54,8 @@ while Ni0 < m
     A = datastruct.scalefree2(N, S, min_alpha + (max_alpha-min_alpha)*rand); % create scale-free network
     %A = datastruct.cutSym(A, 0.6, 0.398); %(A, pin, pout) in order to remove selfloops
     A = datastruct.stabilize(A,'iaa','low'); % run stabilize
+    tmpdgnl = A(eye(N)==1); % saving info about diagonal
+    dgnl = [dgnl; tmpdgnl((s+1):end)];
     A(eye(N)==1) = 0;
     [ar ac] = find(A ~= 0);
     ws = A(find(A ~= 0));
@@ -91,6 +94,8 @@ while Ni0 < m
     A = datastruct.scalefree2(N, S, min_alpha + (max_alpha-min_alpha)*rand); % create scale-free network
     %A = datastruct.cutSym(A, 0.6, 0.398); %(A, pin, pout) in order to remove selfloops
     A = datastruct.stabilize(A,'iaa','low'); % run stabilize
+    tmpdgnl = A(eye(N)==1);
+    dgnl = [dgnl; tmpdgnl((s+1):end)];
     A(eye(N)==1) = 0;
     [ar, ac] = find(A ~= 0);
     ws = A(find(A ~= 0));
@@ -134,10 +139,10 @@ inds2 = double(erase(ind2, 'G'));
 
 Mfull = zeros(m); % go back back to adjacency
 for i = 1:length(inds1)
-    Mfull(inds1(i), inds2(i)) = -1;
+    Mfull(inds1(i), inds2(i)) = Eout.ws(i);
 end
 A = Mfull;
-A(eye(m)==1) = -1;%betarnd(5,1,1,m); % A, here 5, is the parameters of skewness towards one, i.e. higher the value, hihger the chance of having value clos to 1
+A(eye(m)==1) = dgnl;%betarnd(5,1,1,m); % A, here 5, is the parameters of skewness towards one, i.e. higher the value, hihger the chance of having value clos to 1
 
 end
 

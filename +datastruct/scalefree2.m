@@ -92,7 +92,7 @@ allpl = unique([net0.from+net0.to; net0.to+net0.from]);
 crpl = string(grich) + string(gnext);
 if(length(find(allpl == crpl)) == 0)
     i = i + 1;
-    if rand < 0.8 % controling in and out degree
+    if rand < 1 % controling in and out degree, 1 means no-change from original BA algorithm
     net0(i,:) = {grich, gnext}; % add next link to the network
     else
     net0(i,:) = {gnext, grich}; % add next link to the network

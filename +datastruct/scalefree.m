@@ -122,12 +122,12 @@ for i = (m0*2+1):N
 
             % probability that a node will receive new edge
             pl = sum(abs(A(inode,1:i-1)))/nnz(A(1:i-1,1:i-1));
-            %pl = sum(abs(A(inode,1:i-1)))/length(abs(A(inode,1:i-1))); % probability based on rows only
+
             ps = ps + pl; %nthroot(pl,N);% convert to biased probabilities, preserves single and double links to be in majority
 
             if r < ps % decide if the random probability is smaller than a given probability then add new edge
                 
-                
+                r2 = rand();
                 randC = rand;
 
                 if randC <= 0.5 % randomize the sign of edge  50/50 chance, maybe it should be change cause it is more common to have positive regulation e.g. with TFs
@@ -136,9 +136,9 @@ for i = (m0*2+1):N
                     val = 1;
                 end
 
-                if rand < 0.5 % equal chance to be on upper and lower part, i.e. symetrical
+                if r2 < pin % equal chance to be on upper and lower part, i.e. symetrical
                     A(i,inode) = val;
-                else
+                elseif r2 < pin+pout
                     A(inode,i) = val;
                 end
                 
