@@ -10,12 +10,12 @@ function [Y, E] = scnoise(X, P, options)
         options.noise_model = "ZINB" % noise model, ZINB or ZIG (zero-inflated negative binomial or gaussian)
         options.raw_counts (1,1) {mustBeNumericOrLogical} = true % if true, raw counts are outputed, if false fold-change
         options.left_tail (1,1) {mustBeNumeric} = 1  % power of left tail in Pk distribution (>1 makes left tail longer)
-        options.right_tail (1,1) {mustBeNumeric} = 1.5 % power of right tail in Pk distribution (>1 makes right tail longer)
+        options.right_tail (1,1) {mustBeNumeric} = 1 % power of right tail in Pk distribution (>1 makes right tail longer)
         options.negbin_mean (1,1) {mustBeNumeric} = 0.5 % mean for negative binomial used to simulate pseudo control
         options.disper (1,1) {mustBeNumeric} = 1.5 % dispersion parameter in Pk (Svensson et al.)
-        options.n_clusts (1,1) {mustBeNumeric} = 5 % theoretical number of clusters
-        options.prob_clusts {mustBeInRange(options.prob_clusts,0,1)} = 0.6 % probability of gene belonging to a cluster
-        options.prob_dev {mustBeInRange(options.prob_dev,0,1)} = 0.9 % probability of gene being deviated from Pk=0  
+        options.n_clusts (1,1) {mustBeNumeric} = 3 % theoretical number of clusters
+        options.prob_clusts {mustBeInRange(options.prob_clusts,0,1)} = 0.8 % probability of gene belonging to a cluster
+        options.prob_dev {mustBeInRange(options.prob_dev,0,1)} = 0.6 % probability of gene being deviated from Pk=0  
     end  
 
 psc = nbinrnd(1,options.negbin_mean,[1, size(P,1)]);  % pseduocontrol mean from negative binomial
@@ -24,7 +24,6 @@ psc = sort(psc,'ascend');
 psc = psc.^options.right_tail; % to make the tail greater and leave 0s and 1s as 0s and 1s
 
 if strcmp(options.noise_model, "ZIG") 
-
     s = svd(X);
     stdE = s(N)/(options.SNR*sqrt(chi2inv(1-analyse.Data.alpha,numel(P))));
     E = stdE*randn(size(P)); % noise matrix
@@ -57,11 +56,27 @@ end
 % simulating UMAP clusters for random genes
 clst = options.n_clusts;
 
+tots = size(ziE,2);
+int1 = round(size(ziE,2)/clst);
+for it = 1:clst
+    if tots > int1
+        invs(it) = int1;
+        tots = tots - int1;
+    else
+        invs(it) = tots;
+    end
+end
+
+if sum(invs) < size(ziE,2)
+    invs(end) = invs(end) + (size(ziE,2) - sum(invs));
+end
+
 Ab = {};
 for z = 1:clst
-    Ab{z} = ones(round(size(ziE,2)/clst), 1);
+    Ab{z} = ones(invs(z), 1);
 end
 bdg = blkdiag(Ab{:})';
+
 
 % all possible theoretical clusters
 npos = nchoosek(1:clst,2);
