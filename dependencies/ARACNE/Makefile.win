@@ -1,0 +1,46 @@
+#  Copyright (C) 2005  Kai Wang
+#  All Rights Reserved.
+#
+#  Makefile
+#
+#  $Id: Makefile.win,v 1.4 2011/03/01 17:30:01 manju Exp $
+#
+
+DEBUG=	64
+CONTRIBDIR=	include
+CXX=        $(CROSS)g++ 
+LD=	$(CROSS)ld
+AR=	$(CROSS)ar
+CXXFLAGS=	-march=pentium4 -g -Wall -Wno-deprecated -Wno-uninitialized -Wno-long-long -ansi -pedantic\
+		-I . -I ${CONTRIBDIR}/loki\
+		-O3 -DDEBUG_LEVEL=${DEBUG}
+O=	o
+
+HDRS=		Microarray_Set.h MutualInfo.h Matrix.h Matrix_Op.h param.h parseargs.h
+OBJS=		main.${O} Microarray_Set.${O} MutualInfo.${O} Matrix.${O} Matrix_Op.${O} param.${O} util.${O}
+PROG=		aracne2.exe
+LDFLAGS=	-static -Xlinker --enable-stdcall-fixup 
+LIBS=	-lgsl -lm
+all:		$(PROG)
+
+$(PROG):	$(OBJS) $(HDRS)
+		$(CXX) $(LDFLAGS) -o $(PROG) $(OBJS) $(LIBS)
+
+clean:
+		rm -f $(PROG) $(OBJS)
+
+.SUFFIXES:	.cpp .o
+
+.cpp.$O:
+		$(CXX) $(CXXFLAGS) -c $<
+
+# Dependencies.
+$(OBJS):	Makefile.win
+main.$O:	${HDRS}
+Microarray_Set.$O:	Microarray_Set.cpp Microarray_Set.h
+MutualInfo.$O:	MutualInfo.cpp MutualInfo.h Microarray_Set.h
+Matrix.$O:	Matrix.cpp Microarray_Set.h MutualInfo.h
+Matrix_Op.$O:	Microarray_Set.h MutualInfo.h Matrix.h Matrix_Op.h
+param.$O:	param.cpp param.h
+util.$O:        util.cpp util.h
+

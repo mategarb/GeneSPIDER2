@@ -1,0 +1,155 @@
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/repos/sonnh/!svn/ver/3096/InferenceProject/trunk/code/extern/ARACNE
+END
+param.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/repos/sonnh/!svn/ver/2875/InferenceProject/trunk/code/extern/ARACNE/param.cpp
+END
+usage.txt
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/repos/sonnh/!svn/ver/2875/InferenceProject/trunk/code/extern/ARACNE/usage.txt
+END
+Matrix_Op.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/repos/sonnh/!svn/ver/2875/InferenceProject/trunk/code/extern/ARACNE/Matrix_Op.cpp
+END
+config_kernel.txt
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/repos/sonnh/!svn/ver/2875/InferenceProject/trunk/code/extern/ARACNE/config_kernel.txt
+END
+Matrix.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/repos/sonnh/!svn/ver/2875/InferenceProject/trunk/code/extern/ARACNE/Matrix.cpp
+END
+param.h
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/repos/sonnh/!svn/ver/2875/InferenceProject/trunk/code/extern/ARACNE/param.h
+END
+Matrix_Op.h
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/repos/sonnh/!svn/ver/2875/InferenceProject/trunk/code/extern/ARACNE/Matrix_Op.h
+END
+Matrix.h
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/repos/sonnh/!svn/ver/2875/InferenceProject/trunk/code/extern/ARACNE/Matrix.h
+END
+aracne2.exe
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/repos/sonnh/!svn/ver/2875/InferenceProject/trunk/code/extern/ARACNE/aracne2.exe
+END
+util.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/repos/sonnh/!svn/ver/2875/InferenceProject/trunk/code/extern/ARACNE/util.cpp
+END
+config_threshold.txt
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/repos/sonnh/!svn/ver/2875/InferenceProject/trunk/code/extern/ARACNE/config_threshold.txt
+END
+aracne2_executables.zip
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/repos/sonnh/!svn/ver/2875/InferenceProject/trunk/code/extern/ARACNE/aracne2_executables.zip
+END
+util.h
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/repos/sonnh/!svn/ver/2875/InferenceProject/trunk/code/extern/ARACNE/util.h
+END
+Microarray_Set.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/repos/sonnh/!svn/ver/2875/InferenceProject/trunk/code/extern/ARACNE/Microarray_Set.cpp
+END
+MutualInfo.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/repos/sonnh/!svn/ver/2875/InferenceProject/trunk/code/extern/ARACNE/MutualInfo.cpp
+END
+aracne2.macosx
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/repos/sonnh/!svn/ver/2875/InferenceProject/trunk/code/extern/ARACNE/aracne2.macosx
+END
+change.log
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/repos/sonnh/!svn/ver/2875/InferenceProject/trunk/code/extern/ARACNE/change.log
+END
+main.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/repos/sonnh/!svn/ver/2875/InferenceProject/trunk/code/extern/ARACNE/main.cpp
+END
+Makefile.macosx
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/repos/sonnh/!svn/ver/2875/InferenceProject/trunk/code/extern/ARACNE/Makefile.macosx
+END
+MutualInfo.h
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/repos/sonnh/!svn/ver/2875/InferenceProject/trunk/code/extern/ARACNE/MutualInfo.h
+END
+Microarray_Set.h
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/repos/sonnh/!svn/ver/2875/InferenceProject/trunk/code/extern/ARACNE/Microarray_Set.h
+END
+Makefile.win
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/repos/sonnh/!svn/ver/2875/InferenceProject/trunk/code/extern/ARACNE/Makefile.win
+END
+aracne2
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/repos/sonnh/!svn/ver/3096/InferenceProject/trunk/code/extern/ARACNE/aracne2
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/repos/sonnh/!svn/ver/3096/InferenceProject/trunk/code/extern/ARACNE/Makefile
+END
+parseargs.h
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/repos/sonnh/!svn/ver/2875/InferenceProject/trunk/code/extern/ARACNE/parseargs.h
+END
