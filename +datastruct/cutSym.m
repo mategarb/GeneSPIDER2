@@ -1,15 +1,12 @@
 function A = cutSym(A,pupper,plower)
-% removes links in a symmetric matrix with a probability to be in or out degree.
-% A small chance of keeping feedback loops.
+% removes links in a symmetric matrix with settable probabilities for upper and lower triangular parts.
 %
 % A = datastruct.cutSym(A,pupper,plower)
 %
-% A                 : network matrix nxn where i=outgoing, j=incoming
+% A                 : network matrix nxn
 % pupper            : the chance of removing i,j
 % plower            : the chance of removing j,i
 %
-% the probability of a feedback loop is then
-% pfeedback         : 1 - (pupper+plower)
 
 N = size(A,1);
 
