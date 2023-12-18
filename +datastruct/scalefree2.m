@@ -1,4 +1,4 @@
-function A = scalefree2(N, n, pow, varargin)
+function A = scalefree2(N, S, pow, varargin)
 % Create a scalefree network with N nodes and specific sparseness
 % with preferential attachment
 %
@@ -43,7 +43,7 @@ end
 %N = 30;
 %pow = 1.5;
 %n=3;
-spar = n;
+spar = S;
 gns = cellstr(num2str((1:N)', 'G%d'))';
 
 lnk0 = gns(randi(N, 1, 2)); % draw two genes that will be a first seed link
@@ -116,7 +116,7 @@ for j = 1:length(nr)
     else % 0.62
         val = 1;
     end
-    A(nr(j), nc(j)) = val; % outdegree
+    A(nc(j), nr(j)) = val; % outdegree, regulators are in columns
 
 end
 %A(eye(N)==1) = -betarnd(5,1,1,N); % A, here 5, is the parameters of skewness towards one, i.e. higher the value, hihger the chance of having value clos to 1

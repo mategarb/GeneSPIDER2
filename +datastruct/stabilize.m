@@ -70,6 +70,7 @@ if ~inputopts.sign
         cvx_end
     catch ME
         fprintf('%s\n',ME.message)
+        cvx_clear
     end
 elseif inputopts.sign
     Neg = Atilde < -tol;
@@ -90,6 +91,7 @@ elseif inputopts.sign
         cvx_end
     catch ME
         fprintf('%s\n',ME.message)
+        cvx_clear
     end
 end
 
