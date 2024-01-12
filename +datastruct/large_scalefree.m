@@ -141,7 +141,7 @@ Mfull = zeros(m); % go back back to adjacency
 for i = 1:length(inds1)
     Mfull(inds1(i), inds2(i)) = Eout.ws(i);
 end
-A = Mfull'; % interactions from rows to columns as for scnoise it needs expression in rows in order to avoid removing them
+A = Mfull; % interactions from rows to columns as for scnoise it needs expression in rows in order to avoid removing them
 A(eye(m)==1) = dgnl;%betarnd(5,1,1,m); % A, here 5, is the parameters of skewness towards one, i.e. higher the value, hihger the chance of having value clos to 1
 
 end
