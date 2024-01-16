@@ -23,7 +23,7 @@ while Ni0 < m
     s = randi([options.min_ov,options.max_ov],1,1); % number of overlapping genes between subnetworks, here 1-3 genes overlap
     N = randi([options.min_sub_grn,options.max_sub_grn],1,1); % randomize number of nodes (genes)
     S = grn_degree; % calculate sparsity degree
-    A = datastruct.scalefree2(N, S, options.min_alpha + (options.max_alpha-options.min_alpha)*rand); % create scale-free network
+    A = datastruct.scalefree2(N, S,'alpha', options.min_alpha + (options.max_alpha-options.min_alpha)*rand); % create scale-free network
     %A = datastruct.cutSym(A, 0.6, 0.398); %(A, pin, pout) in order to remove selfloops
     A = datastruct.stabilize(A,'iaa','low'); % run stabilize
     dgnl = A(eye(N)==1);
@@ -51,7 +51,7 @@ while Ni0 < m
     % generate next sub GRN that will be merged with previous
     N = randi([options.min_sub_grn,options.max_sub_grn],1,1); % randomize number of nodes (genes)
     S = grn_degree; % calculate sparsity degree
-    A = datastruct.scalefree2(N, S, options.min_alpha + (options.max_alpha-options.min_alpha)*rand); % create scale-free network
+    A = datastruct.scalefree2(N, S,'alpha', options.min_alpha + (options.max_alpha-options.min_alpha)*rand); % create scale-free network
     %A = datastruct.cutSym(A, 0.6, 0.398); %(A, pin, pout) in order to remove selfloops
     A = datastruct.stabilize(A,'iaa','low'); % run stabilize
     tmpdgnl = A(eye(N)==1); % saving info about diagonal
@@ -91,7 +91,7 @@ while Ni0 < m
     elseif (Ni0 >= (m - options.max_sub_grn))
     N = m-Ni0+s; % how many genes remain to fulfuill m number of total genes
     S = grn_degree; % calculate sparsity degree
-    A = datastruct.scalefree2(N, S, options.min_alpha + (options.max_alpha-options.min_alpha)*rand); % create scale-free network
+    A = datastruct.scalefree2(N, S,'alpha', options.min_alpha + (options.max_alpha-options.min_alpha)*rand); % create scale-free network
     %A = datastruct.cutSym(A, 0.6, 0.398); %(A, pin, pout) in order to remove selfloops
     A = datastruct.stabilize(A,'iaa','low'); % run stabilize
     tmpdgnl = A(eye(N)==1);
