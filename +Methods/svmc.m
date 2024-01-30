@@ -50,7 +50,7 @@ end
 Afit = zeros(size(data.P,1),size(data.P,1));
 
     for i = 1:size(data.P,1)
-        mdl = fitcsvm(data.Y', -data.P(i,:),'KernelFunction', 'linear','Standardize', true); % for low and moderate dimensions
+        mdl = fitcsvm(data.Y', abs(data.P(i,:)), KernelFunction="linear", Standardize=true, Solver='SMO'); % for low and moderate dimensions
         Afit(i,:) = mdl.Beta;
     end
 %% Determine how to handle zeta %%

@@ -19,7 +19,7 @@ function [Y, X, P, Ed, Eg] = scdata(A, P, options)
     end  
 
 %% prepare data + input noise
-Net = datastruct.Network(A', 'scnet');
+Net = datastruct.Network(A, 'scnet');
 P = P(:,randperm(size(P,2))); % shuffling P in order to distribute expression across clusters
 X = Net.G*P; %corresponding response Y, G is the static gain matrix (inverse of A (network matrix))
 

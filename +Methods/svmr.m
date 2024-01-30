@@ -47,13 +47,15 @@ end
 
 %% Run svm
 
-Afit = zeros(size(data.P,1),size(data.P,1));
+Afit = zeros(size(data.Y,1), size(data.Y,1));
 
-    for i = 1:size(data.P,1)
-        resp_pr = -Data.P(i,:);
-        resp_pr(resp_pr~=0) = sum(abs(Data.Y(i,find(resp_pr~=0))) > (Data.Y(i,:)))/Data.N;
-        mdl = fitrsvm(data.Y', resp_pr,'Standardize', true); % for low and moderate dimensions
-        Afit(i,:) = mdl.Beta;
+    for i = 1:size(data.Y,1)
+        mdl = fitrsvm(data.Y', data.Y(i,:));
+        if length(mdl.Beta)==0
+            Afit(i,:) = zeros(1, size(data.Y,1));
+        else
+            Afit(i,:) = mdl.Beta;
+        end
     end
 %% Determine how to handle zeta %%
 
