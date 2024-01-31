@@ -51,7 +51,7 @@ Afit = zeros(size(data.Y,1), size(data.Y,1));
 
     for i = 1:size(data.Y,1)
         mdl = fitrsvm(data.Y', data.Y(i,:));
-        if length(mdl.Beta)==0
+        if isempty(mdl.Beta)
             Afit(i,:) = zeros(1, size(data.Y,1));
         else
             Afit(i,:) = mdl.Beta;
