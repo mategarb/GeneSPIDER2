@@ -1,10 +1,10 @@
-function varargout = elnet(varargin)
+function varargout = elnet(data, zetavec, rawZeta, alpha)
 % 
 % This is a wrapper function for elastic net (lasso with alpha 0.7) from matlab toolbox
 %
-% function estA = melasticNet(data,net,zetavec,rawZeta)
+% function estA = elasticNet(data,net,zetavec,rawZeta)
 %
-%   Input Arguments: melasticNet(data,net,zetavec,rawZeta)
+%   Input Arguments: elasticNet(data,net,zetavec,rawZeta)
 %   ================
 %   data:    datastruct.Dataset
 %   net:     datastruct.Network
@@ -20,26 +20,16 @@ function varargout = elnet(varargin)
 %   zetaRange: the sparsity range used when a scaled zeta are used (default).
 %
 
+arguments
+    data (1,1) {mustBeA(data, 'datastruct.Dataset')}
+    zetavec (1,:) {mustBeNumeric}
+    rawZeta (1,1) {mustBeNumericOrLogical} = 0;
+    alpha (1,1) {mustBeNumeric,mustBeReal} = 0.7; % default 0.7, can be tunable
+end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%  Parse input arguments  %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-rawZeta = 0;
-zetavec = [];
-net = [];
-
-for i = 1:nargin
-    if isa(varargin{i},'datastruct.Dataset')
-        data = varargin{i};
-    elseif isa(varargin{i},'datastruct.Network')
-        net = varargin{i};
-    elseif isa(varargin{i},'logical')
-        rawZeta = varargin{i};
-    else
-        if isempty(zetavec)
-            zetavec = varargin{i};
-        end
-    end
-end
 
 if ~exist('data','var')
     error('Data set is missing')
@@ -53,15 +43,15 @@ if ~rawZeta
     zmax = 1;
     zmin = 0;
     % find zero network
-    estA = Methods.elnet(data,net,zmax,true);
+    estA = Methods.elnet(data,zmax,true);
     while nnz(estA) > 0
         zmax = zmax*2;
-        estA = Methods.elnet(data,net,zmax,true);
+        estA = Methods.elnet(data,zmax,true);
     end
     % refine
     while zmax-zmin > tol
         i = (zmax + zmin) * 0.5;
-        estA = Methods.elnet(data,net,i,true);
+        estA = Methods.elnet(data,i,true);
         if nnz(estA) == 0
             zmax = i;
         else
@@ -81,7 +71,7 @@ end
 Afit = zeros(size(data.P,1),size(data.P,1),length(zetavec));
 for i = 1:size(data.P,1)
 
-   [b,fitinfo] = lasso(response(data,net)', -data.P(i,:)', 'Lambda', zetavec,'Alpha',0.7);
+   [b,fitinfo] = lasso(data.Y', -data.P(i,:)', 'Lambda', zetavec, 'Alpha', alpha);
    Afit(i,:,:) = b(:,:);
 
 end
