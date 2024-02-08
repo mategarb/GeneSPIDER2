@@ -1,4 +1,4 @@
-function [Y, X, P, Ed, Eg] = scdata(A, P, options)
+function [Y, X, Ed, Eg, SCC] = scdata(A, P, options)
 % Create a noise matrix E based on log normal and zinb distributions
 % with preferential attachment
 
@@ -6,7 +6,8 @@ function [Y, X, P, Ed, Eg] = scdata(A, P, options)
     arguments
         A double % GRN
         P double % perturbation matrix
-        options.SNR (1,1) {mustBeNumeric} = 0.05; % signal-to-noise ratio
+        options.SNR (1,1) {mustBeNumeric} = 0.1; % signal-to-noise ratio
+        options.SNR_model (1,1) {mustBeText} = "standard"; % signal-to-noise ratio model, standard or ssv (smallest singular value)
         options.raw_counts (1,1) {mustBeNumericOrLogical} = true % if true, raw counts are outputed, if false fold-change
         options.left_tail (1,1) {mustBeNumeric} = 1  % power of left tail in Pk distribution (>1 makes left tail longer)
         options.right_tail (1,1) {mustBeNumeric} = 2 % power of right tail in Pk distribution (>1 makes right tail longer)
@@ -14,18 +15,28 @@ function [Y, X, P, Ed, Eg] = scdata(A, P, options)
         options.disper (1,1) {mustBeNumeric} = 1 % dispersion parameter in Pk (Svensson et al.)
         options.n_clusts (1,1) {mustBeNumeric} = 5 % theoretical number of clusters
         options.logbase {mustBeNumeric} = 10 % log base to use in reversing FC, something that control perturbation strength
-        options.ds_min {mustBeInRange(options.ds_min,0,1)} = 0.2 % minimum dissimilarity between clusters 
+        options.ds_min {mustBeInRange(options.ds_min,0,1)} = 0.3 % minimum dissimilarity between clusters 
         options.ds_max {mustBeInRange(options.ds_max,0,1)} = 0.6 % maximum dissimilarity between clusters
     end  
 
 %% prepare data + input noise
 Net = datastruct.Network(A, 'scnet');
-P = P(:,randperm(size(P,2))); % shuffling P in order to distribute expression across clusters
-X = Net.G*P; %corresponding response Y, G is the static gain matrix (inverse of A (network matrix))
+nsh = randperm(size(P,2)); % shuffling data to have different cells in theoretical clusters
+P = P(:,nsh);
+X = Net.G*P; % corresponding response Y, G is the static gain matrix (inverse of A (network matrix))
 
-stdE = sqrt(var(X(:))/options.SNR);
-Eg = stdE*randn(size(P)); % noise matrix
-X = X + Eg;
+Xtmp = ((options.logbase.^(X))); % reverse (pseudo)log
+vX = var(Xtmp,0,2); % collect variance from noise-free fc
+if options.SNR_model == "standard"
+    stdE = sqrt(var(X(:))/options.SNR);
+    Eg = stdE*randn(size(P)); % noise matrix
+else
+    s = svd(X);
+    stdE = s(size(P,1))/(options.SNR*sqrt(chi2inv(1-analyse.Data.alpha,numel(P))));
+    Eg = stdE*randn(size(P)); % noise matrix
+end
+
+X = X + Eg; % add noise
 
 %% generating theoretical clusters
 
@@ -67,13 +78,19 @@ psc = psc + rand(1, length(psc)); % add some 0-1 rand that will make it behave a
 psc = sort(psc,'ascend');
 psc = psc.^options.right_tail; % to make the tail greater and leave 0s and 1s as 0s and 1s
 
+
 X2 = ((options.logbase.^(X))); % reverse (pseudo)log
-vX = var(X2,0,2); % take variance to relate it with mean
+
 [varx, ~] = sort(vX);
 [~, idx] = ismember(vX, varx);
 psc2 = psc(idx); % mean expression sorted according to gene variance
 
-sigma = sqrt(var(X(:))/options.SNR);
+if options.SNR_model == "standard"
+    stdC = sqrt(var(X2(:))/options.SNR);
+else
+    s = svd(X2);
+    stdC = s(size(P,1))/(options.SNR*sqrt(chi2inv(1-analyse.Data.alpha,numel(P))));
+end
 
 sC = zeros(size(P));
 for i = 1:length(psc2)
@@ -84,8 +101,8 @@ for i = 1:length(psc2)
         m1 = tm + tm*((options.ds_max-options.ds_min)*rr1 + options.ds_min); % generate two means distant by sf
         m2 = tm - tm*((options.ds_max-options.ds_min)*rr2 + options.ds_min);
         m2 = m2 + m2*(sum(tcl==0)/length(tcl)); % adjust mean for unequal length of clusters
-        sC(i,tcl==1) = round(lognrnd(log(m1), log(sigma + 1), [1, sum(tcl==1)]));
-        sC(i,tcl==0) = round(lognrnd(log(m2), log(sigma + 1), [1, sum(tcl==0)]));
+        sC(i,tcl==1) = round(lognrnd(log(m1), log(stdC + 1), [1, sum(tcl==1)]));
+        sC(i,tcl==0) = round(lognrnd(log(m2), log(stdC + 1), [1, sum(tcl==0)]));
 end
 
 X3 = round(X2.*sC); % multiply to get pseudo counts
@@ -105,7 +122,11 @@ end
 %% final conversion to ouput
 if options.raw_counts
     Y = X3.*ziE; % inflate with dropouts
-    Y(Y<0) = 0; % get rid of negatives
+    [~, inds] =  sort(nsh); % unshuffle
+    X3 = X3(:,inds); % unshuffle
+    X = X(:,inds); % unshuffle
+    Y = Y(:,inds); % unshuffle
+    SCC = sC(:,inds); % unshuffle
 else
     Y = X3.*ziE;
     Y = abs(Y./sC); % going back to fold change
@@ -113,9 +134,14 @@ else
     Y(Y~=0) = Y(Y~=0) + eps; % add small value to preserve log10 links with 1 FC (from rounding error)
     Y = log(Y)/log(options.logbase); % going back to log 10 fold change
     Y(isinf(Y)) = 0; % infs from log10(1)
+    [~, inds] =  sort(nsh); % unshuffle
+    X3 = X3(:,inds); % unshuffle
+    X = X(:,inds); % unshuffle
+    Y = Y(:,inds); % unshuffle
+    SCC = sC(:,inds); % unshuffle
 end
 
-ziE3 = ziE;
+ziE3 = ziE(:,inds);
 ziE3(X3 == 0) = 0;
 Ed = ziE3; % final dropouts
 
