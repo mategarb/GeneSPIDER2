@@ -229,7 +229,7 @@ classdef CompareModels < dynamicprops
                 M.mrsde(length(M.mrsde)+1) = max(diag(abs(diag(temp)-diag(M.SA)))*(1./diag(temp)));
 
                 L = eig(T);
-                [crap index] = sort(abs(L),1,'descend');
+                [~, index] = sort(abs(L),1,'descend');
                 L = L(index);
                 M.maeve(length(M.maeve)+1) = max(abs(L-M.LA));
                 M.mreve(length(M.mreve)+1) = max(abs(diag(1./L)*(L-M.LA)));

@@ -101,7 +101,7 @@ classdef Dataset < datastruct.Exchange
         function SNR = get.SNR_L(data)
             alpha = 0.01;
             sigma = min(svd(true_response(data)));
-            SNR = sigma/sqrt(chi2inv(1-alpha,prod(size(data.P)))*data.lambda(1));
+            SNR = sigma/sqrt(chi2inv(1-alpha,numel(data.P))*data.lambda(1));
         end
 %{
         function SNR_Wiki = get.SNR_Wiki(data)

@@ -1,7 +1,7 @@
 function varargout = LSCON(varargin)
-% function estA = lsco(data,net,zetavec,rawZeta,regpath)
+% function estA = LSCON(data,net,zetavec,rawZeta,regpath)
 %
-%   Input Arguments: lsco(data,net,zetavec,rawZeta,regpath)
+%   Input Arguments: LSCON(data,net,zetavec,rawZeta,regpath)
 %   ================
 %   data:    datastruct.Dataset
 %   net:     datastruct.Network
@@ -113,7 +113,6 @@ for i=1:length(zetavec)
     temp = find(abs(Als) <= zetavec(i));
     Atmp = Als;
     Atmp(temp) = 0;
-
     estA(:,:,i) = Atmp;
 end
 

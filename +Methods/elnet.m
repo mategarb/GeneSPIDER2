@@ -76,7 +76,11 @@ for i = 1:size(data.P,1)
 
 end
 
-    varargout{1} = Afit;
+for i = 1:length(zetavec)
+    Atmp = Afit(:,:,i);
+    estA(:,:,i) = Atmp';
+end
+    varargout{1} = estA;
 
 if ~rawZeta
     varargout{2} = zetaRange;

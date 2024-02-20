@@ -29,7 +29,7 @@ classdef Data < analyse.DataModel
 
         end
 
-        function analysis = analyse_data(analysis,data,varargin);
+        function analysis = analyse_data(analysis,data,varargin)
             analysis.dataset       = analyse.Data.identifier(data);
             analysis.SNR_Phi_true  = analyse.Data.calc_SNR_Phi_true(data);
             analysis.SNR_Phi_gauss = analyse.Data.calc_SNR_Phi_gauss(data);
@@ -78,13 +78,13 @@ classdef Data < analyse.DataModel
         function SNR = calc_SNR_Phi_gauss(data)
             alpha = analyse.Data.alpha;
             sigma = min(svd(response(data)));
-            SNR = sigma/sqrt(chi2inv(1-alpha,prod(size(data.P)))*data.lambda(1));
+            SNR = sigma/sqrt(chi2inv(1-alpha,numel(data.P))*data.lambda(1));
         end
 
         function SNR = calc_SNR_L(data)
             alpha = analyse.Data.alpha;
             sigma = min(svd(true_response(data)));
-            SNR = sigma/sqrt(chi2inv(1-alpha,prod(size(data.P)))*data.lambda(1));
+            SNR = sigma/sqrt(chi2inv(1-alpha,numel(data.P))*data.lambda(1));
         end
 
         function SNR = calc_SNR_phi_gauss(data)
