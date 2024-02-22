@@ -72,10 +72,8 @@ Afit = zeros(size(data.P,1),size(data.P,1));
     zetavec = zetavec*delta + zetaRange(1);
 
 for i = 1:length(zetavec)
-
     Atmp = Afit;
     Atmp(abs(Afit) <= zetavec(i)) = 0;
-
     estA(:,:,i) = Atmp;
 end
     varargout{1} = estA;

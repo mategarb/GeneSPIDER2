@@ -54,6 +54,7 @@ Afit = zeros(size(data.P,1),size(data.P,1));
         mdl = fitcnet(data.Y', data.P(i,:),"Activations","sigmoid","LayerSizes",size(data.Y,1),Lambda=zetavec(indmn));
         weis = mdl.LayerWeights{end};
         Afit(i,:) = weis(1,:);
+        disp(i)
     end
 
 %% handle zeta %%

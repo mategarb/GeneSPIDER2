@@ -51,7 +51,7 @@ Afit = zeros(size(data.P,1),size(data.P,1));
 
     for i = 1:size(data.P,1)
         mdl = fitglm(data.Y', data.P(i,:));% generalized linear model
-        Afit(:,i) = mdl.Fitted.Response;
+        Afit(:,i) = mdl.Coefficients.Estimate(2:end);
     end
 %% Determine how to handle zeta %%
 
@@ -67,7 +67,7 @@ Afit = zeros(size(data.P,1),size(data.P,1));
 for i = 1:length(zetavec)
     Atmp = Afit;
     Atmp(abs(Afit) <= zetavec(i)) = 0;
-    estA(:,:,i) = Atmp;
+    estA(:,:,i) = Atmp';
 end
 
     varargout{1} = estA;

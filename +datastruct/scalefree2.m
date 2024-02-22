@@ -6,11 +6,11 @@ function A = scalefree2(N, S, options)
     arguments
         N double % number of nodes in the network
         S double % sparsity of a network
-        options.alpha (1,1) {mustBeNumeric} = 1.5  % it is the power value in the power law distribution
+        options.alpha (1,1) {mustBeNumeric} = 1.2  % it is the power value in the power law distribution
         options.pasign (1,1) {mustBeNumeric} = 0.62 % probability of acitvation sign, default based on TRRUST for h. sapiens
     end 
 
-spar = S;
+spar = S - 1; % due to selfloops
 gns = cellstr(num2str((1:N)', 'G%d'))';
 
 lnk0 = gns(randi(N, 1, 2)); % draw two genes that will be a first seed link
@@ -23,7 +23,7 @@ net0(1,:) = lnk0; % add first link to the network
 dgr = 0;
 i = 1;
 
-while dgr < spar
+while dgr < spar 
 % draw the "rich" gene where the next will attach
 nds = [net0.from; net0.to];
 [gt, gu] = groupcounts(nds); %degree, gene name
@@ -65,7 +65,7 @@ end
 
 nds0 = [net0.from; net0.to];
 [gt0, ~] = groupcounts(nds0);
-dgr = sum(gt0)/N;
+dgr = (sum(gt0)/N)/2;
 end
 
 % edge list to adjacency

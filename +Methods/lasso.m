@@ -84,7 +84,7 @@ end
 Afit = zeros(size(data.P,1),size(data.P,1),length(zetavec));
 for i = 1:size(data.P,1)
 
-   [b,fitinfo] = lasso(response(data,net)', -data.P(i,:)', 'Lambda', zetavec,'Alpha',1);
+   [b,fitinfo] = lasso(data.Y', data.P(i,:)', 'Lambda', zetavec,'Alpha',1, Standardize=true);
    Afit(i,:,:) = b(:,:);
 
 end

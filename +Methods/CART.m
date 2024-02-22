@@ -54,9 +54,16 @@ end
 
 %% Run
 Afit = zeros(size(data.P,1),size(data.P,1));
+    %for i = 1:size(data.P,1)
+    %    mdl = fitctree(data.Y', data.P(i,:), PredictorSelection="interaction-curvature", Surrogate="on", MinLeafSize=size(data.P,1));%,PredictorSelection="interaction-curvature",Surrogate="on", );
+    %    Afit(:,i) = mdl.predictorImportance;
+    %end
+
     for i = 1:size(data.P,1)
-        mdl = fitctree(data.Y', data.P(i,:),PredictorSelection="interaction-curvature", Surrogate="on");%,PredictorSelection="interaction-curvature",Surrogate="on", );
-        Afit(:,i) = mdl.predictorImportance;
+        for j = 1:size(data.P,1)
+        mdl = fitctree(data.Y(j,:)', data.P(i,:)', PredictorSelection="interaction-curvature", Surrogate="on");%,PredictorSelection="interaction-curvature",Surrogate="on", );
+        Afit(i,j) = mdl.predictorImportance;
+        end
     end
 
 %% Determine how to handle zeta %%
@@ -73,7 +80,7 @@ Afit = zeros(size(data.P,1),size(data.P,1));
 for i=1:length(zetavec)
     Atmp = Afit;
     Atmp(abs(Afit) <= zetavec(i)) = 0;
-    estA(:,:,i) = Atmp;
+    estA(:,:,i) = Atmp';
 end
 varargout{1} = estA;
 
