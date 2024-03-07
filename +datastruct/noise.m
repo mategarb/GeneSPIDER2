@@ -11,22 +11,22 @@ function [E, stdE] = noise(X, P, SNR, options)
         s = svd(X);
         stdE = min(s)/(SNR*sqrt(chi2inv(1-analyse.Data.alpha,numel(P))));
         E = stdE*randn(size(P));
-    elseif options.method == "SNR_var"
+    elseif options.method == "SNR_vov"
         stdE = sqrt(var(X(:))/SNR);
         E = stdE*randn(size(P));
-    elseif options.method == "SNR_wiki"
+    elseif options.method == "SNR_movd"
         E = zeros(size(P));
         for i = 1:(size(X,1))
             tmpX = X(:, P(i,:)~=0);
-            m = mean(tmpX(:));
+            m = mean(abs(tmpX(:)));
             stdE = abs(m/SNR);
             E(:, P(i,:)~=0) = stdE*randn(size(tmpX));
         end
-    elseif options.method == "SNR_wiki2"
+    elseif options.method == "SNR_movd2"
         E = zeros(size(P));
         for i = 1:(size(X,1))
             tmpX = X(:, P(i,:)~=0);
-            m = mean(tmpX(:));
+            m = mean(abs(tmpX(:)));
             stdE = sqrt(abs((m^2)/SNR));
             E(:, P(i,:)~=0) = stdE*randn(size(tmpX));
         end
