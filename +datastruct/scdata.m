@@ -6,8 +6,8 @@ function [Y, X, Ed, Eg, SCC] = scdata(A, P, options)
     arguments
         A double % GRN
         P double % perturbation matrix
-        options.SNR (1,1) {mustBeNumeric} = 0.1; % signal-to-noise ratio
-        options.SNR_model (1,1) {mustBeText} = "SNR_L"; % signal-to-noise ratio model, choose between SNR_L (default), SNR_var, SNR_wiki, SNR_wiki2, SNR_cov and SNR_manual
+        options.SNR (1,1) {mustBeNumeric} = 0.1 % signal-to-noise ratio
+        options.SNR_model (1,1) {mustBeText} = "SNR_L" % signal-to-noise ratio model, choose between SNR_L (default), SNR_var, SNR_wiki, SNR_wiki2, SNR_cov and SNR_manual
         options.raw_counts (1,1) {mustBeNumericOrLogical} = true % if true, raw counts are outputed, if false fold-change
         options.left_tail (1,1) {mustBeNumeric} = 1  % power of left tail in Pk distribution (>1 makes left tail longer)
         options.right_tail (1,1) {mustBeNumeric} = 2 % power of right tail in Pk distribution (>1 makes right tail longer)
@@ -24,12 +24,9 @@ Net = datastruct.Network(A, 'scnet');
 nsh = randperm(size(P,2)); % shuffling data to have different cells in theoretical clusters
 P = P(:,nsh);
 X = Net.G*P; % corresponding response Y, G is the static gain matrix (inverse of A (network matrix))
-
 Xtmp = ((options.logbase.^(X))); % reverse (pseudo)log
 vX = var(Xtmp,0,2); % collect variance from noise-free fc
-
-[Eg, ~] = datastruct.noise(X, P, options.SNR, options.SNR_model);
-
+[Eg, ~] = datastruct.noise(X, P, "SNR", options.SNR,"SNR_model", options.SNR_model);
 X = X + Eg; % add noise
 
 %% generating theoretical clusters
