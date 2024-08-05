@@ -91,7 +91,7 @@ end
 
 for i = 1:length(zetavec)
     Atmp = Afit(:,:,i);
-    estA(:,:,i) = Atmp';
+    estA(:,:,i) = Atmp;
 end
 
     varargout{1} = estA;
