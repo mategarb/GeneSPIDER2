@@ -33,7 +33,7 @@ Initial tutorials for GeneSPIDER are archived under [this link.](https://bitbuck
 
 ## Who do I talk to? ##
 
-* For questions contact [Nordling](mailto:torbjorn.nordling@nordlinglab.org)
+* For questions contact [Erik Sonnhammer](mailto:erik.sonnhammer@scilifelab.se)
 * How to cite [bibtex]:
 
         @article{Tjarnberg2017-GeneSPIDER,
