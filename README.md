@@ -6,6 +6,8 @@
      \_____|\___|_| |_|\___||_____/|_|   |_____|_____/|______|_|  \_\
      
 <img src="https://sonnhammer-tutorials.bitbucket.io/images/gs_logo_small.png"/>
+### GeneSpider version: v2
+
 # Gene regulatory network inference benchmarking with controlled network and data properties #
 
 This is the collection repository for the GeneSPIDER toolbox (Generation and Simulation Package for Informative Data ExploRation).
