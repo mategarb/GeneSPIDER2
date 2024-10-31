@@ -6,7 +6,7 @@
 ## Gene regulatory network inference benchmarking with controlled network and data properties ##
 This is the collection repository for the GeneSPIDER toolbox (Generation and Simulation Package for Informative Data ExploRation).
 
-## Visit official GS2 repository ##
+## Visit the official GS2 repository ##
 https://bitbucket.org/sonnhammergrni/genespider
 
 ## GeneSPIDER website ##
